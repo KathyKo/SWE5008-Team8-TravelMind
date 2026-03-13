@@ -2,22 +2,22 @@ from tools import search_weather, search_attractions
 
 def local_guide(state):
     """
-    Local Guide: Provides elite insider tips, weather, and must-see landmarks.
+    Local Guide: Provides weather and attractions info.
     """
     dest = state.get("destination")
     if not dest:
-        return {"messages": [{"role": "assistant", "content": "Our Local Insider team is ready to curate your experience, but first, we must confirm your destination!"}]}
+        return {"messages": [{"role": "assistant", "content": "I need to know your destination before I can give you local tips!"}]}
 
-    print(f"\n[INSIDER] Local Guide is assessing the climate for {dest}...")
+    print(f"\n[AGENT] Local Guide is checking weather for {dest}...")
     weather = search_weather(dest)
     
-    print(f"[INSIDER] Local Guide is discovering the best of {dest} for you...")
+    print(f"[AGENT] Local Guide is finding attractions in {dest}...")
     attractions = search_attractions(dest)
 
-    response_text = f"Bonjour from 'Luxe Voyage' Insider Services! I have personally vetted the latest for your journey to {dest}:\n\n"
-    response_text += f" **CLIMATE OUTLOOK**:\n{weather}\n\n"
-    response_text += f" **CURATED ATTRACTIONS**:\n{attractions}\n\n"
-    response_text += "These gems are chosen to give you a truly authentic and high-end experience of the city. Shall I delve deeper into any of these for you?"
+    response_text = f"Here is some local information for your trip to {dest}:\n\n"
+    response_text += f"WEATHER:\n{weather}\n\n"
+    response_text += f"ATTRACTIONS:\n{attractions}\n\n"
+    response_text += "Does this help you plan your activities?"
 
     return {
         "messages": [{"role": "assistant", "content": response_text}]

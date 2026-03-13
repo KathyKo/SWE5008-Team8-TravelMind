@@ -1,6 +1,6 @@
 from typing import Literal
-from .state import State
-from .agents import (
+from state import State
+from agents import (
     travel_orchestrator,
     concierge,
     booking_agent,
@@ -24,15 +24,26 @@ def orchestrator_node(state: State) -> dict:
 def concierge_node(state: State) -> dict:
     """Node for the Concierge agent."""
     print("\n[AGENT] Concierge is responding...")
-    return concierge(state)
+    result = concierge(state)
+    if "messages" in result and result["messages"]:
+        print(f"\nConcierge: {result['messages'][-1]['content']}")
+    return result
 
 def booking_node(state: State) -> dict:
     """Node for the Booking Specialist agent."""
-    return booking_agent(state)
+    print("\n[AGENT] Booking Specialist is responding...")
+    result = booking_agent(state)
+    if "messages" in result and result["messages"]:
+        print(f"\nBooking Specialist: {result['messages'][-1]['content']}")
+    return result
 
 def local_guide_node(state: State) -> dict:
     """Node for the Local Guide agent."""
-    return local_guide(state)
+    print("\n[AGENT] Local Guide is responding...")
+    result = local_guide(state)
+    if "messages" in result and result["messages"]:
+        print(f"\nLocal Guide: {result['messages'][-1]['content']}")
+    return result
 
 def summarizer_node(state: State) -> dict:
     """Node for the Travel Summarizer agent."""

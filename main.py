@@ -69,7 +69,7 @@ def build_travel_graph():
 
 def main():
     print("==========================================")
-    print("      LUXURY TRAVEL PLANNING AGENCY       ")
+    print("      TRAVEL PLANNING AGENCY       ")
     print("==========================================")
     print("Welcome! Our team of experts is ready to help you plan your dream trip.")
     print("Type 'exit' or 'done' whenever you are ready to finalize your itinerary.\n")
@@ -93,7 +93,7 @@ def main():
         # Start the graph interaction
         graph.invoke(initial_state)
     except KeyboardInterrupt:
-        print("\n\nSession ended. Happy travels!")
+        print("\n\n[SYSTEM] Session ended by user (Ctrl+C). Happy travels!")
     except Exception as e:
         print(f"\nAn error occurred: {e}")
 

@@ -6,43 +6,55 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-CUSTOM_SEARCH_API_KEY = os.getenv("CUSTOM_SEARCH_API_KEY")
-CUSTOM_SEARCH_CX = os.getenv("CUSTOM_SEARCH_CX")
+TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 
 def web_search(query: str) -> str:
     """
-    Searches the web for real-time information using Google Custom Search.
+    Searches the web for real-time information using Tavily API.
+    Tavily is specifically designed for AI agents.
     """
-    if not CUSTOM_SEARCH_API_KEY or not CUSTOM_SEARCH_CX:
-        return json.dumps({"error": "Google Search API keys not configured."})
+    if not TAVILY_API_KEY:
+        return json.dumps({"error": "Tavily API key is missing in .env file."})
 
-    search_url = "https://www.googleapis.com/customsearch/v1"
-    params = {
-        "key": CUSTOM_SEARCH_API_KEY,
-        "cx": CUSTOM_SEARCH_CX,
-        "q": query,
-        "num": 3 
+    tavily_url = "https://api.tavily.com/search"
+    
+    headers = {
+        "Content-Type": "application/json"
+    }
+    
+    # Tavily API Payload
+    data = {
+        "api_key": TAVILY_API_KEY,
+        "query": query,
+        "search_depth": "basic", # or "advanced" for deeper search
+        "max_results": 3,
+        "include_answer": False
     }
     
     try:
-        response = requests.get(search_url, params=params, timeout=5)
-        response.raise_for_status()
-        search_data = response.json()
+        response = requests.post(tavily_url, headers=headers, json=data, timeout=10)
         
-        results = search_data.get("items", [])
+        if response.status_code != 200:
+            return json.dumps({
+                "error": f"Tavily API error (Status {response.status_code})",
+                "details": response.json().get("detail", "Unknown error")
+            })
+            
+        search_data = response.json()
+        results = search_data.get("results", [])
         
         if not results:
-            return json.dumps({"error": f"No web search results found for query: '{query}'"})
+            return json.dumps({"error": f"No Tavily search results found for query: '{query}'"})
             
         simplified_results = []
         for item in results:
             simplified_results.append({
                 "title": item.get("title"),
-                "snippet": item.get("snippet"),
-                "source": item.get("link")
+                "snippet": item.get("content"), # Tavily calls snippets 'content'
+                "source": item.get("url")
             })
             
         return json.dumps(simplified_results)
 
     except requests.exceptions.RequestException as e:
-        return json.dumps({"error": f"Error connecting to Google Search API: {str(e)}"})
+        return json.dumps({"error": f"Error connecting to Tavily API: {str(e)}"})

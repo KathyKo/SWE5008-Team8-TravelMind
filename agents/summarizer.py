@@ -3,7 +3,7 @@ from langchain.schema import HumanMessage, SystemMessage
 
 def travel_summarizer(state):
     """
-    Master Planner: Compiles everything into a beautiful, ready-to-use travel itinerary.
+    Master Planner: Compiles everything into a final travel itinerary.
     """
     dest = state.get("destination")
     dates = state.get("dates")
@@ -11,7 +11,6 @@ def travel_summarizer(state):
     flights = state.get("flight_options", [])
     hotels = state.get("hotel_options", [])
     
-    # Simple summary of gathered data for the prompt
     context_data = f"""
     Destination: {dest}
     Dates: {dates}
@@ -20,30 +19,26 @@ def travel_summarizer(state):
     Hotels: {hotels}
     """
 
-    system_prompt = """You are the Lead Master Planner at travel agency. Your task is to craft a truly cohesive, and inspiring final travel itinerary based on the information gathered.
-
-Your response MUST be elegant and well-structured, using professional formatting (Markdown).
+    system_prompt = """You are a Master Travel Planner. Your task is to compile a cohesive and final travel itinerary based on all the information gathered.
 
 STRUCTURE:
-1.  **A Signature Welcome**: A warm, sophisticated opening.
-2.  **Executive Summary**: Overview of the destination and travel dates.
-3.  **The Logistic Pillar**: Clear, summarized flight and hotel recommendations.
-4.  **Local Flavor & Experience**: A curated guide to attractions and the expected climate.
-5.  **Closing Remarks**: A gracious sign-off.
+1. Welcome & Summary
+2. Flights & Hotels
+3. Local Info & Attractions
+4. Closing message
 
-Tone: Professional, elite, encouraging, and detailed.
+Tone: Professional and organized.
 """
 
     try:
         llm = ChatOpenAI(model="gpt-5-mini-2025-08-07", temperature=0.7)
         response = llm.invoke([
             SystemMessage(content=system_prompt),
-            HumanMessage(content=f"Please finalize the itinerary with the following data: {context_data}")
+            HumanMessage(content=f"Create a final itinerary with this data: {context_data}")
         ])
         
         summary = str(response.content)
         
-        # Display the final itinerary beautifully
         print("\n" + "="*50)
         print("          YOUR FINAL TRAVEL PLAN          ")
         print("="*50)
@@ -56,4 +51,4 @@ Tone: Professional, elite, encouraging, and detailed.
         }
     except Exception as e:
         print(f"Summarizer error: {e}")
-        return {"final_itinerary": "Your plan is ready, but I encountered a slight printing error. Happy travels!", "is_complete": True}
+        return {"is_complete": True}
