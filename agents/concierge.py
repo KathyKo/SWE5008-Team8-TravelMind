@@ -13,7 +13,7 @@ def concierge(state):
     dates = state.get("dates", "Not set")
     budget = state.get("budget", "Not set")
 
-    system_prompt = f"""You are a luxury Travel Concierge. Your goal is to be helpful and gather information:
+    system_prompt = f"""You are a Travel Concierge. Your goal is to be helpful and gather information:
 - Destination
 - Travel Dates
 - Budget
