@@ -7,6 +7,7 @@ from agents import (
     local_guide,
     travel_summarizer
 )
+from agent_tools import get_tools_for_agent
 
 def human_node(state: State) -> dict:
     """Gets user input and resets state for the next turn."""
@@ -32,7 +33,8 @@ def concierge_node(state: State) -> dict:
 def booking_node(state: State) -> dict:
     """Node for the Booking Specialist agent."""
     print("\n[AGENT] Booking Specialist is responding...")
-    result = booking_agent(state)
+    tools = get_tools_for_agent("booking_agent")
+    result = booking_agent(state, tools=tools)
     if "messages" in result and result["messages"]:
         print(f"\nBooking Specialist: {result['messages'][-1]['content']}")
     return result
@@ -40,7 +42,8 @@ def booking_node(state: State) -> dict:
 def local_guide_node(state: State) -> dict:
     """Node for the Local Guide agent."""
     print("\n[AGENT] Local Guide is responding...")
-    result = local_guide(state)
+    tools = get_tools_for_agent("local_guide")
+    result = local_guide(state, tools=tools)
     if "messages" in result and result["messages"]:
         print(f"\nLocal Guide: {result['messages'][-1]['content']}")
     return result
@@ -52,6 +55,9 @@ def summarizer_node(state: State) -> dict:
 
 def orchestrator_routing(state: State) -> Literal["concierge", "booking_agent", "local_guide", "summarizer"]:
     """Determines which specialized agent node to go to next."""
+    # If the plan has been explicitly confirmed, go straight to summarizer
+    if state.get("confirmed"):
+        return "summarizer"
     return state.get("next_agent", "concierge")
 
 def check_exit_condition(state: State) -> Literal["summarizer", "orchestrator"]:

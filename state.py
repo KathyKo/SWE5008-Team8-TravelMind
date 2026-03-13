@@ -10,6 +10,7 @@ class State(TypedDict):
     messages: Annotated[list, operator.add]
     
     # User Preferences (to be filled by the agents as they talk)
+    origin: Optional[str]
     destination: Optional[str]
     budget: Optional[str]
     dates: Optional[str]
@@ -23,4 +24,5 @@ class State(TypedDict):
     
     # Flow control
     next_agent: Optional[str]
+    confirmed: Optional[bool]
     is_complete: bool
