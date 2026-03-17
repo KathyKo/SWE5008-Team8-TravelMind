@@ -2,57 +2,100 @@ import os
 import requests
 import json
 from dotenv import load_dotenv
+from .web_search import web_search
+from .google_search import google_search
 
-# Load environment variables
 load_dotenv()
 
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
 
-def search_weather(city: str) -> str:
+
+
+def _openweather_forecast(city: str, days: int = 5) -> str | None:
     """
-    Gets the 2-day weather forecast for a specific city.
+    Fetch a rolling forecast from OpenWeather API.
+    `days` controls how many days of 3-hour intervals to return (max ~5 days free tier).
+    Returns JSON string on success, None on failure.
     """
     if not OPENWEATHER_API_KEY:
-        return json.dumps({"error": "OpenWeather API key not configured."})
+        return None
 
-    api_url = "http://api.openweathermap.org/data/2.5/forecast"
-    params = {
-        "q": city,
-        "appid": OPENWEATHER_API_KEY,
-        "units": "metric",
-        "cnt": 16 
-    }
-    
+    # cnt = number of 3-hour intervals; 8 per day
+    cnt = min(days * 8, 40)
+
     try:
-        response = requests.get(api_url, params=params, timeout=5)
-        response.raise_for_status()
-        forecast_data = response.json()
-        
-        list_data = forecast_data.get("list", [])
-        
-        if not list_data:
-            return json.dumps({"error": f"No forecast data found for city '{city}'."})
+        resp = requests.get(
+            "http://api.openweathermap.org/data/2.5/forecast",
+            params={"q": city, "appid": OPENWEATHER_API_KEY, "units": "metric", "cnt": cnt},
+            timeout=5,
+        )
+        resp.raise_for_status()
+        data = resp.json().get("list", [])
+        if not data:
+            return None
 
-        # Tomorrow and the day after (roughly)
-        day1_forecast = list_data[7] 
-        day2_forecast = list_data[15]
+        # Sample one reading per day (every 8th interval = noon-ish)
+        forecasts = []
+        for i in range(0, len(data), 8):
+            item = data[i]
+            forecasts.append({
+                "time":     item.get("dt_txt"),
+                "summary":  item.get("weather", [{}])[0].get("description"),
+                "temp_c":   item.get("main", {}).get("temp"),
+                "humidity": item.get("main", {}).get("humidity"),
+                "wind_kph": round(item.get("wind", {}).get("speed", 0) * 3.6, 1),
+            })
+        return json.dumps(forecasts)
+    except Exception:
+        return None
 
-        simplified_forecasts = [
-            {
-                "day": "Tomorrow",
-                "summary": day1_forecast.get("weather", [{}])[0].get("description"),
-                "temp": day1_forecast.get("main", {}).get("temp"),
-            },
-            {
-                "day": "The Day After Tomorrow",
-                "summary": day2_forecast.get("weather", [{}])[0].get("description"),
-                "temp": day2_forecast.get("main", {}).get("temp"),
-            }
-        ]
-            
-        return json.dumps(simplified_forecasts)
 
-    except requests.exceptions.RequestException as e:
-        return json.dumps({"error": f"Error connecting to Forecast API: {str(e)}"})
-    except Exception as e:
-        return json.dumps({"error": f"An unexpected error occurred: {str(e)}"})
+def _web_weather_search(city: str, travel_dates: str = "", days: int = 5) -> str:
+    """
+    Fallback: search seasonal / historical / forecast weather via Tavily + Google.
+    Useful for far-future dates and remote locations.
+    """
+    date_part = f"{travel_dates} " if travel_dates else ""
+    queries = [
+        f"{city} weather {date_part}forecast {days} day temperature rain",
+        f"{city} {date_part}travel weather what to expect climate",
+    ]
+    parts = []
+    for q in queries:
+        print(f"[TOOL] Weather web search: {q}")
+        t = web_search(q)
+        g = google_search(q)
+        for r in [t, g]:
+            if r and "error" not in r[:60].lower():
+                parts.append(r)
+    return " | ".join(parts)
+
+
+def search_weather(city: str, travel_dates: str = "", days: int = 5) -> str:
+    """
+    Get weather information for any city or region.
+
+    Args:
+        city:          Destination name (any city, island, or region — no hardcoded list).
+        travel_dates:  Optional travel date range (e.g. "2026-05-01 to 2026-05-03").
+                       Used in web search fallback for seasonal context.
+        days:          Number of forecast days requested (default 5).
+
+    Strategy:
+      1. Try OpenWeather API (accurate for near-future forecasts up to ~5 days).
+      2. If the API fails or returns nothing — fall back to Tavily + Google web search,
+         which works for far-future dates and seasonal planning.
+    """
+    print(f"[TOOL] Weather lookup: {city} | dates: {travel_dates} | days: {days}")
+
+    # Try live API first
+    api_result = _openweather_forecast(city, days)
+    if api_result:
+        return api_result
+
+    # Fall back to web search
+    web_result = _web_weather_search(city, travel_dates, days)
+    if web_result:
+        return web_result
+
+    return json.dumps({"error": f"Could not retrieve weather data for '{city}'."})

@@ -26,9 +26,9 @@ def web_search(query: str) -> str:
     data = {
         "api_key": TAVILY_API_KEY,
         "query": query,
-        "search_depth": "basic", # or "advanced" for deeper search
-        "max_results": 3,
-        "include_answer": False
+        "search_depth": "advanced", # Use advanced for deeper results
+        "max_results": 5, # Increased for more data
+        "include_answer": True # Let Tavily try to answer directly
     }
     
     try:

@@ -6,6 +6,7 @@ from tools import (
     search_weather,
     web_search,
     search_attractions,
+    google_search,
 )
 
 
@@ -15,6 +16,7 @@ TOOLS_BY_AGENT: Dict[str, Dict[str, Callable]] = {
         "web_search": web_search,
         "search_hotels": search_hotels,
         "search_flights": search_flights,
+        "google_search": google_search,
     },
     "local_guide": {
         "search_weather": search_weather,

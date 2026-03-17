@@ -65,6 +65,8 @@ def check_exit_condition(state: State) -> Literal["summarizer", "orchestrator"]:
     messages = state.get("messages", [])
     if messages:
         last_msg = messages[-1].get("content", "").lower()
-        if "exit" in last_msg or "quit" in last_msg or "done" in last_msg:
+        # Use split to check for exact word matches to avoid "indonesia" triggering "done"
+        words = last_msg.replace(".", "").replace("!", "").replace("?", "").split()
+        if "exit" in words or "quit" in words or "done" in words:
             return "summarizer"
     return "orchestrator"

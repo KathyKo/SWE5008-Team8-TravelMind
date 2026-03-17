@@ -79,19 +79,28 @@ def main():
     # Initial state
     initial_state = State(
         messages=[],
+        origin=None,
         destination=None,
         dates=None,
         budget=None,
+        preferences=None,
+        duration=None,
         flight_options=None,
         hotel_options=None,
+        stage=None,
+        itinerary=None,
+        research=None,
+        selections=None,
+        search_results=None,
         final_itinerary=None,
         next_agent=None,
+        confirmed=False,
         is_complete=False
     )
 
     try:
-        # Start the graph interaction
-        graph.invoke(initial_state)
+        # Start the graph interaction with a higher recursion limit for longer conversations
+        graph.invoke(initial_state, config={"recursion_limit": 100})
     except KeyboardInterrupt:
         print("\n\n[SYSTEM] Session ended by user (Ctrl+C). Happy travels!")
     except Exception as e:
