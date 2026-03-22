@@ -3,7 +3,7 @@
 ## Project Overview
 This project is an AI-powered multi-agent travel agency designed to help users plan a complete trip. Whether it's finding flights, hotels, or discovering local attractions, our expert agents collaborate to generate a personalized itinerary. 
 
-This system demonstrates a robust **Orchestrator-Worker architecture** using **LangGraph**, where a specialized coordinator manages the flow between different domain experts.
+This system demonstrates Orchestrator-Worker architecture using **LangGraph**, where a specialized coordinator manages the flow between different domain experts.
 
 ## Key Features
 - **Multi-Agent Coordination**: An intelligent Orchestrator routes tasks to specialized agents (Concierge, Booking Specialist, Local Guide).
