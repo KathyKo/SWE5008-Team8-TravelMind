@@ -1,21 +1,26 @@
 FROM python:3.12-slim
 
-WORKDIR /app
+WORKDIR /app/backend
 
 RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy backend requirements and agents requirements
+COPY backend/requirements.txt .
+COPY agents/requirements.txt ../agents_requirements.txt
+
+# Install all dependencies
+RUN pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir -r ../agents_requirements.txt
 
 # Copy backend code
-COPY . .
+COPY backend/ .
 
 # Copy agents and tools from project root (needed at runtime)
-COPY ../agents ./agents
-COPY ../tools ./tools
+COPY agents /app/agents
+COPY tools /app/tools
 
 EXPOSE 8000
 

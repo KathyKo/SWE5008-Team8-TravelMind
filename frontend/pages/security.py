@@ -4,16 +4,69 @@ pages/security.py — Security Demo page
 
 import streamlit as st
 from datetime import datetime
+import requests
 from data.store import ATTACK_PATTERNS, PRESETS, PIPELINE_STAGES
 
+# ── API Configuration ────────────────────────────────────────
+# BACKEND_URL = "http://localhost:8000"  # Change to http://backend:8000 in Docker
+BACKEND_URL = "http://backend:8000"
 
-def classify_input(text: str):
+def call_security_check(text: str) -> dict:
+    """
+    Call the backend security check endpoint.
+    Returns the security check result from input_guard_agent.
+    """
+    try:
+        url = f"{BACKEND_URL}/travel/security/check"
+        payload = {"text": text, "user_id": st.session_state.get("user_id", "test_user")}
+        
+        # Log the request
+        print(f"[Frontend] 🔍 Sending security check request to {url}")
+        print(f"[Frontend] Payload: {payload}")
+        
+        response = requests.post(
+            url,
+            json=payload,
+            timeout=10,
+        )
+        
+        print(f"[Frontend] ✅ Response status: {response.status_code}")
+        response.raise_for_status()
+        result = response.json()
+        print(f"[Frontend] Response: {result}")
+        return result
+    except requests.exceptions.ConnectionError as e:
+        print(f"[Frontend] ❌ Connection Error: {str(e)}")
+        print(f"[Frontend] Backend URL: {BACKEND_URL}")
+        # Fallback to local classification if backend is unavailable
+        st.warning("⚠️  Backend unavailable — falling back to local simulation")
+        return classify_input_local(text)
+    except Exception as e:
+        print(f"[Frontend] ❌ Error: {str(e)}")
+        st.error(f"Error calling security check: {str(e)}")
+        return {"threat_blocked": False, "threat_type": "Unknown"}
+
+
+def classify_input_local(text: str):
+    """Local fallback classification for testing without backend."""
     lower = text.lower()
     for pattern in ATTACK_PATTERNS:
         for kw in pattern["keywords"]:
             if kw.lower() in lower:
-                return True, pattern
-    return False, None
+                return {
+                    "threat_blocked": True,
+                    "threat_type": pattern["type"],
+                    "threat_detail": pattern["reason"],
+                    "sanitised_input": text,
+                    "security_audit_log": [],
+                }
+    return {
+        "threat_blocked": False,
+        "threat_type": "Normal Query",
+        "sanitised_input": text,
+        "security_audit_log": [],
+    }
+
 
 
 def render():
@@ -52,45 +105,51 @@ def render():
         if chosen_preset:
             st.session_state["attack_prefill"] = chosen_preset
             st.info(f"Preset loaded: `{chosen_preset[:60]}...`" if len(chosen_preset) > 60 else f"Preset loaded: `{chosen_preset}`")
-            # Process immediately
-            is_blocked, pattern = classify_input(chosen_preset)
+            # Process immediately via backend
+            with st.spinner("🔍 Checking security..."):
+                result = call_security_check(chosen_preset)
+            
+            is_blocked = result.get("threat_blocked", False)
+            threat_type = result.get("threat_type", "Unknown")
+            threat_detail = result.get("threat_detail", "")
             now = datetime.now().strftime("%H:%M:%S")
             entry = {
                 "blocked": is_blocked,
-                "type": pattern["type"] if is_blocked else "Normal Query",
-                "stage": pattern["stage"] if is_blocked else None,
+                "type": threat_type,
+                "stage": None,  # Will be mapped from threat_type if needed
                 "input": chosen_preset[:80] + ("..." if len(chosen_preset) > 80 else ""),
-                "reason": pattern["reason"] if is_blocked else "Input clean. Routing to Intent Agent.",
+                "reason": threat_detail if is_blocked else "Input clean. Routing to Intent Agent.",
                 "time": now,
             }
             st.session_state.security_log.insert(0, entry)
             if is_blocked:
                 st.session_state.blocked_count += 1
-                st.session_state.active_pipe_stage = pattern["stage"]
             else:
                 st.session_state.passed_count += 1
-                st.session_state.active_pipe_stage = None
             st.rerun()
 
         # Process manual send
         if send and attack_text.strip():
-            is_blocked, pattern = classify_input(attack_text)
+            with st.spinner("🔍 Checking security..."):
+                result = call_security_check(attack_text)
+            
+            is_blocked = result.get("threat_blocked", False)
+            threat_type = result.get("threat_type", "Unknown")
+            threat_detail = result.get("threat_detail", "")
             now = datetime.now().strftime("%H:%M:%S")
             entry = {
                 "blocked": is_blocked,
-                "type": pattern["type"] if is_blocked else "Normal Query",
-                "stage": pattern["stage"] if is_blocked else None,
+                "type": threat_type,
+                "stage": None,  # Will be mapped from threat_type if needed
                 "input": attack_text[:80] + ("..." if len(attack_text) > 80 else ""),
-                "reason": pattern["reason"] if is_blocked else "Input clean. Routing to Intent Agent.",
+                "reason": threat_detail if is_blocked else "Input clean. Routing to Intent Agent.",
                 "time": now,
             }
             st.session_state.security_log.insert(0, entry)
             if is_blocked:
                 st.session_state.blocked_count += 1
-                st.session_state.active_pipe_stage = pattern["stage"]
             else:
                 st.session_state.passed_count += 1
-                st.session_state.active_pipe_stage = None
             st.rerun()
 
         # ── Log ───────────────────────────────────────────────

@@ -4,3 +4,5 @@ langchain-openai
 python-dotenv
 requests
 
+# Security
+llm-guard==0.3.14

@@ -14,15 +14,35 @@ from typing import Optional
 
 # ── Path setup ────────────────────────────────────────────────
 # Allow importing from agents/ and tools/ at the project root
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
+# In Docker: agents and tools are at /app/agents and /app/tools
+# Locally: they're at project root/../agents and project root/../tools
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if os.path.exists(os.path.join(project_root, "agents")):
+    sys.path.insert(0, project_root)
+elif os.path.exists("/app/agents"):
+    sys.path.insert(0, "/app")
 
 from agents.graph import build_travel_graph
 from agents.state import State
+from agents import input_guard_agent
 
 router = APIRouter()
 
 
 # ── Request / Response schemas ────────────────────────────────
+
+class SecurityCheckRequest(BaseModel):
+    text: str
+    user_id: Optional[str] = None
+
+
+class SecurityCheckResponse(BaseModel):
+    threat_blocked: bool
+    threat_type: Optional[str] = None
+    threat_detail: Optional[str] = None
+    sanitised_input: str
+    security_audit_log: Optional[list] = None
+
 
 class PlanRequest(BaseModel):
     message: str
@@ -58,6 +78,73 @@ class SummarizeRequest(BaseModel):
 
 
 # ── Endpoints ─────────────────────────────────────────────────
+
+@router.post("/security/check", response_model=SecurityCheckResponse)
+def security_check(request: SecurityCheckRequest):
+    """
+    Security check endpoint — validates user input against the input guard agent.
+    Tests the input through the two-layer security pipeline:
+      Layer 1: Regex-based injection detection
+      Layer 2: LLM Guard semantic scanner
+    
+    Returns whether the input was blocked and any sanitised version of it.
+    """
+    print(f"[Backend] 🔐 Received security check request")
+    print(f"[Backend] Text: {request.text[:100]}...")
+    print(f"[Backend] User ID: {request.user_id}")
+    
+    try:
+        # Build initial state with user message
+        initial_state = State(
+            messages=[{"role": "user", "content": request.text}],
+            user_id=request.user_id or "test_user",
+            # Fill other required fields with defaults
+            origin=None,
+            destination=None,
+            dates=None,
+            budget=None,
+            preferences=None,
+            duration=None,
+            flight_options=None,
+            hotel_options=None,
+            stage=None,
+            itinerary=None,
+            research=None,
+            selections=None,
+            search_results=None,
+            final_itinerary=None,
+            next_agent=None,
+            confirmed=False,
+            is_complete=False,
+            threat_blocked=False,
+            threat_type=None,
+            threat_detail=None,
+            sanitised_input="",
+            security_audit_log=[],
+        )
+        
+        # Run the input guard agent
+        print(f"[Backend] 🔐 Running input_guard_agent...")
+        result = input_guard_agent(initial_state)
+        print(f"[Backend] ✅ input_guard_agent completed")
+        print(f"[Backend] Result: threat_blocked={result.get('threat_blocked')}, threat_type={result.get('threat_type')}")
+        
+        response = SecurityCheckResponse(
+            threat_blocked=result.get("threat_blocked", False),
+            threat_type=result.get("threat_type"),
+            threat_detail=result.get("threat_detail"),
+            sanitised_input=result.get("sanitised_input", request.text),
+            security_audit_log=result.get("security_audit_log", []),
+        )
+        print(f"[Backend] 📤 Returning response")
+        return response
+    
+    except Exception as e:
+        print(f"[Backend] ❌ Error in security_check: {str(e)}")
+        import traceback
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"Security check failed: {str(e)}")
+
 
 @router.post("/plan", response_model=PlanResponse)
 def plan(request: PlanRequest):

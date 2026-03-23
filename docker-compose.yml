@@ -8,8 +8,8 @@ services:
 
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./frontend/Dockerfile
     container_name: travelmind-frontend
     ports:
       - "8501:8501"
@@ -19,6 +19,8 @@ services:
     depends_on:
       backend:
         condition: service_healthy
+    networks:
+      - travelmind-network
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
@@ -29,8 +31,8 @@ services:
 
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./backend/Dockerfile
     container_name: travelmind-backend
     ports:
       - "8000:8000"
@@ -38,6 +40,8 @@ services:
       - .env
     environment:
       - PYTHONUNBUFFERED=1
+    networks:
+      - travelmind-network
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
@@ -59,3 +63,7 @@ services:
 #
 # volumes:
 #   chroma_data:
+
+networks:
+  travelmind-network:
+    driver: bridge
