@@ -1,6 +1,6 @@
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
-from llm_config import OPENAI_MODEL
+from ..llm_config import OPENAI_MODEL
 import json
 
 

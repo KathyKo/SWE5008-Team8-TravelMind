@@ -1,10 +1,7 @@
-import os
 from dotenv import load_dotenv
 from langgraph.graph import StateGraph, START, END
 
-# Import Travel Agency components
-from state import State
-from nodes import (
+from .nodes import (
     human_node,
     orchestrator_node,
     concierge_node,
@@ -12,11 +9,14 @@ from nodes import (
     local_guide_node,
     summarizer_node,
     orchestrator_routing,
-    check_exit_condition
+    check_exit_condition,
 )
+from .state import State
+
 
 # Load environment variables (API Keys)
 load_dotenv(override=True)
+
 
 def build_travel_graph():
     """
@@ -41,8 +41,8 @@ def build_travel_graph():
         check_exit_condition,
         {
             "summarizer": "summarizer",
-            "orchestrator": "orchestrator"
-        }
+            "orchestrator": "orchestrator",
+        },
     )
 
     # From orchestrator, route to the selected specialized agent
@@ -53,8 +53,8 @@ def build_travel_graph():
             "concierge": "concierge",
             "booking_agent": "booking_agent",
             "local_guide": "local_guide",
-            "summarizer": "summarizer"
-        }
+            "summarizer": "summarizer",
+        },
     )
 
     # Specialized agents all return to human for next user input
@@ -67,7 +67,8 @@ def build_travel_graph():
 
     return builder.compile()
 
-def main():
+
+def run_cli():
     print("==========================================")
     print("      TRAVEL PLANNING AGENCY       ")
     print("==========================================")
@@ -95,7 +96,7 @@ def main():
         final_itinerary=None,
         next_agent=None,
         confirmed=False,
-        is_complete=False
+        is_complete=False,
     )
 
     try:
@@ -105,6 +106,3 @@ def main():
         print("\n\n[SYSTEM] Session ended by user (Ctrl+C). Happy travels!")
     except Exception as e:
         print(f"\nAn error occurred: {e}")
-
-if __name__ == "__main__":
-    main()

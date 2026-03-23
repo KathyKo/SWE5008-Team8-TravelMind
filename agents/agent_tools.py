@@ -32,4 +32,3 @@ def get_tools_for_agent(agent_name: str) -> Dict[str, Callable]:
     is not configured here, it has no tools by default.
     """
     return TOOLS_BY_AGENT.get(agent_name, {})
-

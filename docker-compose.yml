@@ -1,0 +1,61 @@
+version: "3.9"
+
+# Python 3.12 — see frontend/Dockerfile and backend/Dockerfile
+# Usage: docker compose up --build
+# Requires: .env file at project root (copy from .env.example)
+
+services:
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: travelmind-frontend
+    ports:
+      - "8501:8501"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - BACKEND_URL=http://backend:8000
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: travelmind-backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+# Future services:
+#
+#  chromadb:
+#    image: chromadb/chroma:latest
+#    container_name: travelmind-chromadb
+#    ports:
+#      - "8002:8000"
+#    volumes:
+#      - chroma_data:/chroma/chroma
+#    restart: unless-stopped
+#
+# volumes:
+#   chroma_data:

@@ -1,7 +1,7 @@
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage
 import json
-from llm_config import OPENAI_MODEL
+from ..llm_config import OPENAI_MODEL
 
 # ---------------------------------------------------------------------------
 # Stage constants
