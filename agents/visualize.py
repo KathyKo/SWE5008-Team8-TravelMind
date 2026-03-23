@@ -1,10 +1,10 @@
-from main import build_travel_graph
-import os
+from .graph import build_travel_graph
+
 
 def visualize():
     print("Building travel graph...")
     graph = build_travel_graph()
-    
+
     # 1. Generate ASCII diagram
     print("\n--- ASCII Workflow Diagram ---")
     try:
@@ -20,7 +20,7 @@ def visualize():
         mermaid_md = graph.get_graph().draw_mermaid()
         print("\n--- Mermaid Markdown (copy & paste to mermaid.live) ---")
         print(mermaid_md)
-        
+
         # This will work if you have a connection to mermaid.ink or local graphviz
         png_data = graph.get_graph().draw_mermaid_png()
         with open("graph_workflow.png", "wb") as f:
@@ -29,6 +29,7 @@ def visualize():
     except Exception as e:
         print(f"\nCould not generate PNG: {e}")
         print("Try installing pygraphviz or checking your internet connection for Mermaid.ink.")
+
 
 if __name__ == "__main__":
     visualize()

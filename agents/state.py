@@ -16,6 +16,14 @@ class State(TypedDict):
     dates: Optional[str]
     preferences: Optional[str]   # e.g. "budget", "moderate", "luxury"
     duration: Optional[str]      # e.g. "3 days"
+    user_id: Optional[str]       # User identifier for logging
+
+    # Security fields
+    threat_blocked: Optional[bool]
+    threat_type: Optional[str]
+    threat_detail: Optional[str]
+    sanitised_input: Optional[str]
+    security_audit_log: Optional[List]
 
     # Options gathered by specialized agents
     flight_options: Optional[List]

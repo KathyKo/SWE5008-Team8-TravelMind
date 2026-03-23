@@ -1,6 +1,6 @@
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage
-from llm_config import OPENAI_MODEL
+from ..llm_config import OPENAI_MODEL
 
 
 def local_guide(state, tools=None):
