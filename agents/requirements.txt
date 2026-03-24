@@ -3,6 +3,7 @@ langchain
 langchain-openai
 python-dotenv
 requests
+google-search-results
 
 # Security
 llm-guard==0.3.14

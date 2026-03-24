@@ -30,8 +30,8 @@ NUS-ISS Graduate Certificate in Architecting AI Systems — SWE5008, Team 8.
                            │
 ┌──────────────────────────▼──────────────────────────────┐
 │                   Tools                                 │
+│  SerpAPI (Flights · Hotels · Maps)                      │
 │  Tavily · Google Search · OpenWeather                   │
-│  Flights · Hotels · Attractions                         │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -85,12 +85,13 @@ SWE5008-TEAM8-TRAVELMIND/
 │
 ├── tools/                       # External API integrations
 │   ├── __init__.py
+│   ├── serp_search.py           # SerpAPI helpers (flights / hotels / maps)
 │   ├── web_search.py            # Tavily
 │   ├── google_search.py         # Google Custom Search
-│   ├── search_flights.py
-│   ├── search_hotels.py
-│   ├── search_weather.py
-│   └── search_attractions.py
+│   ├── search_flights.py        # SerpAPI → Tavily+Google fallback
+│   ├── search_hotels.py         # SerpAPI → Tavily+Google fallback
+│   ├── search_weather.py        # OpenWeather → web search fallback
+│   └── search_attractions.py   # SerpAPI Maps → Tavily+Google fallback
 │
 ├── docker-compose.yml           # Full stack — all services
 ├── .env.example                 # API key template
@@ -144,11 +145,12 @@ Copy `.env.example` to `.env` and fill in all values:
 | Variable | Description |
 |---|---|
 | `OPENAI_API_KEY` | OpenAI API key |
-| `OPENAI_MODEL` | Model name (default: `gpt-5-mini-2025-08-07`) |
+| `OPENAI_MODEL` | Model name (default: `gpt-4o-mini`) |
 | `TAVILY_API_KEY` | Tavily web search API key |
 | `GOOGLE_API_KEY` | Google Custom Search API key |
 | `GOOGLE_CSE_ID` | Google Custom Search Engine ID |
 | `OPENWEATHER_API_KEY` | OpenWeatherMap API key |
+| `SERPAPI_API_KEY` | SerpAPI key — powers Google Flights, Hotels, and Maps search |
 
 ---
 
@@ -168,9 +170,31 @@ Copy `.env.example` to `.env` and fill in all values:
 |---|---|
 | Orchestrator | Routes user requests to the appropriate specialist |
 | Concierge | Gathers user preferences — destination, dates, budget, interests |
-| Booking Agent | Searches and presents flight and hotel options |
+| Booking Agent | Searches and presents flight and hotel options with live prices |
 | Local Guide | Recommends attractions, activities, and local experiences |
 | Summarizer | Produces the final consolidated travel itinerary |
+
+### Booking Agent — 4-Stage Flow
+
+```
+Stage 1 (itinerary_draft)   → Research destination, draft day-by-day plan + numbered options
+Stage 2 (awaiting_selection) → User picks transport/hotel, agent fetches live prices via SerpAPI
+Stage 3 (reviewing)          → User confirms or changes one item; only changed item is re-searched
+Stage 4 (confirmed)          → Trip locked; follow-up questions answered via live search
+```
+
+---
+
+## Tools
+
+| Tool | Primary Source | Fallback |
+|---|---|---|
+| `search_flights` | SerpAPI Google Flights (times, flight no., prices) | Tavily + Google web search |
+| `search_hotels` | SerpAPI Google Hotels (ratings, prices, availability) | Tavily + Google web search |
+| `search_attractions` | SerpAPI Google Maps (places, ratings, hours) | Tavily + Google web search |
+| `search_weather` | OpenWeatherMap API (5-day forecast) | Tavily + Google web search |
+| `web_search` | Tavily API | — |
+| `google_search` | Google Custom Search API | — |
 
 ---
 
@@ -180,10 +204,9 @@ Copy `.env.example` to `.env` and fill in all values:
 |---|---|
 | Frontend | Streamlit |
 | Backend | FastAPI + Uvicorn |
-| Agent Orchestration | LangGraph 0.2 |
-| LLM | OpenAI GPT-5-mini |
-| Search | Tavily + Google Custom Search |
+| Agent Orchestration | LangGraph |
+| LLM | OpenAI GPT-4o-mini |
+| Flight / Hotel / Maps Search | SerpAPI (Google Flights, Hotels, Maps) |
+| General Web Search | Tavily + Google Custom Search |
 | Weather | OpenWeatherMap API |
 | Containerisation | Docker + Docker Compose |
-
----

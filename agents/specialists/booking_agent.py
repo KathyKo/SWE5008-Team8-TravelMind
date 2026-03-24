@@ -324,10 +324,12 @@ def booking_agent(state: dict, tools: dict = None) -> dict:
     if not dest:
         return {"messages": [{"role": "assistant", "content": "I need a destination to help plan your trip."}]}
 
-    tools         = tools or {}
-    web_search    = tools.get("web_search")
-    google_search = tools.get("google_search")
-    llm           = _llm()
+    tools              = tools or {}
+    web_search         = tools.get("web_search")
+    google_search      = tools.get("google_search")
+    search_flights_fn  = tools.get("search_flights")
+    search_hotels_fn   = tools.get("search_hotels")
+    llm                = _llm()
 
     # -----------------------------------------------------------------------
     # PRE-STAGE: if the user is asking a question that needs live data,
@@ -340,19 +342,48 @@ Classify it as ONE of:
 
 Return ONLY a JSON object:
 {
-  "intent":       "question" | "action",
-  "search_query": "a concise search query to answer the question, or null if intent is action"
+  "intent":        "question" | "action",
+  "question_type": "flight" | "hotel" | "general",
+  "queries": [
+    "short focused search query #1 (max 8 words)",
+    "short focused search query #2 (max 8 words)"
+  ]
 }
+
+Rules for queries:
+- Keep each query SHORT (≤8 words). Short queries return better results.
+- For flights: include airline name, route (e.g. TPE SIN), and date.
+  Example: ["Singapore Airlines TPE SIN schedule", "SQ flight Taipei Singapore timing"]
+- For hotels: include hotel name, city, dates.
+- For general: two different short angles on the question.
+- If intent is "action", set queries to [].
 """
-    pre_intent = _json_invoke(llm, pre_intent_prompt, messages)
+    pre_intent    = _json_invoke(llm, pre_intent_prompt, messages)
     if pre_intent.get("intent") == "question":
-        query = pre_intent.get("search_query") or messages[-1].get("content", "") if messages else ""
-        if query:
-            live_data = _live_search(query, web_search, google_search)
-            reply     = _answer_with_live_data(llm, messages, query, live_data)
+        q_type  = pre_intent.get("question_type", "general")
+        queries = pre_intent.get("queries") or []
+
+        # ── Flight question: use the dedicated search_flights tool ──
+        if q_type == "flight" and search_flights_fn:
+            live_data = search_flights_fn(origin, dest, dates)
+            # Also run the short queries through both tools for extra coverage
+            for q in queries[:2]:
+                live_data += " | " + _live_search(q, web_search, google_search)
+        # ── Hotel question: use the dedicated search_hotels tool ──
+        elif q_type == "hotel" and search_hotels_fn:
+            live_data = search_hotels_fn(dest, preferences or "best rated", dates)
+            for q in queries[:2]:
+                live_data += " | " + _live_search(q, web_search, google_search)
+        # ── General question: run all short queries through both tools ──
+        else:
+            parts = [_live_search(q, web_search, google_search) for q in queries if q]
+            live_data = " | ".join(p for p in parts if p)
+
+        if live_data:
+            reply = _answer_with_live_data(llm, messages, " | ".join(queries), live_data)
             return {
                 "messages": [{"role": "assistant", "content": reply}],
-                "stage":    stage,   # preserve — booking flow continues next turn
+                "stage":    stage,
             }
 
     # -----------------------------------------------------------------------
