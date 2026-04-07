@@ -25,6 +25,7 @@ elif os.path.exists("/app/agents"):
 from agents.graph import build_travel_graph
 from agents.state import State
 from agents import input_guard_agent
+from agents.specialists.output_guard_agent import output_guard_agent
 
 router = APIRouter()
 
@@ -41,6 +42,18 @@ class SecurityCheckResponse(BaseModel):
     threat_type: Optional[str] = None
     threat_detail: Optional[str] = None
     sanitised_input: str
+    security_audit_log: Optional[list] = None
+
+
+class OutputCheckRequest(BaseModel):
+    text: str
+    user_id: Optional[str] = None
+
+
+class OutputCheckResponse(BaseModel):
+    threat_blocked: bool
+    threat_type: Optional[str] = None
+    threat_detail: Optional[str] = None
     security_audit_log: Optional[list] = None
 
 
@@ -144,6 +157,80 @@ def security_check(request: SecurityCheckRequest):
         import traceback
         print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Security check failed: {str(e)}")
+
+
+@router.post("/security/check-output", response_model=OutputCheckResponse)
+def security_check_output(request: OutputCheckRequest):
+    """
+    Output security check endpoint — validates model output against the output guard agent.
+    Tests the output through the multi-layer security pipeline:
+      Layer 1: Hallucination detection
+      Layer 2: Regex-based PII detection
+      Layer 3: Rule-based unsafe topics check
+      Layer 4: LLM semantic unsafe-content check
+      Layer 5: LLM Guard output scanner
+    
+    Returns whether the output was flagged for security issues.
+    """
+    print(f"[Backend] 🔐 Received output security check request")
+    print(f"[Backend] Text: {request.text[:100]}...")
+    print(f"[Backend] User ID: {request.user_id}")
+    
+    try:
+        # Build initial state with output to validate
+        initial_state = State(
+            messages=[{"role": "assistant", "content": request.text}],
+            user_id=request.user_id or "test_user",
+            # Fill other required fields with defaults
+            origin=None,
+            destination=None,
+            dates=None,
+            budget=None,
+            preferences=None,
+            duration=None,
+            flight_options=None,
+            hotel_options=None,
+            stage=None,
+            itinerary=None,
+            research=None,
+            selections=None,
+            search_results=None,
+            final_itinerary=None,
+            next_agent=None,
+            confirmed=False,
+            is_complete=False,
+            threat_blocked=False,
+            threat_type=None,
+            threat_detail=None,
+            sanitised_input="",
+            security_audit_log=[],
+        )
+        
+        # Run the output guard agent
+        print(f"[Backend] 🔐 Running output_guard_agent...")
+        result = output_guard_agent(initial_state)
+        print(f"[Backend] ✅ output_guard_agent completed")
+        print(f"[Backend] Result: output_flagged={result.get('output_flagged')}, output_flag_reason={result.get('output_flag_reason')}")
+        
+        # Map output_guard_agent result keys to response keys
+        threat_blocked = result.get("output_flagged", False)
+        threat_type = result.get("output_flag_reason")
+        threat_detail = result.get("output_guard_decision", {}).get("reason", "Output passed validation")
+        
+        response = OutputCheckResponse(
+            threat_blocked=threat_blocked,
+            threat_type=threat_type,
+            threat_detail=threat_detail,
+            security_audit_log=result.get("security_audit_log", []),
+        )
+        print(f"[Backend] 📤 Returning response: threat_blocked={threat_blocked}")
+        return response
+    
+    except Exception as e:
+        print(f"[Backend] ❌ Error in security_check_output: {str(e)}")
+        import traceback
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"Output security check failed: {str(e)}")
 
 
 @router.post("/plan", response_model=PlanResponse)

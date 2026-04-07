@@ -1,4 +1,4 @@
-from typing import TypedDict, Optional, Annotated, List
+from typing import TypedDict, Optional, Annotated, List, Dict, Any
 import operator
 
 
@@ -24,6 +24,8 @@ class State(TypedDict):
     threat_detail: Optional[str]
     sanitised_input: Optional[str]
     security_audit_log: Optional[List]
+    input_guard_decision: Optional[Dict[str, Any]]
+    output_guard_decision: Optional[Dict[str, Any]]
 
     # Options gathered by specialized agents
     flight_options: Optional[List]

@@ -6,3 +6,4 @@ requests
 
 # Security
 llm-guard==0.3.14
+PyYAML>=6.0
