@@ -1,0 +1,16 @@
+output_guard:
+  config:
+    v1:
+      llm_unsafe_conf_threshold: 0.70
+  unsafe_regex_rules:
+    v1:
+      - pattern: "\\b(how\\s+to|guide\\s+to|steps\\s+to|tutorial\\s+for|best\\s+way\\s+to)\\b.{0,60}\\b(smuggl(?:e|ing)|drug\\s+trafficking|human\\s+trafficking|weapon\\s+trafficking)\\b"
+        reason: "Actionable guidance for trafficking/smuggling detected"
+      - pattern: "\\b(fake|forged?|counterfeit)\\b.{0,40}\\b(passport|visa|id|identity\\s+card|documents?)\\b"
+        reason: "Guidance involving forged/fake travel documents detected"
+      - pattern: "\\b(bypass|evade|circumvent)\\b.{0,40}\\b(customs|immigration|border\\s+control|law\\s+enforcement)\\b"
+        reason: "Advice to evade law enforcement/border controls detected"
+      - pattern: "\\b(recommend|suggest|best\\s+place\\s+to\\s+go|travel\\s+to|visit)\\b.{0,50}\\b(active\\s+war\\s+zone|combat\\s+zone|frontline)\\b"
+        reason: "Unsafe recommendation to travel into conflict zones detected"
+      - pattern: "\\b(bribe|bribery|pay\\s+off\\s+(?:officers?|officials?))\\b.{0,40}\\b(immigration|customs|officer|official)\\b"
+        reason: "Advice related to bribery in travel process detected"

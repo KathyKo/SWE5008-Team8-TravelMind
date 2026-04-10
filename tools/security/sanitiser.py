@@ -4,7 +4,12 @@ tools/sanitiser.py — Input Sanitisation
 Cleans and normalises raw user input before it enters the agent pipeline.
 Runs before injection detection — removes noise that could mask patterns.
 
-Used by Agent 5a (Input Gatekeeper).
+Responsibility: cleaning only.
+Length enforcement is handled by InputGuardAgent (Agent 5a) as an
+explicit block condition — oversized inputs are rejected, not silently
+truncated.
+
+Used by InputGuardAgent (Agent 5a).
 """
 
 import re
@@ -16,7 +21,7 @@ def sanitise(text: str) -> str:
     Clean and normalise a raw input string.
 
     Steps:
-    1. Decode unicode escapes and normalise to NFC form
+    1. Normalise unicode to NFC form — prevents homoglyph attacks
     2. Strip null bytes and control characters (except newline/tab)
     3. Collapse excessive whitespace
     4. Trim leading/trailing whitespace
@@ -38,29 +43,3 @@ def sanitise(text: str) -> str:
     text = re.sub(r" {3,}", " ", text)
 
     return text.strip()
-
-
-def truncate(text: str, max_length: int = 2000) -> tuple[str, bool]:
-    """
-    Truncate text to max_length characters.
-    Returns (truncated_text, was_truncated).
-    """
-    if len(text) <= max_length:
-        return text, False
-    return text[:max_length], True
-
-
-def sanitise_and_truncate(text: str, max_length: int = 2000) -> dict:
-    """
-    Combined sanitise + truncate. Returns a dict with:
-    - clean_text: the processed text
-    - was_truncated: bool
-    - original_length: int
-    """
-    cleaned = sanitise(text)
-    truncated, was_truncated = truncate(cleaned, max_length)
-    return {
-        "clean_text": truncated,
-        "was_truncated": was_truncated,
-        "original_length": len(text),
-    }
