@@ -2,10 +2,13 @@ FROM python:3.12-slim
 
 WORKDIR /app/backend
 
-RUN apt-get update && apt-get install -y \
+ENV PYTHONPATH=/app
+
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
     build-essential \
     curl \
     && rm -rf /var/lib/apt/lists/*
+
 
 # Copy backend requirements and agents requirements
 COPY backend/requirements.txt .

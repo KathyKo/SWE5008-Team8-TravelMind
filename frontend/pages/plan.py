@@ -84,7 +84,7 @@ def render():
         # ── Input ────────────────────────────────────────────
         with st.container(border=True):
             st.markdown("**Your request**")
-            query = st.text_area(
+            st.text_area(
                 "query",
                 value="I want to visit Kyoto for 5 days, budget SGD 3000, vegetarian, love cultural heritage and local food",
                 height=80,
@@ -127,7 +127,6 @@ def render():
             for i, (key, meta) in enumerate(OPTION_META.items()):
                 with opt_cols[i]:
                     selected = st.session_state.selected_option == key
-                    border_color = "#3b9eff" if selected else "rgba(255,255,255,0.07)"
                     if st.button(
                         f"{'✓ ' if selected else ''}{meta['badge']}",
                         key=f"opt_{key}",
