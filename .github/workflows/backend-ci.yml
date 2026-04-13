@@ -19,6 +19,8 @@ on:
 
 permissions:
   contents: read
+  checks: write
+  pull-requests: write
 
 jobs:
   test:
@@ -36,6 +38,14 @@ jobs:
           cache: "pip"
           cache-dependency-path: backend/requirements.txt
 
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-backend-${{ hashFiles('backend/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-backend-
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -48,15 +58,78 @@ jobs:
 
       - name: Run backend tests
         run: |
-          python -m pytest -q backend/tests
+          python -m pytest -q backend/tests \
+            --junitxml=backend-test-results.xml \
+            --cov=backend \
+            --cov-report=xml:backend-coverage.xml \
+            --cov-report=term-missing
+
+      - name: Publish backend test results
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Backend Test Results
+          path: backend-test-results.xml
+          reporter: java-junit
+          fail-on-error: false
+
+      - name: Extract backend coverage
+        if: always()
+        id: backend_coverage
+        run: |
+          python - <<'PY'
+          import os
+          import xml.etree.ElementTree as ET
+
+          output = os.environ["GITHUB_OUTPUT"]
+          path = "backend-coverage.xml"
+          rate = 0.0
+          if os.path.exists(path):
+              root = ET.parse(path).getroot()
+              rate = float(root.attrib.get("line-rate", 0.0)) * 100
+          with open(output, "a", encoding="utf-8") as f:
+              f.write(f"rate={rate:.2f}\n")
+          PY
+
+      - name: Add backend coverage to job summary
+        if: always()
+        run: |
+          echo "### Backend Coverage" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Line coverage: **${{ steps.backend_coverage.outputs.rate }}%**" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Comment backend coverage on PR
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const marker = '<!-- backend-coverage-comment -->';
+            const body = `${marker}\n### Backend Coverage\nLine coverage: **${{ steps.backend_coverage.outputs.rate }}%**`;
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number });
+            const existing = comments.find(c => c.user.type === 'Bot' && c.body && c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }
 
       - name: Compile backend code
         run: |
           python -m compileall backend
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Build backend Docker image
-        run: |
-          docker build -f backend/Dockerfile -t travelmind-backend:${GITHUB_SHA} .
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: backend/Dockerfile
+          load: true
+          tags: travelmind-backend:${{ github.sha }}
+          cache-from: type=gha,scope=backend-image
+          cache-to: type=gha,mode=max,scope=backend-image
 
       - name: Trivy image scan
         uses: aquasecurity/trivy-action@master
@@ -66,10 +139,6 @@ jobs:
           severity: CRITICAL,HIGH
           ignore-unfixed: true
           exit-code: 0
-
-      - name: Set up Docker Buildx
-        if: github.event_name != 'pull_request'
-        uses: docker/setup-buildx-action@v3
 
       - name: Extract metadata
         if: github.event_name != 'pull_request'
@@ -98,5 +167,5 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=backend-image
+          cache-to: type=gha,mode=max,scope=backend-image
