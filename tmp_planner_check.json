@@ -1,0 +1,3111 @@
+{
+  "itineraries": {
+    "A": [
+      {
+        "day": "Day 1",
+        "items": [
+          {
+            "time": "13:55",
+            "icon": "flight",
+            "key": "flight_outbound",
+            "name": "EVA Air BR 215 (Nonstop) | Taiwan Taoyuan International Airport → Singapore Changi Airport | dep 2026-06-01 09:25 → arr 2026-06-01 13:55 | 270 min | Economy | USD 530",
+            "cost": "SGD 716"
+          },
+          {
+            "time": "15:25",
+            "icon": "activity",
+            "key": "attraction_05_singapore_chinese_cultural_centre",
+            "name": "Singapore Chinese Cultural Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:00",
+            "icon": "restaurant",
+            "key": "restaurant_11_chinatown_food_street",
+            "name": "Chinatown Food Street",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:30",
+            "icon": "hotel",
+            "key": "hotel_stay",
+            "name": "Citadines Balestier Singapore - Studio",
+            "cost": "SGD 197/night"
+          }
+        ]
+      },
+      {
+        "day": "Day 2",
+        "items": [
+          {
+            "time": "09:27",
+            "icon": "activity",
+            "key": "attraction_01_former_house_of_tan_teng_niah",
+            "name": "Former House of Tan Teng Niah",
+            "cost": "TBC"
+          },
+          {
+            "time": "11:58",
+            "icon": "restaurant",
+            "key": "restaurant_03_hawkers_street",
+            "name": "Hawkers' Street",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:15",
+            "icon": "restaurant",
+            "key": "restaurant_07_hawkers_street_ion",
+            "name": "Hawkers' Street @ ION",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 3",
+        "items": [
+          {
+            "time": "09:24",
+            "icon": "activity",
+            "key": "attraction_07_buddha_tooth_relic_temple",
+            "name": "Buddha Tooth Relic Temple",
+            "cost": "TBC"
+          },
+          {
+            "time": "11:55",
+            "icon": "restaurant",
+            "key": "restaurant_09_hawkers_street_bpp",
+            "name": "Hawkers' Street @ BPP",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:30",
+            "icon": "restaurant",
+            "key": "restaurant_10_ri_xin_snack_delights",
+            "name": "Ri Xin Snack Delights",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 4",
+        "items": [
+          {
+            "time": "09:56",
+            "icon": "activity",
+            "key": "attraction_08_fort_canning_heritage_gallery",
+            "name": "Fort Canning Heritage Gallery",
+            "cost": "TBC"
+          },
+          {
+            "time": "12:42",
+            "icon": "restaurant",
+            "key": "restaurant_06_holland_drive_market_food_centre",
+            "name": "Holland Drive Market & Food Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:00",
+            "icon": "restaurant",
+            "key": "restaurant_04_20_ghim_moh_road_market_food_centre",
+            "name": "20 Ghim Moh Road Market & Food Centre",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 5",
+        "items": [
+          {
+            "time": "09:20",
+            "icon": "hotel",
+            "key": "hotel_stay",
+            "name": "Citadines Balestier Singapore - Studio",
+            "cost": "SGD 197/night"
+          },
+          {
+            "time": "09:40",
+            "icon": "restaurant",
+            "key": "restaurant_08_maxwell_food_centre",
+            "name": "Maxwell Food Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "15:20",
+            "icon": "flight",
+            "key": "flight_return",
+            "name": "EVA Air BR 216 (Nonstop) | Singapore Changi Airport → Taiwan Taoyuan International Airport | dep 2026-06-05 15:20 → arr 2026-06-05 20:00 | 280 min | Economy | USD 259",
+            "cost": "SGD 350"
+          }
+        ]
+      }
+    ],
+    "B": [
+      {
+        "day": "Day 1",
+        "items": [
+          {
+            "time": "13:55",
+            "icon": "flight",
+            "key": "flight_outbound",
+            "name": "EVA Air BR 215 (Nonstop) | Taiwan Taoyuan International Airport → Singapore Changi Airport | dep 2026-06-01 09:25 → arr 2026-06-01 13:55 | 270 min | Economy | USD 530",
+            "cost": "SGD 716"
+          },
+          {
+            "time": "15:25",
+            "icon": "activity",
+            "key": "attraction_05_singapore_chinese_cultural_centre",
+            "name": "Singapore Chinese Cultural Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:00",
+            "icon": "restaurant",
+            "key": "restaurant_11_chinatown_food_street",
+            "name": "Chinatown Food Street",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:30",
+            "icon": "hotel",
+            "key": "hotel_stay",
+            "name": "Village Hotel Albert Court",
+            "cost": "SGD 128/night"
+          }
+        ]
+      },
+      {
+        "day": "Day 2",
+        "items": [
+          {
+            "time": "09:57",
+            "icon": "activity",
+            "key": "attraction_07_buddha_tooth_relic_temple",
+            "name": "Buddha Tooth Relic Temple",
+            "cost": "TBC"
+          },
+          {
+            "time": "12:13",
+            "icon": "restaurant",
+            "key": "restaurant_03_hawkers_street",
+            "name": "Hawkers' Street",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:15",
+            "icon": "restaurant",
+            "key": "restaurant_07_hawkers_street_ion",
+            "name": "Hawkers' Street @ ION",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 3",
+        "items": [
+          {
+            "time": "10:14",
+            "icon": "activity",
+            "key": "attraction_01_former_house_of_tan_teng_niah",
+            "name": "Former House of Tan Teng Niah",
+            "cost": "TBC"
+          },
+          {
+            "time": "12:45",
+            "icon": "restaurant",
+            "key": "restaurant_09_hawkers_street_bpp",
+            "name": "Hawkers' Street @ BPP",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:30",
+            "icon": "restaurant",
+            "key": "restaurant_10_ri_xin_snack_delights",
+            "name": "Ri Xin Snack Delights",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 4",
+        "items": [
+          {
+            "time": "10:36",
+            "icon": "activity",
+            "key": "attraction_08_fort_canning_heritage_gallery",
+            "name": "Fort Canning Heritage Gallery",
+            "cost": "TBC"
+          },
+          {
+            "time": "13:22",
+            "icon": "restaurant",
+            "key": "restaurant_06_holland_drive_market_food_centre",
+            "name": "Holland Drive Market & Food Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:00",
+            "icon": "restaurant",
+            "key": "restaurant_04_20_ghim_moh_road_market_food_centre",
+            "name": "20 Ghim Moh Road Market & Food Centre",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 5",
+        "items": [
+          {
+            "time": "09:20",
+            "icon": "hotel",
+            "key": "hotel_stay",
+            "name": "Village Hotel Albert Court",
+            "cost": "SGD 128/night"
+          },
+          {
+            "time": "09:40",
+            "icon": "restaurant",
+            "key": "restaurant_08_maxwell_food_centre",
+            "name": "Maxwell Food Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "15:20",
+            "icon": "flight",
+            "key": "flight_return",
+            "name": "EVA Air BR 216 (Nonstop) | Singapore Changi Airport → Taiwan Taoyuan International Airport | dep 2026-06-05 15:20 → arr 2026-06-05 20:00 | 280 min | Economy | USD 259",
+            "cost": "SGD 350"
+          }
+        ]
+      }
+    ],
+    "C": [
+      {
+        "day": "Day 1",
+        "items": [
+          {
+            "time": "13:55",
+            "icon": "flight",
+            "key": "flight_outbound",
+            "name": "EVA Air BR 215 (Nonstop) | Taiwan Taoyuan International Airport → Singapore Changi Airport | dep 2026-06-01 09:25 → arr 2026-06-01 13:55 | 270 min | Economy | USD 530",
+            "cost": "SGD 716"
+          },
+          {
+            "time": "15:25",
+            "icon": "activity",
+            "key": "attraction_05_singapore_chinese_cultural_centre",
+            "name": "Singapore Chinese Cultural Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:00",
+            "icon": "restaurant",
+            "key": "restaurant_11_chinatown_food_street",
+            "name": "Chinatown Food Street",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:30",
+            "icon": "hotel",
+            "key": "hotel_stay",
+            "name": "Vibe Hotel Singapore Orchard",
+            "cost": "SGD 146/night"
+          }
+        ]
+      },
+      {
+        "day": "Day 2",
+        "items": [
+          {
+            "time": "10:12",
+            "icon": "activity",
+            "key": "attraction_07_buddha_tooth_relic_temple",
+            "name": "Buddha Tooth Relic Temple",
+            "cost": "TBC"
+          },
+          {
+            "time": "12:28",
+            "icon": "restaurant",
+            "key": "restaurant_03_hawkers_street",
+            "name": "Hawkers' Street",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:15",
+            "icon": "restaurant",
+            "key": "restaurant_07_hawkers_street_ion",
+            "name": "Hawkers' Street @ ION",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 3",
+        "items": [
+          {
+            "time": "10:29",
+            "icon": "activity",
+            "key": "attraction_01_former_house_of_tan_teng_niah",
+            "name": "Former House of Tan Teng Niah",
+            "cost": "TBC"
+          },
+          {
+            "time": "13:00",
+            "icon": "restaurant",
+            "key": "restaurant_09_hawkers_street_bpp",
+            "name": "Hawkers' Street @ BPP",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:30",
+            "icon": "restaurant",
+            "key": "restaurant_10_ri_xin_snack_delights",
+            "name": "Ri Xin Snack Delights",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 4",
+        "items": [
+          {
+            "time": "10:51",
+            "icon": "activity",
+            "key": "attraction_08_fort_canning_heritage_gallery",
+            "name": "Fort Canning Heritage Gallery",
+            "cost": "TBC"
+          },
+          {
+            "time": "13:37",
+            "icon": "restaurant",
+            "key": "restaurant_06_holland_drive_market_food_centre",
+            "name": "Holland Drive Market & Food Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:00",
+            "icon": "restaurant",
+            "key": "restaurant_04_20_ghim_moh_road_market_food_centre",
+            "name": "20 Ghim Moh Road Market & Food Centre",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 5",
+        "items": [
+          {
+            "time": "09:20",
+            "icon": "hotel",
+            "key": "hotel_stay",
+            "name": "Vibe Hotel Singapore Orchard",
+            "cost": "SGD 146/night"
+          },
+          {
+            "time": "09:40",
+            "icon": "restaurant",
+            "key": "restaurant_08_maxwell_food_centre",
+            "name": "Maxwell Food Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "15:20",
+            "icon": "flight",
+            "key": "flight_return",
+            "name": "EVA Air BR 216 (Nonstop) | Singapore Changi Airport → Taiwan Taoyuan International Airport | dep 2026-06-05 15:20 → arr 2026-06-05 20:00 | 280 min | Economy | USD 259",
+            "cost": "SGD 350"
+          }
+        ]
+      }
+    ]
+  },
+  "final_itineraries": {
+    "A": [
+      {
+        "day": "Day 1",
+        "items": [
+          {
+            "time": "13:55",
+            "icon": "flight",
+            "key": "flight_outbound",
+            "name": "EVA Air BR 215 (Nonstop) | Taiwan Taoyuan International Airport → Singapore Changi Airport | dep 2026-06-01 09:25 → arr 2026-06-01 13:55 | 270 min | Economy | USD 530",
+            "cost": "SGD 716"
+          },
+          {
+            "time": "15:25",
+            "icon": "activity",
+            "key": "attraction_05_singapore_chinese_cultural_centre",
+            "name": "Singapore Chinese Cultural Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:00",
+            "icon": "restaurant",
+            "key": "restaurant_11_chinatown_food_street",
+            "name": "Chinatown Food Street",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:30",
+            "icon": "hotel",
+            "key": "hotel_stay",
+            "name": "Citadines Balestier Singapore - Studio",
+            "cost": "SGD 197/night"
+          }
+        ]
+      },
+      {
+        "day": "Day 2",
+        "items": [
+          {
+            "time": "09:27",
+            "icon": "activity",
+            "key": "attraction_01_former_house_of_tan_teng_niah",
+            "name": "Former House of Tan Teng Niah",
+            "cost": "TBC"
+          },
+          {
+            "time": "11:58",
+            "icon": "restaurant",
+            "key": "restaurant_03_hawkers_street",
+            "name": "Hawkers' Street",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:15",
+            "icon": "restaurant",
+            "key": "restaurant_07_hawkers_street_ion",
+            "name": "Hawkers' Street @ ION",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 3",
+        "items": [
+          {
+            "time": "09:24",
+            "icon": "activity",
+            "key": "attraction_07_buddha_tooth_relic_temple",
+            "name": "Buddha Tooth Relic Temple",
+            "cost": "TBC"
+          },
+          {
+            "time": "11:55",
+            "icon": "restaurant",
+            "key": "restaurant_09_hawkers_street_bpp",
+            "name": "Hawkers' Street @ BPP",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:30",
+            "icon": "restaurant",
+            "key": "restaurant_10_ri_xin_snack_delights",
+            "name": "Ri Xin Snack Delights",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 4",
+        "items": [
+          {
+            "time": "09:56",
+            "icon": "activity",
+            "key": "attraction_08_fort_canning_heritage_gallery",
+            "name": "Fort Canning Heritage Gallery",
+            "cost": "TBC"
+          },
+          {
+            "time": "12:42",
+            "icon": "restaurant",
+            "key": "restaurant_06_holland_drive_market_food_centre",
+            "name": "Holland Drive Market & Food Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:00",
+            "icon": "restaurant",
+            "key": "restaurant_04_20_ghim_moh_road_market_food_centre",
+            "name": "20 Ghim Moh Road Market & Food Centre",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 5",
+        "items": [
+          {
+            "time": "09:20",
+            "icon": "hotel",
+            "key": "hotel_stay",
+            "name": "Citadines Balestier Singapore - Studio",
+            "cost": "SGD 197/night"
+          },
+          {
+            "time": "09:40",
+            "icon": "restaurant",
+            "key": "restaurant_08_maxwell_food_centre",
+            "name": "Maxwell Food Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "15:20",
+            "icon": "flight",
+            "key": "flight_return",
+            "name": "EVA Air BR 216 (Nonstop) | Singapore Changi Airport → Taiwan Taoyuan International Airport | dep 2026-06-05 15:20 → arr 2026-06-05 20:00 | 280 min | Economy | USD 259",
+            "cost": "SGD 350"
+          }
+        ]
+      }
+    ],
+    "B": [
+      {
+        "day": "Day 1",
+        "items": [
+          {
+            "time": "13:55",
+            "icon": "flight",
+            "key": "flight_outbound",
+            "name": "EVA Air BR 215 (Nonstop) | Taiwan Taoyuan International Airport → Singapore Changi Airport | dep 2026-06-01 09:25 → arr 2026-06-01 13:55 | 270 min | Economy | USD 530",
+            "cost": "SGD 716"
+          },
+          {
+            "time": "15:25",
+            "icon": "activity",
+            "key": "attraction_05_singapore_chinese_cultural_centre",
+            "name": "Singapore Chinese Cultural Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:00",
+            "icon": "restaurant",
+            "key": "restaurant_11_chinatown_food_street",
+            "name": "Chinatown Food Street",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:30",
+            "icon": "hotel",
+            "key": "hotel_stay",
+            "name": "Village Hotel Albert Court",
+            "cost": "SGD 128/night"
+          }
+        ]
+      },
+      {
+        "day": "Day 2",
+        "items": [
+          {
+            "time": "09:57",
+            "icon": "activity",
+            "key": "attraction_07_buddha_tooth_relic_temple",
+            "name": "Buddha Tooth Relic Temple",
+            "cost": "TBC"
+          },
+          {
+            "time": "12:13",
+            "icon": "restaurant",
+            "key": "restaurant_03_hawkers_street",
+            "name": "Hawkers' Street",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:15",
+            "icon": "restaurant",
+            "key": "restaurant_07_hawkers_street_ion",
+            "name": "Hawkers' Street @ ION",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 3",
+        "items": [
+          {
+            "time": "10:14",
+            "icon": "activity",
+            "key": "attraction_01_former_house_of_tan_teng_niah",
+            "name": "Former House of Tan Teng Niah",
+            "cost": "TBC"
+          },
+          {
+            "time": "12:45",
+            "icon": "restaurant",
+            "key": "restaurant_09_hawkers_street_bpp",
+            "name": "Hawkers' Street @ BPP",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:30",
+            "icon": "restaurant",
+            "key": "restaurant_10_ri_xin_snack_delights",
+            "name": "Ri Xin Snack Delights",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 4",
+        "items": [
+          {
+            "time": "10:36",
+            "icon": "activity",
+            "key": "attraction_08_fort_canning_heritage_gallery",
+            "name": "Fort Canning Heritage Gallery",
+            "cost": "TBC"
+          },
+          {
+            "time": "13:22",
+            "icon": "restaurant",
+            "key": "restaurant_06_holland_drive_market_food_centre",
+            "name": "Holland Drive Market & Food Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:00",
+            "icon": "restaurant",
+            "key": "restaurant_04_20_ghim_moh_road_market_food_centre",
+            "name": "20 Ghim Moh Road Market & Food Centre",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 5",
+        "items": [
+          {
+            "time": "09:20",
+            "icon": "hotel",
+            "key": "hotel_stay",
+            "name": "Village Hotel Albert Court",
+            "cost": "SGD 128/night"
+          },
+          {
+            "time": "09:40",
+            "icon": "restaurant",
+            "key": "restaurant_08_maxwell_food_centre",
+            "name": "Maxwell Food Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "15:20",
+            "icon": "flight",
+            "key": "flight_return",
+            "name": "EVA Air BR 216 (Nonstop) | Singapore Changi Airport → Taiwan Taoyuan International Airport | dep 2026-06-05 15:20 → arr 2026-06-05 20:00 | 280 min | Economy | USD 259",
+            "cost": "SGD 350"
+          }
+        ]
+      }
+    ],
+    "C": [
+      {
+        "day": "Day 1",
+        "items": [
+          {
+            "time": "13:55",
+            "icon": "flight",
+            "key": "flight_outbound",
+            "name": "EVA Air BR 215 (Nonstop) | Taiwan Taoyuan International Airport → Singapore Changi Airport | dep 2026-06-01 09:25 → arr 2026-06-01 13:55 | 270 min | Economy | USD 530",
+            "cost": "SGD 716"
+          },
+          {
+            "time": "15:25",
+            "icon": "activity",
+            "key": "attraction_05_singapore_chinese_cultural_centre",
+            "name": "Singapore Chinese Cultural Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:00",
+            "icon": "restaurant",
+            "key": "restaurant_11_chinatown_food_street",
+            "name": "Chinatown Food Street",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:30",
+            "icon": "hotel",
+            "key": "hotel_stay",
+            "name": "Vibe Hotel Singapore Orchard",
+            "cost": "SGD 146/night"
+          }
+        ]
+      },
+      {
+        "day": "Day 2",
+        "items": [
+          {
+            "time": "10:12",
+            "icon": "activity",
+            "key": "attraction_07_buddha_tooth_relic_temple",
+            "name": "Buddha Tooth Relic Temple",
+            "cost": "TBC"
+          },
+          {
+            "time": "12:28",
+            "icon": "restaurant",
+            "key": "restaurant_03_hawkers_street",
+            "name": "Hawkers' Street",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:15",
+            "icon": "restaurant",
+            "key": "restaurant_07_hawkers_street_ion",
+            "name": "Hawkers' Street @ ION",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 3",
+        "items": [
+          {
+            "time": "10:29",
+            "icon": "activity",
+            "key": "attraction_01_former_house_of_tan_teng_niah",
+            "name": "Former House of Tan Teng Niah",
+            "cost": "TBC"
+          },
+          {
+            "time": "13:00",
+            "icon": "restaurant",
+            "key": "restaurant_09_hawkers_street_bpp",
+            "name": "Hawkers' Street @ BPP",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:30",
+            "icon": "restaurant",
+            "key": "restaurant_10_ri_xin_snack_delights",
+            "name": "Ri Xin Snack Delights",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 4",
+        "items": [
+          {
+            "time": "10:51",
+            "icon": "activity",
+            "key": "attraction_08_fort_canning_heritage_gallery",
+            "name": "Fort Canning Heritage Gallery",
+            "cost": "TBC"
+          },
+          {
+            "time": "13:37",
+            "icon": "restaurant",
+            "key": "restaurant_06_holland_drive_market_food_centre",
+            "name": "Holland Drive Market & Food Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:00",
+            "icon": "restaurant",
+            "key": "restaurant_04_20_ghim_moh_road_market_food_centre",
+            "name": "20 Ghim Moh Road Market & Food Centre",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 5",
+        "items": [
+          {
+            "time": "09:20",
+            "icon": "hotel",
+            "key": "hotel_stay",
+            "name": "Vibe Hotel Singapore Orchard",
+            "cost": "SGD 146/night"
+          },
+          {
+            "time": "09:40",
+            "icon": "restaurant",
+            "key": "restaurant_08_maxwell_food_centre",
+            "name": "Maxwell Food Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "15:20",
+            "icon": "flight",
+            "key": "flight_return",
+            "name": "EVA Air BR 216 (Nonstop) | Singapore Changi Airport → Taiwan Taoyuan International Airport | dep 2026-06-05 15:20 → arr 2026-06-05 20:00 | 280 min | Economy | USD 259",
+            "cost": "SGD 350"
+          }
+        ]
+      }
+    ]
+  },
+  "normalized_itineraries": {
+    "A": [
+      {
+        "day": "Day 1",
+        "items": [
+          {
+            "time": "13:55",
+            "icon": "flight",
+            "key": "flight_outbound",
+            "name": "EVA Air BR 215 (Nonstop) | Taiwan Taoyuan International Airport → Singapore Changi Airport | dep 2026-06-01 09:25 → arr 2026-06-01 13:55 | 270 min | Economy | USD 530",
+            "cost": "SGD 716"
+          },
+          {
+            "time": "15:25",
+            "icon": "activity",
+            "key": "attraction_05_singapore_chinese_cultural_centre",
+            "name": "Singapore Chinese Cultural Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:00",
+            "icon": "restaurant",
+            "key": "restaurant_11_chinatown_food_street",
+            "name": "Chinatown Food Street",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:30",
+            "icon": "hotel",
+            "key": "hotel_stay",
+            "name": "Citadines Balestier Singapore - Studio",
+            "cost": "SGD 197/night"
+          }
+        ]
+      },
+      {
+        "day": "Day 2",
+        "items": [
+          {
+            "time": "09:27",
+            "icon": "activity",
+            "key": "attraction_01_former_house_of_tan_teng_niah",
+            "name": "Former House of Tan Teng Niah",
+            "cost": "TBC"
+          },
+          {
+            "time": "11:58",
+            "icon": "restaurant",
+            "key": "restaurant_03_hawkers_street",
+            "name": "Hawkers' Street",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:15",
+            "icon": "restaurant",
+            "key": "restaurant_07_hawkers_street_ion",
+            "name": "Hawkers' Street @ ION",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 3",
+        "items": [
+          {
+            "time": "09:24",
+            "icon": "activity",
+            "key": "attraction_07_buddha_tooth_relic_temple",
+            "name": "Buddha Tooth Relic Temple",
+            "cost": "TBC"
+          },
+          {
+            "time": "11:55",
+            "icon": "restaurant",
+            "key": "restaurant_09_hawkers_street_bpp",
+            "name": "Hawkers' Street @ BPP",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:30",
+            "icon": "restaurant",
+            "key": "restaurant_10_ri_xin_snack_delights",
+            "name": "Ri Xin Snack Delights",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 4",
+        "items": [
+          {
+            "time": "09:56",
+            "icon": "activity",
+            "key": "attraction_08_fort_canning_heritage_gallery",
+            "name": "Fort Canning Heritage Gallery",
+            "cost": "TBC"
+          },
+          {
+            "time": "12:42",
+            "icon": "restaurant",
+            "key": "restaurant_06_holland_drive_market_food_centre",
+            "name": "Holland Drive Market & Food Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:00",
+            "icon": "restaurant",
+            "key": "restaurant_04_20_ghim_moh_road_market_food_centre",
+            "name": "20 Ghim Moh Road Market & Food Centre",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 5",
+        "items": [
+          {
+            "time": "09:20",
+            "icon": "hotel",
+            "key": "hotel_stay",
+            "name": "Citadines Balestier Singapore - Studio",
+            "cost": "SGD 197/night"
+          },
+          {
+            "time": "09:40",
+            "icon": "restaurant",
+            "key": "restaurant_08_maxwell_food_centre",
+            "name": "Maxwell Food Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "15:20",
+            "icon": "flight",
+            "key": "flight_return",
+            "name": "EVA Air BR 216 (Nonstop) | Singapore Changi Airport → Taiwan Taoyuan International Airport | dep 2026-06-05 15:20 → arr 2026-06-05 20:00 | 280 min | Economy | USD 259",
+            "cost": "SGD 350"
+          }
+        ]
+      }
+    ],
+    "B": [
+      {
+        "day": "Day 1",
+        "items": [
+          {
+            "time": "13:55",
+            "icon": "flight",
+            "key": "flight_outbound",
+            "name": "EVA Air BR 215 (Nonstop) | Taiwan Taoyuan International Airport → Singapore Changi Airport | dep 2026-06-01 09:25 → arr 2026-06-01 13:55 | 270 min | Economy | USD 530",
+            "cost": "SGD 716"
+          },
+          {
+            "time": "15:25",
+            "icon": "activity",
+            "key": "attraction_05_singapore_chinese_cultural_centre",
+            "name": "Singapore Chinese Cultural Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:00",
+            "icon": "restaurant",
+            "key": "restaurant_11_chinatown_food_street",
+            "name": "Chinatown Food Street",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:30",
+            "icon": "hotel",
+            "key": "hotel_stay",
+            "name": "Village Hotel Albert Court",
+            "cost": "SGD 128/night"
+          }
+        ]
+      },
+      {
+        "day": "Day 2",
+        "items": [
+          {
+            "time": "09:57",
+            "icon": "activity",
+            "key": "attraction_07_buddha_tooth_relic_temple",
+            "name": "Buddha Tooth Relic Temple",
+            "cost": "TBC"
+          },
+          {
+            "time": "12:13",
+            "icon": "restaurant",
+            "key": "restaurant_03_hawkers_street",
+            "name": "Hawkers' Street",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:15",
+            "icon": "restaurant",
+            "key": "restaurant_07_hawkers_street_ion",
+            "name": "Hawkers' Street @ ION",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 3",
+        "items": [
+          {
+            "time": "10:14",
+            "icon": "activity",
+            "key": "attraction_01_former_house_of_tan_teng_niah",
+            "name": "Former House of Tan Teng Niah",
+            "cost": "TBC"
+          },
+          {
+            "time": "12:45",
+            "icon": "restaurant",
+            "key": "restaurant_09_hawkers_street_bpp",
+            "name": "Hawkers' Street @ BPP",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:30",
+            "icon": "restaurant",
+            "key": "restaurant_10_ri_xin_snack_delights",
+            "name": "Ri Xin Snack Delights",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 4",
+        "items": [
+          {
+            "time": "10:36",
+            "icon": "activity",
+            "key": "attraction_08_fort_canning_heritage_gallery",
+            "name": "Fort Canning Heritage Gallery",
+            "cost": "TBC"
+          },
+          {
+            "time": "13:22",
+            "icon": "restaurant",
+            "key": "restaurant_06_holland_drive_market_food_centre",
+            "name": "Holland Drive Market & Food Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:00",
+            "icon": "restaurant",
+            "key": "restaurant_04_20_ghim_moh_road_market_food_centre",
+            "name": "20 Ghim Moh Road Market & Food Centre",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 5",
+        "items": [
+          {
+            "time": "09:20",
+            "icon": "hotel",
+            "key": "hotel_stay",
+            "name": "Village Hotel Albert Court",
+            "cost": "SGD 128/night"
+          },
+          {
+            "time": "09:40",
+            "icon": "restaurant",
+            "key": "restaurant_08_maxwell_food_centre",
+            "name": "Maxwell Food Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "15:20",
+            "icon": "flight",
+            "key": "flight_return",
+            "name": "EVA Air BR 216 (Nonstop) | Singapore Changi Airport → Taiwan Taoyuan International Airport | dep 2026-06-05 15:20 → arr 2026-06-05 20:00 | 280 min | Economy | USD 259",
+            "cost": "SGD 350"
+          }
+        ]
+      }
+    ],
+    "C": [
+      {
+        "day": "Day 1",
+        "items": [
+          {
+            "time": "13:55",
+            "icon": "flight",
+            "key": "flight_outbound",
+            "name": "EVA Air BR 215 (Nonstop) | Taiwan Taoyuan International Airport → Singapore Changi Airport | dep 2026-06-01 09:25 → arr 2026-06-01 13:55 | 270 min | Economy | USD 530",
+            "cost": "SGD 716"
+          },
+          {
+            "time": "15:25",
+            "icon": "activity",
+            "key": "attraction_05_singapore_chinese_cultural_centre",
+            "name": "Singapore Chinese Cultural Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:00",
+            "icon": "restaurant",
+            "key": "restaurant_11_chinatown_food_street",
+            "name": "Chinatown Food Street",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:30",
+            "icon": "hotel",
+            "key": "hotel_stay",
+            "name": "Vibe Hotel Singapore Orchard",
+            "cost": "SGD 146/night"
+          }
+        ]
+      },
+      {
+        "day": "Day 2",
+        "items": [
+          {
+            "time": "10:12",
+            "icon": "activity",
+            "key": "attraction_07_buddha_tooth_relic_temple",
+            "name": "Buddha Tooth Relic Temple",
+            "cost": "TBC"
+          },
+          {
+            "time": "12:28",
+            "icon": "restaurant",
+            "key": "restaurant_03_hawkers_street",
+            "name": "Hawkers' Street",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:15",
+            "icon": "restaurant",
+            "key": "restaurant_07_hawkers_street_ion",
+            "name": "Hawkers' Street @ ION",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 3",
+        "items": [
+          {
+            "time": "10:29",
+            "icon": "activity",
+            "key": "attraction_01_former_house_of_tan_teng_niah",
+            "name": "Former House of Tan Teng Niah",
+            "cost": "TBC"
+          },
+          {
+            "time": "13:00",
+            "icon": "restaurant",
+            "key": "restaurant_09_hawkers_street_bpp",
+            "name": "Hawkers' Street @ BPP",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:30",
+            "icon": "restaurant",
+            "key": "restaurant_10_ri_xin_snack_delights",
+            "name": "Ri Xin Snack Delights",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 4",
+        "items": [
+          {
+            "time": "10:51",
+            "icon": "activity",
+            "key": "attraction_08_fort_canning_heritage_gallery",
+            "name": "Fort Canning Heritage Gallery",
+            "cost": "TBC"
+          },
+          {
+            "time": "13:37",
+            "icon": "restaurant",
+            "key": "restaurant_06_holland_drive_market_food_centre",
+            "name": "Holland Drive Market & Food Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:00",
+            "icon": "restaurant",
+            "key": "restaurant_04_20_ghim_moh_road_market_food_centre",
+            "name": "20 Ghim Moh Road Market & Food Centre",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 5",
+        "items": [
+          {
+            "time": "09:20",
+            "icon": "hotel",
+            "key": "hotel_stay",
+            "name": "Vibe Hotel Singapore Orchard",
+            "cost": "SGD 146/night"
+          },
+          {
+            "time": "09:40",
+            "icon": "restaurant",
+            "key": "restaurant_08_maxwell_food_centre",
+            "name": "Maxwell Food Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "15:20",
+            "icon": "flight",
+            "key": "flight_return",
+            "name": "EVA Air BR 216 (Nonstop) | Singapore Changi Airport → Taiwan Taoyuan International Airport | dep 2026-06-05 15:20 → arr 2026-06-05 20:00 | 280 min | Economy | USD 259",
+            "cost": "SGD 350"
+          }
+        ]
+      }
+    ]
+  },
+  "validated_itineraries": {
+    "A": [
+      {
+        "day": "Day 1",
+        "items": [
+          {
+            "time": "13:55",
+            "icon": "flight",
+            "key": "flight_outbound",
+            "name": "EVA Air BR 215 (Nonstop) | Taiwan Taoyuan International Airport → Singapore Changi Airport | dep 2026-06-01 09:25 → arr 2026-06-01 13:55 | 270 min | Economy | USD 530",
+            "cost": "SGD 716"
+          },
+          {
+            "time": "15:25",
+            "icon": "activity",
+            "key": "attraction_05_singapore_chinese_cultural_centre",
+            "name": "Singapore Chinese Cultural Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:00",
+            "icon": "restaurant",
+            "key": "restaurant_11_chinatown_food_street",
+            "name": "Chinatown Food Street",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:30",
+            "icon": "hotel",
+            "key": "hotel_stay",
+            "name": "Citadines Balestier Singapore - Studio",
+            "cost": "SGD 197/night"
+          }
+        ]
+      },
+      {
+        "day": "Day 2",
+        "items": [
+          {
+            "time": "09:27",
+            "icon": "activity",
+            "key": "attraction_01_former_house_of_tan_teng_niah",
+            "name": "Former House of Tan Teng Niah",
+            "cost": "TBC"
+          },
+          {
+            "time": "11:58",
+            "icon": "restaurant",
+            "key": "restaurant_03_hawkers_street",
+            "name": "Hawkers' Street",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:15",
+            "icon": "restaurant",
+            "key": "restaurant_07_hawkers_street_ion",
+            "name": "Hawkers' Street @ ION",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 3",
+        "items": [
+          {
+            "time": "09:24",
+            "icon": "activity",
+            "key": "attraction_07_buddha_tooth_relic_temple",
+            "name": "Buddha Tooth Relic Temple",
+            "cost": "TBC"
+          },
+          {
+            "time": "11:55",
+            "icon": "restaurant",
+            "key": "restaurant_09_hawkers_street_bpp",
+            "name": "Hawkers' Street @ BPP",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:30",
+            "icon": "restaurant",
+            "key": "restaurant_10_ri_xin_snack_delights",
+            "name": "Ri Xin Snack Delights",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 4",
+        "items": [
+          {
+            "time": "09:56",
+            "icon": "activity",
+            "key": "attraction_08_fort_canning_heritage_gallery",
+            "name": "Fort Canning Heritage Gallery",
+            "cost": "TBC"
+          },
+          {
+            "time": "12:42",
+            "icon": "restaurant",
+            "key": "restaurant_06_holland_drive_market_food_centre",
+            "name": "Holland Drive Market & Food Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:00",
+            "icon": "restaurant",
+            "key": "restaurant_04_20_ghim_moh_road_market_food_centre",
+            "name": "20 Ghim Moh Road Market & Food Centre",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 5",
+        "items": [
+          {
+            "time": "09:20",
+            "icon": "hotel",
+            "key": "hotel_stay",
+            "name": "Citadines Balestier Singapore - Studio",
+            "cost": "SGD 197/night"
+          },
+          {
+            "time": "09:40",
+            "icon": "restaurant",
+            "key": "restaurant_08_maxwell_food_centre",
+            "name": "Maxwell Food Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "15:20",
+            "icon": "flight",
+            "key": "flight_return",
+            "name": "EVA Air BR 216 (Nonstop) | Singapore Changi Airport → Taiwan Taoyuan International Airport | dep 2026-06-05 15:20 → arr 2026-06-05 20:00 | 280 min | Economy | USD 259",
+            "cost": "SGD 350"
+          }
+        ]
+      }
+    ],
+    "B": [
+      {
+        "day": "Day 1",
+        "items": [
+          {
+            "time": "13:55",
+            "icon": "flight",
+            "key": "flight_outbound",
+            "name": "EVA Air BR 215 (Nonstop) | Taiwan Taoyuan International Airport → Singapore Changi Airport | dep 2026-06-01 09:25 → arr 2026-06-01 13:55 | 270 min | Economy | USD 530",
+            "cost": "SGD 716"
+          },
+          {
+            "time": "15:25",
+            "icon": "activity",
+            "key": "attraction_05_singapore_chinese_cultural_centre",
+            "name": "Singapore Chinese Cultural Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:00",
+            "icon": "restaurant",
+            "key": "restaurant_11_chinatown_food_street",
+            "name": "Chinatown Food Street",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:30",
+            "icon": "hotel",
+            "key": "hotel_stay",
+            "name": "Village Hotel Albert Court",
+            "cost": "SGD 128/night"
+          }
+        ]
+      },
+      {
+        "day": "Day 2",
+        "items": [
+          {
+            "time": "09:57",
+            "icon": "activity",
+            "key": "attraction_07_buddha_tooth_relic_temple",
+            "name": "Buddha Tooth Relic Temple",
+            "cost": "TBC"
+          },
+          {
+            "time": "12:13",
+            "icon": "restaurant",
+            "key": "restaurant_03_hawkers_street",
+            "name": "Hawkers' Street",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:15",
+            "icon": "restaurant",
+            "key": "restaurant_07_hawkers_street_ion",
+            "name": "Hawkers' Street @ ION",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 3",
+        "items": [
+          {
+            "time": "10:14",
+            "icon": "activity",
+            "key": "attraction_01_former_house_of_tan_teng_niah",
+            "name": "Former House of Tan Teng Niah",
+            "cost": "TBC"
+          },
+          {
+            "time": "12:45",
+            "icon": "restaurant",
+            "key": "restaurant_09_hawkers_street_bpp",
+            "name": "Hawkers' Street @ BPP",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:30",
+            "icon": "restaurant",
+            "key": "restaurant_10_ri_xin_snack_delights",
+            "name": "Ri Xin Snack Delights",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 4",
+        "items": [
+          {
+            "time": "10:36",
+            "icon": "activity",
+            "key": "attraction_08_fort_canning_heritage_gallery",
+            "name": "Fort Canning Heritage Gallery",
+            "cost": "TBC"
+          },
+          {
+            "time": "13:22",
+            "icon": "restaurant",
+            "key": "restaurant_06_holland_drive_market_food_centre",
+            "name": "Holland Drive Market & Food Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:00",
+            "icon": "restaurant",
+            "key": "restaurant_04_20_ghim_moh_road_market_food_centre",
+            "name": "20 Ghim Moh Road Market & Food Centre",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 5",
+        "items": [
+          {
+            "time": "09:20",
+            "icon": "hotel",
+            "key": "hotel_stay",
+            "name": "Village Hotel Albert Court",
+            "cost": "SGD 128/night"
+          },
+          {
+            "time": "09:40",
+            "icon": "restaurant",
+            "key": "restaurant_08_maxwell_food_centre",
+            "name": "Maxwell Food Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "15:20",
+            "icon": "flight",
+            "key": "flight_return",
+            "name": "EVA Air BR 216 (Nonstop) | Singapore Changi Airport → Taiwan Taoyuan International Airport | dep 2026-06-05 15:20 → arr 2026-06-05 20:00 | 280 min | Economy | USD 259",
+            "cost": "SGD 350"
+          }
+        ]
+      }
+    ],
+    "C": [
+      {
+        "day": "Day 1",
+        "items": [
+          {
+            "time": "13:55",
+            "icon": "flight",
+            "key": "flight_outbound",
+            "name": "EVA Air BR 215 (Nonstop) | Taiwan Taoyuan International Airport → Singapore Changi Airport | dep 2026-06-01 09:25 → arr 2026-06-01 13:55 | 270 min | Economy | USD 530",
+            "cost": "SGD 716"
+          },
+          {
+            "time": "15:25",
+            "icon": "activity",
+            "key": "attraction_05_singapore_chinese_cultural_centre",
+            "name": "Singapore Chinese Cultural Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:00",
+            "icon": "restaurant",
+            "key": "restaurant_11_chinatown_food_street",
+            "name": "Chinatown Food Street",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:30",
+            "icon": "hotel",
+            "key": "hotel_stay",
+            "name": "Vibe Hotel Singapore Orchard",
+            "cost": "SGD 146/night"
+          }
+        ]
+      },
+      {
+        "day": "Day 2",
+        "items": [
+          {
+            "time": "10:12",
+            "icon": "activity",
+            "key": "attraction_07_buddha_tooth_relic_temple",
+            "name": "Buddha Tooth Relic Temple",
+            "cost": "TBC"
+          },
+          {
+            "time": "12:28",
+            "icon": "restaurant",
+            "key": "restaurant_03_hawkers_street",
+            "name": "Hawkers' Street",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:15",
+            "icon": "restaurant",
+            "key": "restaurant_07_hawkers_street_ion",
+            "name": "Hawkers' Street @ ION",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 3",
+        "items": [
+          {
+            "time": "10:29",
+            "icon": "activity",
+            "key": "attraction_01_former_house_of_tan_teng_niah",
+            "name": "Former House of Tan Teng Niah",
+            "cost": "TBC"
+          },
+          {
+            "time": "13:00",
+            "icon": "restaurant",
+            "key": "restaurant_09_hawkers_street_bpp",
+            "name": "Hawkers' Street @ BPP",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:30",
+            "icon": "restaurant",
+            "key": "restaurant_10_ri_xin_snack_delights",
+            "name": "Ri Xin Snack Delights",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 4",
+        "items": [
+          {
+            "time": "10:51",
+            "icon": "activity",
+            "key": "attraction_08_fort_canning_heritage_gallery",
+            "name": "Fort Canning Heritage Gallery",
+            "cost": "TBC"
+          },
+          {
+            "time": "13:37",
+            "icon": "restaurant",
+            "key": "restaurant_06_holland_drive_market_food_centre",
+            "name": "Holland Drive Market & Food Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "18:00",
+            "icon": "restaurant",
+            "key": "restaurant_04_20_ghim_moh_road_market_food_centre",
+            "name": "20 Ghim Moh Road Market & Food Centre",
+            "cost": "TBC"
+          }
+        ]
+      },
+      {
+        "day": "Day 5",
+        "items": [
+          {
+            "time": "09:20",
+            "icon": "hotel",
+            "key": "hotel_stay",
+            "name": "Vibe Hotel Singapore Orchard",
+            "cost": "SGD 146/night"
+          },
+          {
+            "time": "09:40",
+            "icon": "restaurant",
+            "key": "restaurant_08_maxwell_food_centre",
+            "name": "Maxwell Food Centre",
+            "cost": "TBC"
+          },
+          {
+            "time": "15:20",
+            "icon": "flight",
+            "key": "flight_return",
+            "name": "EVA Air BR 216 (Nonstop) | Singapore Changi Airport → Taiwan Taoyuan International Airport | dep 2026-06-05 15:20 → arr 2026-06-05 20:00 | 280 min | Economy | USD 259",
+            "cost": "SGD 350"
+          }
+        ]
+      }
+    ]
+  },
+  "raw_planner_output": {
+    "planner_mode": "deterministic_route_first",
+    "chain_of_thought": "Built 3 deterministic itinerary variants from the saved research inventory by choosing the highest-ranked flights, selecting distinct hotels per option, clustering attractions by lat/lng, pairing nearby lunch and dinner stops, and scheduling the final day by working backward from the return flight airport buffer.",
+    "options": {
+      "A": {
+        "label": "Heritage Highlights",
+        "desc": "A culture-forward route centered on the city's strongest heritage, temple, and landmark experiences, with dependable local meals nearby.",
+        "budget": "SGD 5000 (flight + hotel; meals/transport TBC)",
+        "style": "Heritage / landmark route",
+        "badge": "Best for first-time visitors who want the cultural essentials",
+        "days": [
+          {
+            "day": "Day 1",
+            "items": [
+              {
+                "time": "13:55",
+                "icon": "flight",
+                "key": "flight_outbound",
+                "name": "EVA Air BR 215 (Nonstop) | Taiwan Taoyuan International Airport → Singapore Changi Airport | dep 2026-06-01 09:25 → arr 2026-06-01 13:55 | 270 min | Economy | USD 530",
+                "cost": "SGD 716"
+              },
+              {
+                "time": "15:25",
+                "icon": "activity",
+                "key": "attraction_05_singapore_chinese_cultural_centre",
+                "name": "Singapore Chinese Cultural Centre",
+                "cost": "TBC"
+              },
+              {
+                "time": "18:00",
+                "icon": "restaurant",
+                "key": "restaurant_11_chinatown_food_street",
+                "name": "Chinatown Food Street",
+                "cost": "TBC"
+              },
+              {
+                "time": "18:30",
+                "icon": "hotel",
+                "key": "hotel_stay",
+                "name": "Citadines Balestier Singapore - Studio",
+                "cost": "SGD 197/night"
+              }
+            ]
+          },
+          {
+            "day": "Day 2",
+            "items": [
+              {
+                "time": "09:27",
+                "icon": "activity",
+                "key": "attraction_01_former_house_of_tan_teng_niah",
+                "name": "Former House of Tan Teng Niah",
+                "cost": "TBC"
+              },
+              {
+                "time": "11:58",
+                "icon": "restaurant",
+                "key": "restaurant_03_hawkers_street",
+                "name": "Hawkers' Street",
+                "cost": "TBC"
+              },
+              {
+                "time": "18:15",
+                "icon": "restaurant",
+                "key": "restaurant_07_hawkers_street_ion",
+                "name": "Hawkers' Street @ ION",
+                "cost": "TBC"
+              }
+            ]
+          },
+          {
+            "day": "Day 3",
+            "items": [
+              {
+                "time": "09:24",
+                "icon": "activity",
+                "key": "attraction_07_buddha_tooth_relic_temple",
+                "name": "Buddha Tooth Relic Temple",
+                "cost": "TBC"
+              },
+              {
+                "time": "11:55",
+                "icon": "restaurant",
+                "key": "restaurant_09_hawkers_street_bpp",
+                "name": "Hawkers' Street @ BPP",
+                "cost": "TBC"
+              },
+              {
+                "time": "18:30",
+                "icon": "restaurant",
+                "key": "restaurant_10_ri_xin_snack_delights",
+                "name": "Ri Xin Snack Delights",
+                "cost": "TBC"
+              }
+            ]
+          },
+          {
+            "day": "Day 4",
+            "items": [
+              {
+                "time": "09:56",
+                "icon": "activity",
+                "key": "attraction_08_fort_canning_heritage_gallery",
+                "name": "Fort Canning Heritage Gallery",
+                "cost": "TBC"
+              },
+              {
+                "time": "12:42",
+                "icon": "restaurant",
+                "key": "restaurant_06_holland_drive_market_food_centre",
+                "name": "Holland Drive Market & Food Centre",
+                "cost": "TBC"
+              },
+              {
+                "time": "18:00",
+                "icon": "restaurant",
+                "key": "restaurant_04_20_ghim_moh_road_market_food_centre",
+                "name": "20 Ghim Moh Road Market & Food Centre",
+                "cost": "TBC"
+              }
+            ]
+          },
+          {
+            "day": "Day 5",
+            "items": [
+              {
+                "time": "09:20",
+                "icon": "hotel",
+                "key": "hotel_stay",
+                "name": "Citadines Balestier Singapore - Studio",
+                "cost": "SGD 197/night"
+              },
+              {
+                "time": "09:40",
+                "icon": "restaurant",
+                "key": "restaurant_08_maxwell_food_centre",
+                "name": "Maxwell Food Centre",
+                "cost": "TBC"
+              },
+              {
+                "time": "15:20",
+                "icon": "flight",
+                "key": "flight_return",
+                "name": "EVA Air BR 216 (Nonstop) | Singapore Changi Airport → Taiwan Taoyuan International Airport | dep 2026-06-05 15:20 → arr 2026-06-05 20:00 | 280 min | Economy | USD 259",
+                "cost": "SGD 350"
+              }
+            ]
+          }
+        ]
+      },
+      "B": {
+        "label": "Neighborhood Food Trail",
+        "desc": "A food-led itinerary that pairs local street food and hawker-style stops with nearby heritage pockets and walkable neighborhood culture.",
+        "budget": "SGD 5000 (flight + hotel; meals/transport TBC)",
+        "style": "Food + neighborhood exploration",
+        "badge": "Best for travelers who want local eats woven into each day",
+        "days": [
+          {
+            "day": "Day 1",
+            "items": [
+              {
+                "time": "13:55",
+                "icon": "flight",
+                "key": "flight_outbound",
+                "name": "EVA Air BR 215 (Nonstop) | Taiwan Taoyuan International Airport → Singapore Changi Airport | dep 2026-06-01 09:25 → arr 2026-06-01 13:55 | 270 min | Economy | USD 530",
+                "cost": "SGD 716"
+              },
+              {
+                "time": "15:25",
+                "icon": "activity",
+                "key": "attraction_05_singapore_chinese_cultural_centre",
+                "name": "Singapore Chinese Cultural Centre",
+                "cost": "TBC"
+              },
+              {
+                "time": "18:00",
+                "icon": "restaurant",
+                "key": "restaurant_11_chinatown_food_street",
+                "name": "Chinatown Food Street",
+                "cost": "TBC"
+              },
+              {
+                "time": "18:30",
+                "icon": "hotel",
+                "key": "hotel_stay",
+                "name": "Village Hotel Albert Court",
+                "cost": "SGD 128/night"
+              }
+            ]
+          },
+          {
+            "day": "Day 2",
+            "items": [
+              {
+                "time": "09:57",
+                "icon": "activity",
+                "key": "attraction_07_buddha_tooth_relic_temple",
+                "name": "Buddha Tooth Relic Temple",
+                "cost": "TBC"
+              },
+              {
+                "time": "12:13",
+                "icon": "restaurant",
+                "key": "restaurant_03_hawkers_street",
+                "name": "Hawkers' Street",
+                "cost": "TBC"
+              },
+              {
+                "time": "18:15",
+                "icon": "restaurant",
+                "key": "restaurant_07_hawkers_street_ion",
+                "name": "Hawkers' Street @ ION",
+                "cost": "TBC"
+              }
+            ]
+          },
+          {
+            "day": "Day 3",
+            "items": [
+              {
+                "time": "10:14",
+                "icon": "activity",
+                "key": "attraction_01_former_house_of_tan_teng_niah",
+                "name": "Former House of Tan Teng Niah",
+                "cost": "TBC"
+              },
+              {
+                "time": "12:45",
+                "icon": "restaurant",
+                "key": "restaurant_09_hawkers_street_bpp",
+                "name": "Hawkers' Street @ BPP",
+                "cost": "TBC"
+              },
+              {
+                "time": "18:30",
+                "icon": "restaurant",
+                "key": "restaurant_10_ri_xin_snack_delights",
+                "name": "Ri Xin Snack Delights",
+                "cost": "TBC"
+              }
+            ]
+          },
+          {
+            "day": "Day 4",
+            "items": [
+              {
+                "time": "10:36",
+                "icon": "activity",
+                "key": "attraction_08_fort_canning_heritage_gallery",
+                "name": "Fort Canning Heritage Gallery",
+                "cost": "TBC"
+              },
+              {
+                "time": "13:22",
+                "icon": "restaurant",
+                "key": "restaurant_06_holland_drive_market_food_centre",
+                "name": "Holland Drive Market & Food Centre",
+                "cost": "TBC"
+              },
+              {
+                "time": "18:00",
+                "icon": "restaurant",
+                "key": "restaurant_04_20_ghim_moh_road_market_food_centre",
+                "name": "20 Ghim Moh Road Market & Food Centre",
+                "cost": "TBC"
+              }
+            ]
+          },
+          {
+            "day": "Day 5",
+            "items": [
+              {
+                "time": "09:20",
+                "icon": "hotel",
+                "key": "hotel_stay",
+                "name": "Village Hotel Albert Court",
+                "cost": "SGD 128/night"
+              },
+              {
+                "time": "09:40",
+                "icon": "restaurant",
+                "key": "restaurant_08_maxwell_food_centre",
+                "name": "Maxwell Food Centre",
+                "cost": "TBC"
+              },
+              {
+                "time": "15:20",
+                "icon": "flight",
+                "key": "flight_return",
+                "name": "EVA Air BR 216 (Nonstop) | Singapore Changi Airport → Taiwan Taoyuan International Airport | dep 2026-06-05 15:20 → arr 2026-06-05 20:00 | 280 min | Economy | USD 259",
+                "cost": "SGD 350"
+              }
+            ]
+          }
+        ]
+      },
+      "C": {
+        "label": "Slow Culture & Scenic Pace",
+        "desc": "A calmer plan with fewer jumps, prioritizing temples, heritage, greener stops, and relaxed local meals over sheer volume.",
+        "budget": "SGD 5000 (flight + hotel; meals/transport TBC)",
+        "style": "Slower scenic / culture-forward pace",
+        "badge": "Best for travelers who prefer an easier rhythm",
+        "days": [
+          {
+            "day": "Day 1",
+            "items": [
+              {
+                "time": "13:55",
+                "icon": "flight",
+                "key": "flight_outbound",
+                "name": "EVA Air BR 215 (Nonstop) | Taiwan Taoyuan International Airport → Singapore Changi Airport | dep 2026-06-01 09:25 → arr 2026-06-01 13:55 | 270 min | Economy | USD 530",
+                "cost": "SGD 716"
+              },
+              {
+                "time": "15:25",
+                "icon": "activity",
+                "key": "attraction_05_singapore_chinese_cultural_centre",
+                "name": "Singapore Chinese Cultural Centre",
+                "cost": "TBC"
+              },
+              {
+                "time": "18:00",
+                "icon": "restaurant",
+                "key": "restaurant_11_chinatown_food_street",
+                "name": "Chinatown Food Street",
+                "cost": "TBC"
+              },
+              {
+                "time": "18:30",
+                "icon": "hotel",
+                "key": "hotel_stay",
+                "name": "Vibe Hotel Singapore Orchard",
+                "cost": "SGD 146/night"
+              }
+            ]
+          },
+          {
+            "day": "Day 2",
+            "items": [
+              {
+                "time": "10:12",
+                "icon": "activity",
+                "key": "attraction_07_buddha_tooth_relic_temple",
+                "name": "Buddha Tooth Relic Temple",
+                "cost": "TBC"
+              },
+              {
+                "time": "12:28",
+                "icon": "restaurant",
+                "key": "restaurant_03_hawkers_street",
+                "name": "Hawkers' Street",
+                "cost": "TBC"
+              },
+              {
+                "time": "18:15",
+                "icon": "restaurant",
+                "key": "restaurant_07_hawkers_street_ion",
+                "name": "Hawkers' Street @ ION",
+                "cost": "TBC"
+              }
+            ]
+          },
+          {
+            "day": "Day 3",
+            "items": [
+              {
+                "time": "10:29",
+                "icon": "activity",
+                "key": "attraction_01_former_house_of_tan_teng_niah",
+                "name": "Former House of Tan Teng Niah",
+                "cost": "TBC"
+              },
+              {
+                "time": "13:00",
+                "icon": "restaurant",
+                "key": "restaurant_09_hawkers_street_bpp",
+                "name": "Hawkers' Street @ BPP",
+                "cost": "TBC"
+              },
+              {
+                "time": "18:30",
+                "icon": "restaurant",
+                "key": "restaurant_10_ri_xin_snack_delights",
+                "name": "Ri Xin Snack Delights",
+                "cost": "TBC"
+              }
+            ]
+          },
+          {
+            "day": "Day 4",
+            "items": [
+              {
+                "time": "10:51",
+                "icon": "activity",
+                "key": "attraction_08_fort_canning_heritage_gallery",
+                "name": "Fort Canning Heritage Gallery",
+                "cost": "TBC"
+              },
+              {
+                "time": "13:37",
+                "icon": "restaurant",
+                "key": "restaurant_06_holland_drive_market_food_centre",
+                "name": "Holland Drive Market & Food Centre",
+                "cost": "TBC"
+              },
+              {
+                "time": "18:00",
+                "icon": "restaurant",
+                "key": "restaurant_04_20_ghim_moh_road_market_food_centre",
+                "name": "20 Ghim Moh Road Market & Food Centre",
+                "cost": "TBC"
+              }
+            ]
+          },
+          {
+            "day": "Day 5",
+            "items": [
+              {
+                "time": "09:20",
+                "icon": "hotel",
+                "key": "hotel_stay",
+                "name": "Vibe Hotel Singapore Orchard",
+                "cost": "SGD 146/night"
+              },
+              {
+                "time": "09:40",
+                "icon": "restaurant",
+                "key": "restaurant_08_maxwell_food_centre",
+                "name": "Maxwell Food Centre",
+                "cost": "TBC"
+              },
+              {
+                "time": "15:20",
+                "icon": "flight",
+                "key": "flight_return",
+                "name": "EVA Air BR 216 (Nonstop) | Singapore Changi Airport → Taiwan Taoyuan International Airport | dep 2026-06-05 15:20 → arr 2026-06-05 20:00 | 280 min | Economy | USD 259",
+                "cost": "SGD 350"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "validation_report": {
+    "A": {
+      "removed_items": 0,
+      "normalized_items": 0,
+      "duplicate_items": 0,
+      "invalid_items": 0,
+      "sparse_days": [],
+      "boundary_repairs": [],
+      "route_warnings": []
+    },
+    "B": {
+      "removed_items": 0,
+      "normalized_items": 0,
+      "duplicate_items": 0,
+      "invalid_items": 0,
+      "sparse_days": [],
+      "boundary_repairs": [],
+      "route_warnings": []
+    },
+    "C": {
+      "removed_items": 0,
+      "normalized_items": 0,
+      "duplicate_items": 0,
+      "invalid_items": 0,
+      "sparse_days": [],
+      "boundary_repairs": [],
+      "route_warnings": []
+    }
+  },
+  "option_meta": {
+    "A": {
+      "label": "Heritage Highlights",
+      "desc": "A culture-forward route centered on the city's strongest heritage, temple, and landmark experiences, with dependable local meals nearby.",
+      "budget": "SGD 5000 (flight + hotel; meals/transport TBC)",
+      "style": "Heritage / landmark route",
+      "badge": "Best for first-time visitors who want the cultural essentials"
+    },
+    "B": {
+      "label": "Neighborhood Food Trail",
+      "desc": "A food-led itinerary that pairs local street food and hawker-style stops with nearby heritage pockets and walkable neighborhood culture.",
+      "budget": "SGD 5000 (flight + hotel; meals/transport TBC)",
+      "style": "Food + neighborhood exploration",
+      "badge": "Best for travelers who want local eats woven into each day"
+    },
+    "C": {
+      "label": "Slow Culture & Scenic Pace",
+      "desc": "A calmer plan with fewer jumps, prioritizing temples, heritage, greener stops, and relaxed local meals over sheer volume.",
+      "budget": "SGD 5000 (flight + hotel; meals/transport TBC)",
+      "style": "Slower scenic / culture-forward pace",
+      "badge": "Best for travelers who prefer an easier rhythm"
+    }
+  },
+  "planner_chain_of_thought": "Built 3 deterministic itinerary variants from the saved research inventory by choosing the highest-ranked flights, selecting distinct hotels per option, clustering attractions by lat/lng, pairing nearby lunch and dinner stops, and scheduling the final day by working backward from the return flight airport buffer.",
+  "chain_of_thought": "Built 3 deterministic itinerary variants from the saved research inventory by choosing the highest-ranked flights, selecting distinct hotels per option, clustering attractions by lat/lng, pairing nearby lunch and dinner stops, and scheduling the final day by working backward from the return flight airport buffer.",
+  "research": {
+    "maps_attractions": [],
+    "maps_restaurants": [],
+    "ta_attractions": [
+      {
+        "place_id": "ChIJX0z5sbgZ2jERbP7t9-0hs_E",
+        "name": "Former House of Tan Teng Niah",
+        "category": "Historical Landmark",
+        "rating": "4.3",
+        "reviews": "2281",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "37 Kerbau Rd, Singapore 219168",
+        "lat": 1.3070541,
+        "lng": 103.85096019999999,
+        "google_maps_uri": "https://maps.google.com/?cid=17416301489922375276&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best traditional cultural attractions in Singapore"
+      },
+      {
+        "place_id": "ChIJnWdQKQQZ2jERScXuKeFHyIE",
+        "name": "ArtScience Museum",
+        "category": "Museum",
+        "rating": "4.4",
+        "reviews": "18126",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "6 Bayfront Ave, Singapore 018974",
+        "lat": 1.2862738,
+        "lng": 103.8592663,
+        "google_maps_uri": "https://maps.google.com/?cid=9351803658631562569&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best traditional cultural attractions in Singapore"
+      },
+      {
+        "place_id": "ChIJ4yNzDRoa2jERnj_qax-lg_w",
+        "name": "Forest Discovery Centre (Atbara)",
+        "category": "Museum",
+        "rating": "4.6",
+        "reviews": "102",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "5 Gallop Rd, Singapore 258960",
+        "lat": 1.3137585,
+        "lng": 103.81068309999999,
+        "google_maps_uri": "https://maps.google.com/?cid=18195568473880018846&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best traditional cultural attractions in Singapore"
+      },
+      {
+        "place_id": "ChIJlcijSfYa2jERGZ3CD7lpz_E",
+        "name": "Lee Kong Chian Natural History Museum, Singapore",
+        "category": "Museum",
+        "rating": "4.6",
+        "reviews": "2645",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "2 Conservatory Dr, #01-03, Singapore 117377",
+        "lat": 1.3014156,
+        "lng": 103.7736549,
+        "google_maps_uri": "https://maps.google.com/?cid=17424261726874017049&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best traditional cultural attractions in Singapore"
+      },
+      {
+        "place_id": "ChIJq7P-2n4P2jERoflGFhUAEfQ",
+        "name": "Singapore Discovery Centre",
+        "category": "Museum",
+        "rating": "4.7",
+        "reviews": "8897",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "510 Upper Jurong Rd, Singapore 638365",
+        "lat": 1.3326904,
+        "lng": 103.67894319999999,
+        "google_maps_uri": "https://maps.google.com/?cid=17586838110426560929&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best traditional cultural attractions in Singapore"
+      },
+      {
+        "place_id": "ChIJ_xvk7hMZ2jERYNfvhEUMFWc",
+        "name": "Singapore Chinese Cultural Centre",
+        "category": "Cultural Center",
+        "rating": "4.5",
+        "reviews": "2341",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "1 Straits Blvd, Singapore 018906",
+        "lat": 1.2759828,
+        "lng": 103.84956319999999,
+        "google_maps_uri": "https://maps.google.com/?cid=7427856653140088672&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best traditional cultural attractions in Singapore"
+      },
+      {
+        "place_id": "ChIJ3xSV5_ob2jERCnZyINDAtN4",
+        "name": "Hell's Museum",
+        "category": "Museum",
+        "rating": "4.8",
+        "reviews": "1051",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "262 Pasir Panjang Rd, Singapore 118628",
+        "lat": 1.2841013,
+        "lng": 103.7816422,
+        "google_maps_uri": "https://maps.google.com/?cid=16047663372358022666&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best heritage neighborhoods museums and temples in Singapore"
+      },
+      {
+        "place_id": "ChIJX0z5sbgZ2jERbP7t9-0hs_E",
+        "name": "Former House of Tan Teng Niah",
+        "category": "Historical Landmark",
+        "rating": "4.3",
+        "reviews": "2281",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "37 Kerbau Rd, Singapore 219168",
+        "lat": 1.3070541,
+        "lng": 103.85096019999999,
+        "google_maps_uri": "https://maps.google.com/?cid=17416301489922375276&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best heritage neighborhoods museums and temples in Singapore"
+      },
+      {
+        "place_id": "ChIJ0bwmznIZ2jEREOCMNggtIBk",
+        "name": "Buddha Tooth Relic Temple",
+        "category": "Buddhist Temple",
+        "rating": "4.6",
+        "reviews": "12061",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "288 S Bridge Rd, Singapore 058840",
+        "lat": 1.2815155,
+        "lng": 103.84423969999999,
+        "google_maps_uri": "https://maps.google.com/?cid=1810496563501129744&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best heritage neighborhoods museums and temples in Singapore"
+      },
+      {
+        "place_id": "ChIJC-8_Y6sZ2jER7OK5YLUBF98",
+        "name": "Fort Canning Heritage Gallery",
+        "category": "Museum",
+        "rating": "4.5",
+        "reviews": "62",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "5 Cox Terrace, Singapore 179620",
+        "lat": 1.2949762999999999,
+        "lng": 103.8468403,
+        "google_maps_uri": "https://maps.google.com/?cid=16075319273445778156&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best heritage neighborhoods museums and temples in Singapore"
+      },
+      {
+        "place_id": "ChIJq-n-yJgZ2jEROm7mN2JMTpE",
+        "name": "Sri Thendayuthapani Temple",
+        "category": "Hindu Temple",
+        "rating": "4.8",
+        "reviews": "1457",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "15 Tank Rd, Singapore 238065",
+        "lat": 1.2943221999999999,
+        "lng": 103.843047,
+        "google_maps_uri": "https://maps.google.com/?cid=10470390168411336250&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best heritage neighborhoods museums and temples in Singapore"
+      },
+      {
+        "place_id": "ChIJSXU0BrsZ2jER4HhOboVXKJ0",
+        "name": "Kwan Im Thong Hood Cho Temple",
+        "category": "Buddhist Temple",
+        "rating": "4.7",
+        "reviews": "8122",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "178 Waterloo St, Singapore 187964",
+        "lat": 1.3008575999999998,
+        "lng": 103.8529932,
+        "google_maps_uri": "https://maps.google.com/?cid=11324397493616015584&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best heritage neighborhoods museums and temples in Singapore"
+      },
+      {
+        "place_id": "ChIJEWnurbgZ2jERgnTACKlYCBw",
+        "name": "The Indian Heritage Pte Ltd",
+        "category": "Tourist Attraction",
+        "rating": "4.2",
+        "reviews": "254",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "41 Kerbau Rd, Singapore 219170",
+        "lat": 1.3070233,
+        "lng": 103.8508147,
+        "google_maps_uri": "https://maps.google.com/?cid=2019961915895215234&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best heritage neighborhoods museums and temples in Singapore"
+      },
+      {
+        "place_id": "ChIJ9e68CQ0Z2jER4G80iFVcJgo",
+        "name": "Thian Hock Keng Temple",
+        "category": "Place Of Worship",
+        "rating": "",
+        "reviews": "",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "158 Telok Ayer St, Singapore 068613",
+        "lat": 1.280939,
+        "lng": 103.8476354,
+        "google_maps_uri": "https://maps.google.com/?cid=731373511921397728&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best heritage neighborhoods museums and temples in Singapore"
+      },
+      {
+        "place_id": "ChIJT4lHCgMZ2jERloDE6WmkdMk",
+        "name": "Supertree Grove",
+        "category": "Garden",
+        "rating": "4.7",
+        "reviews": "53361",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "18 Marina Gardens Dr, Singapore 018953",
+        "lat": 1.2819616999999999,
+        "lng": 103.86390569999999,
+        "google_maps_uri": "https://maps.google.com/?cid=14516408273722441878&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "Best attractions in Singapore"
+      },
+      {
+        "place_id": "ChIJT4AHFwcZ2jERDJbPVLTEbOk",
+        "name": "The Helix Bridge",
+        "category": "Bridge",
+        "rating": "4.7",
+        "reviews": "5295",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "Singapore",
+        "lat": 1.2874774,
+        "lng": 103.86063259999999,
+        "google_maps_uri": "https://maps.google.com/?cid=16820034987118007820&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "Best attractions in Singapore"
+      },
+      {
+        "place_id": "ChIJOScA0tkZ2jERRqSy4_FqfD4",
+        "name": "Singapore Skyline View",
+        "category": "Tourist Attraction",
+        "rating": "4.8",
+        "reviews": "366",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "10 Bayfront Ave, Marina Bay Sands, Singapore 018956",
+        "lat": 1.2842867,
+        "lng": 103.85842749999999,
+        "google_maps_uri": "https://maps.google.com/?cid=4502591314603451462&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "Best attractions in Singapore"
+      },
+      {
+        "place_id": "ChIJOeEf9S2vewIRM0B9a06CKwg",
+        "name": "SkyPark Observation Deck",
+        "category": "Observation Deck",
+        "rating": "4.6",
+        "reviews": "13631",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "10 Bayfront Avenue, Hotel, Tower 3 Level 56, Marina Bay Sands, Singapore 018956",
+        "lat": 1.2852044,
+        "lng": 103.8610313,
+        "google_maps_uri": "https://maps.google.com/?cid=588707449624412211&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "Best attractions in Singapore"
+      },
+      {
+        "place_id": "ChIJUc0YwKIZ2jERnCfsCKnOamE",
+        "name": "Fort Canning Tree Tunnel",
+        "category": "Park",
+        "rating": "4.3",
+        "reviews": "2659",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "51 Canning Rise, Singapore 179872",
+        "lat": 1.2972839999999999,
+        "lng": 103.846345,
+        "google_maps_uri": "https://maps.google.com/?cid=7019650194604828572&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "Best attractions in Singapore"
+      },
+      {
+        "place_id": "ChIJT4lHCgMZ2jERloDE6WmkdMk",
+        "name": "Supertree Grove",
+        "category": "Garden",
+        "rating": "4.7",
+        "reviews": "53361",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "18 Marina Gardens Dr, Singapore 018953",
+        "lat": 1.2819616999999999,
+        "lng": 103.86390569999999,
+        "google_maps_uri": "https://maps.google.com/?cid=14516408273722441878&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "Best attractions in Singapore"
+      },
+      {
+        "place_id": "ChIJT4AHFwcZ2jERDJbPVLTEbOk",
+        "name": "The Helix Bridge",
+        "category": "Bridge",
+        "rating": "4.7",
+        "reviews": "5295",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "Singapore",
+        "lat": 1.2874774,
+        "lng": 103.86063259999999,
+        "google_maps_uri": "https://maps.google.com/?cid=16820034987118007820&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "Best attractions in Singapore"
+      },
+      {
+        "place_id": "ChIJOScA0tkZ2jERRqSy4_FqfD4",
+        "name": "Singapore Skyline View",
+        "category": "Tourist Attraction",
+        "rating": "4.8",
+        "reviews": "366",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "10 Bayfront Ave, Marina Bay Sands, Singapore 018956",
+        "lat": 1.2842867,
+        "lng": 103.85842749999999,
+        "google_maps_uri": "https://maps.google.com/?cid=4502591314603451462&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "Best attractions in Singapore"
+      },
+      {
+        "place_id": "ChIJOeEf9S2vewIRM0B9a06CKwg",
+        "name": "SkyPark Observation Deck",
+        "category": "Observation Deck",
+        "rating": "4.6",
+        "reviews": "13631",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "10 Bayfront Avenue, Hotel, Tower 3 Level 56, Marina Bay Sands, Singapore 018956",
+        "lat": 1.2852044,
+        "lng": 103.8610313,
+        "google_maps_uri": "https://maps.google.com/?cid=588707449624412211&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "Best attractions in Singapore"
+      },
+      {
+        "place_id": "ChIJUc0YwKIZ2jERnCfsCKnOamE",
+        "name": "Fort Canning Tree Tunnel",
+        "category": "Park",
+        "rating": "4.3",
+        "reviews": "2659",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "51 Canning Rise, Singapore 179872",
+        "lat": 1.2972839999999999,
+        "lng": 103.846345,
+        "google_maps_uri": "https://maps.google.com/?cid=7019650194604828572&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "Best attractions in Singapore"
+      },
+      {
+        "place_id": "ChIJT4lHCgMZ2jERloDE6WmkdMk",
+        "name": "Supertree Grove",
+        "category": "Garden",
+        "rating": "4.7",
+        "reviews": "53361",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "18 Marina Gardens Dr, Singapore 018953",
+        "lat": 1.2819616999999999,
+        "lng": 103.86390569999999,
+        "google_maps_uri": "https://maps.google.com/?cid=14516408273722441878&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "Best attractions in Singapore"
+      },
+      {
+        "place_id": "ChIJT4AHFwcZ2jERDJbPVLTEbOk",
+        "name": "The Helix Bridge",
+        "category": "Bridge",
+        "rating": "4.7",
+        "reviews": "5295",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "Singapore",
+        "lat": 1.2874774,
+        "lng": 103.86063259999999,
+        "google_maps_uri": "https://maps.google.com/?cid=16820034987118007820&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "Best attractions in Singapore"
+      },
+      {
+        "place_id": "ChIJOScA0tkZ2jERRqSy4_FqfD4",
+        "name": "Singapore Skyline View",
+        "category": "Tourist Attraction",
+        "rating": "4.8",
+        "reviews": "366",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "10 Bayfront Ave, Marina Bay Sands, Singapore 018956",
+        "lat": 1.2842867,
+        "lng": 103.85842749999999,
+        "google_maps_uri": "https://maps.google.com/?cid=4502591314603451462&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "Best attractions in Singapore"
+      },
+      {
+        "place_id": "ChIJOeEf9S2vewIRM0B9a06CKwg",
+        "name": "SkyPark Observation Deck",
+        "category": "Observation Deck",
+        "rating": "4.6",
+        "reviews": "13631",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "10 Bayfront Avenue, Hotel, Tower 3 Level 56, Marina Bay Sands, Singapore 018956",
+        "lat": 1.2852044,
+        "lng": 103.8610313,
+        "google_maps_uri": "https://maps.google.com/?cid=588707449624412211&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "Best attractions in Singapore"
+      },
+      {
+        "place_id": "ChIJUc0YwKIZ2jERnCfsCKnOamE",
+        "name": "Fort Canning Tree Tunnel",
+        "category": "Park",
+        "rating": "4.3",
+        "reviews": "2659",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "51 Canning Rise, Singapore 179872",
+        "lat": 1.2972839999999999,
+        "lng": 103.846345,
+        "google_maps_uri": "https://maps.google.com/?cid=7019650194604828572&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "Best attractions in Singapore"
+      }
+    ],
+    "ta_restaurants": [
+      {
+        "place_id": "ChIJyRcdyZMa2jERVyFlLiByOAw",
+        "name": "Ayer Rajah Food Centre",
+        "category": "Restaurant",
+        "rating": "4.2",
+        "reviews": "7347",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "503 W Coast Dr, Singapore 120503",
+        "lat": 1.3118695,
+        "lng": 103.7597825,
+        "google_maps_uri": "https://maps.google.com/?cid=880579209693831511&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best local hawker food and famous local eats in Singapore"
+      },
+      {
+        "place_id": "ChIJ5Y6l4Q0Z2jERYL0KDIjT6v0",
+        "name": "Lau Pa Sat",
+        "category": "Restaurant",
+        "rating": "4.4",
+        "reviews": "37655",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "18 Raffles Quay, Singapore 048582",
+        "lat": 1.2805121,
+        "lng": 103.8503809,
+        "google_maps_uri": "https://maps.google.com/?cid=18296669017417104736&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best local hawker food and famous local eats in Singapore"
+      },
+      {
+        "place_id": "ChIJR_I8XgAb2jERujbRxvJdKlM",
+        "name": "Hawkers' Street",
+        "category": "Food Court",
+        "rating": "4.6",
+        "reviews": "712",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "3155 Commonwealth Ave W, #04-20/21/22 The Clementi Mall, Singapore 129588",
+        "lat": 1.3145331999999998,
+        "lng": 103.7639212,
+        "google_maps_uri": "https://maps.google.com/?cid=5992705551468934842&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best local hawker food and famous local eats in Singapore"
+      },
+      {
+        "place_id": "ChIJN69e7Gga2jERsqinNIodaeg",
+        "name": "20 Ghim Moh Road Market & Food Centre",
+        "category": "Restaurant",
+        "rating": "4.3",
+        "reviews": "3031",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "20 Ghim Moh Rd, Singapore 270020",
+        "lat": 1.3109708,
+        "lng": 103.7883085,
+        "google_maps_uri": "https://maps.google.com/?cid=16746949168779995314&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best local hawker food and famous local eats in Singapore"
+      },
+      {
+        "place_id": "ChIJu0Kj3f8W2jERpHVeB5eORMM",
+        "name": "Chomp Chomp Centre",
+        "category": "Restaurant",
+        "rating": "4.2",
+        "reviews": "4716",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "20 Kensington Park Rd, Singapore 557269",
+        "lat": 1.3642303999999998,
+        "lng": 103.8664113,
+        "google_maps_uri": "https://maps.google.com/?cid=14070527915127109028&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best local hawker food and famous local eats in Singapore"
+      },
+      {
+        "place_id": "ChIJ7SUpBGoa2jER31LgG0EuOmk",
+        "name": "Holland Drive Market & Food Centre",
+        "category": "Restaurant",
+        "rating": "4.1",
+        "reviews": "3169",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "44 Holland Dr, Singapore 270044",
+        "lat": 1.3081669999999999,
+        "lng": 103.79279919999999,
+        "google_maps_uri": "https://maps.google.com/?cid=7582423779807089375&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best local hawker food and famous local eats in Singapore"
+      },
+      {
+        "place_id": "ChIJsUJymcwZ2jERaYAaWRthb5s",
+        "name": "Hawkers' Street @ ION",
+        "category": "Food Court",
+        "rating": "4.6",
+        "reviews": "1914",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "2 Orchard Turn, #B4-66, Singapore 238801",
+        "lat": 1.3039288,
+        "lng": 103.83195119999999,
+        "google_maps_uri": "https://maps.google.com/?cid=11200277568380633193&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best local hawker food and famous local eats in Singapore"
+      },
+      {
+        "place_id": "ChIJseQsTQ0Z2jERqpBTWF0Zf84",
+        "name": "Maxwell Food Centre",
+        "category": "Restaurant",
+        "rating": "4.4",
+        "reviews": "22980",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "1 Kadayanallur St, Singapore 069184",
+        "lat": 1.2803361,
+        "lng": 103.844767,
+        "google_maps_uri": "https://maps.google.com/?cid=14879639582559932586&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best local hawker food and famous local eats in Singapore"
+      },
+      {
+        "place_id": "ChIJ5Y6l4Q0Z2jERYL0KDIjT6v0",
+        "name": "Lau Pa Sat",
+        "category": "Restaurant",
+        "rating": "4.4",
+        "reviews": "37655",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "18 Raffles Quay, Singapore 048582",
+        "lat": 1.2805121,
+        "lng": 103.8503809,
+        "google_maps_uri": "https://maps.google.com/?cid=18296669017417104736&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best traditional local snacks and must-try street food in Singapore"
+      },
+      {
+        "place_id": "ChIJsUJymcwZ2jERaYAaWRthb5s",
+        "name": "Hawkers' Street @ ION",
+        "category": "Food Court",
+        "rating": "4.6",
+        "reviews": "1914",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "2 Orchard Turn, #B4-66, Singapore 238801",
+        "lat": 1.3039288,
+        "lng": 103.83195119999999,
+        "google_maps_uri": "https://maps.google.com/?cid=11200277568380633193&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best traditional local snacks and must-try street food in Singapore"
+      },
+      {
+        "place_id": "ChIJu0Kj3f8W2jERpHVeB5eORMM",
+        "name": "Chomp Chomp Centre",
+        "category": "Restaurant",
+        "rating": "4.2",
+        "reviews": "4716",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "20 Kensington Park Rd, Singapore 557269",
+        "lat": 1.3642303999999998,
+        "lng": 103.8664113,
+        "google_maps_uri": "https://maps.google.com/?cid=14070527915127109028&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best traditional local snacks and must-try street food in Singapore"
+      },
+      {
+        "place_id": "ChIJyUme9TQR2jER1H5Rycs68oo",
+        "name": "Hawkers' Street @ BPP",
+        "category": "Food Court",
+        "rating": "4.8",
+        "reviews": "2420",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "1 Jelebu Rd, #03-08, Plaza 677743",
+        "lat": 1.3805265,
+        "lng": 103.7642075,
+        "google_maps_uri": "https://maps.google.com/?cid=10012129568528367316&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best traditional local snacks and must-try street food in Singapore"
+      },
+      {
+        "place_id": "ChIJyRcdyZMa2jERVyFlLiByOAw",
+        "name": "Ayer Rajah Food Centre",
+        "category": "Restaurant",
+        "rating": "4.2",
+        "reviews": "7347",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "503 W Coast Dr, Singapore 120503",
+        "lat": 1.3118695,
+        "lng": 103.7597825,
+        "google_maps_uri": "https://maps.google.com/?cid=880579209693831511&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best traditional local snacks and must-try street food in Singapore"
+      },
+      {
+        "place_id": "ChIJseQsTQ0Z2jERqpBTWF0Zf84",
+        "name": "Maxwell Food Centre",
+        "category": "Restaurant",
+        "rating": "4.4",
+        "reviews": "22980",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "1 Kadayanallur St, Singapore 069184",
+        "lat": 1.2803361,
+        "lng": 103.844767,
+        "google_maps_uri": "https://maps.google.com/?cid=14879639582559932586&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best traditional local snacks and must-try street food in Singapore"
+      },
+      {
+        "place_id": "ChIJl-8GHKAZ2jER2qsyMED6IUM",
+        "name": "Ri Xin Snack Delights",
+        "category": "Restaurant",
+        "rating": "4.9",
+        "reviews": "143",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "1 Kadayanallur St, #01-55 Maxwell Food Centre, Singapore 069184",
+        "lat": 1.2803361,
+        "lng": 103.844767,
+        "google_maps_uri": "https://maps.google.com/?cid=4837422628366101466&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best traditional local snacks and must-try street food in Singapore"
+      },
+      {
+        "place_id": "ChIJY4OYJXMZ2jERq9aW_MKjwAc",
+        "name": "Chinatown Food Street",
+        "category": "Food Court",
+        "rating": "4.2",
+        "reviews": "6025",
+        "price": "",
+        "description": "",
+        "source": "google_places",
+        "address": "41 Smith St, Singapore 058953",
+        "lat": 1.2822896,
+        "lng": 103.84392799999999,
+        "google_maps_uri": "https://maps.google.com/?cid=558626411650668203&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "search_query": "best traditional local snacks and must-try street food in Singapore"
+      }
+    ],
+    "weather": "[{\"time\": \"2026-04-12 15:00:00\", \"summary\": \"broken clouds\", \"temp_c\": 27.57, \"humidity\": 84, \"wind_kph\": 8.1}, {\"time\": \"2026-04-13 15:00:00\", \"summary\": \"light rain\", \"temp_c\": 28.22, \"humidity\": 77, \"wind_kph\": 10.6}, {\"time\": \"2026-04-14 15:00:00\", \"summary\": \"light rain\", \"temp_c\": 27.75, \"humidity\": 77, \"wind_kph\": 10.5}, {\"time\": \"2026-04-15 15:00:00\", \"summary\": \"broken clouds\", \"temp_c\": 28.17, \"humidity\": 73, \"wind_kph\": 11.8}, {\"time\": \"2026-04-16 15:00:00\", \"summary\": \"broken clouds\", \"temp_c\": 27.88, \"humidity\": 75, \"wind_kph\": 4.0}]",
+    "web_general": "{\"error\": \"Tavily API error (Status 432)\", \"details\": {\"error\": \"This request exceeds your plan's set usage limit. Please upgrade your plan or contact support@tavily.com\"}}",
+    "pref_structured": [],
+    "hotel_reviews": "=== hilton garden inn singapore serangoon ===\nHilton Garden Inn Singapore Serangoon\nAbout: Set in a concrete-and-glass building in the Little India district, this polished hotel surrounded by shops and restaurants is a 4-minute walk from the nearest subway station, and 4 km from The Esplana\nRating: ⭐ 4.3/5 (3798 reviews)\nAmenities: Wi-Fi, Wi-Fi in public areas, Restaurant, Table service, Room service, Breakfast, Breakfast buffet, Smoke-free property, Credit cards, Debit cards, Cash, Front desk\nNearby: Marina Bay Sands Singapore, Gardens by the Bay, Singapore Flyer, Singapore Botanic Gardens\n⭐5 (Trip.com) Trip.com Member: \"Easy breezy check in with friendly helpful staff. Room is clean and comfortable, walking distance to many eating places and very happy indeed with thi\"\n⭐4 (Tripadvisor) Journey819276: \"Our best experience was at breakfast time and at check in, |staff at breakfast especially Maria and Adi were extremely attentive and helpful regarding\"\n⭐5 (Google) Andy Rodriguez: \"I had a wonderful experience at Hilton Garden Inn Singapore Serangoon. The hotel is modern, clean, and very well maintained. From check-in to check-ou\"\n\n=== citadines balestier singapore - studio ===\nCitadines Balestier Singapore - Studio\nAbout: Citadines Balestier Singapore offers an outdoor swimming pool and a fitness room, as well as accommodations with a kitchen in Singapore, a 17-minute walk from Mustafa Center. This 4-star condo hotel o\nRating: ⭐ 4.5041723/5 (1438 reviews)\nAmenities: Air conditioning, Kid-friendly, Crib, Elevator, Fitness center, Ironing board, Kitchen, Microwave, Outdoor pool, Pet-friendly, Smoke-free, Cable TV\nNearby: Opp Blk 104, Bef Blk 104, Singapore Changi Airport, Seletar Airport"
+  },
+  "state": {
+    "origin": "Taipei",
+    "destination": "Singapore",
+    "dates": "2026-06-01 to 2026-06-05",
+    "duration": "5 days",
+    "budget": "SGD 5000",
+    "preferences": "traditional cultural, local street food",
+    "outbound_time_pref": "morning",
+    "return_time_pref": "afternoon",
+    "user_profile": {
+      "prefs": [
+        "traditional cultural",
+        "local street food"
+      ]
+    },
+    "hard_constraints": {
+      "origin": "Taipei",
+      "destination": "Singapore",
+      "start_date": "2026-06-01",
+      "end_date": "2026-06-05",
+      "budget": {
+        "amount": 5000,
+        "currency": "SGD",
+        "flexibility": "strict"
+      },
+      "travelers": 2,
+      "requirements": [
+        "no red-eye flights"
+      ]
+    },
+    "soft_preferences": {
+      "travel_style": "relaxed",
+      "interest_tags": [
+        "traditional cultural",
+        "local street food"
+      ],
+      "pace": 2,
+      "vibe": "traditional_cultural"
+    },
+    "search_queries": [
+      {
+        "type": "rag_attraction",
+        "query": "best traditional cultural attractions in Singapore"
+      },
+      {
+        "type": "rag_attraction",
+        "query": "best heritage neighborhoods museums and temples in Singapore"
+      },
+      {
+        "type": "rag_restaurant",
+        "query": "best local hawker food and famous local eats in Singapore"
+      },
+      {
+        "type": "rag_restaurant",
+        "query": "best traditional local snacks and must-try street food in Singapore"
+      }
+    ]
+  },
+  "tool_log": [
+    "[places_llm_filter attractions raw=60 removed=11 kept=29 min_keep=48 max_output=60]",
+    "[places_llm_filter restaurants raw=40 removed=8 kept=16 min_keep=32 max_output=40]",
+    "[search_flights(Taipei->Singapore)]",
+    "[search_flights(Singapore->Taipei) return]",
+    "[search_hotels(Singapore)]",
+    "[google_places_attractions(explicit_queries)]",
+    "[google_places_restaurants(explicit_queries)]",
+    "[search_weather(Singapore)]",
+    "[places_quota attractions=60 restaurants=40 days=5 city=Singapore dietary=none]",
+    "[places_query_attraction(best traditional cultural attractions in Singapore) quota=12]",
+    "[places_query_attraction(best heritage neighborhoods museums and temples in Singapore) quota=12]",
+    "[places_query_attraction(Best attractions in Singapore) quota=12]",
+    "[places_query_attraction(Best attractions in Singapore) quota=12]",
+    "[places_query_attraction(Best attractions in Singapore) quota=12]",
+    "[places_query_restaurant(best local hawker food and famous local eats in Singapore) quota=8]",
+    "[places_query_restaurant(best traditional local snacks and must-try street food in Singapore) quota=8]",
+    "[places_query_restaurant(Best restaurants in Singapore) quota=8]",
+    "[places_query_restaurant(Best restaurants in Singapore) quota=8]",
+    "[places_query_restaurant(Best restaurants in Singapore) quota=8]",
+    "[flight_ranking] prioritized nonstop flights, then time preference, then price",
+    "[price_search] corpus 0 chars",
+    "[research_agent_1] Data collection complete",
+    "[planner_agent_1] Deterministic route-first scheduler used saved research inventory",
+    "[planner_agent_1] Generated options: ['A', 'B', 'C']",
+    "[planner_agent_1] Deterministic route-first scheduler used saved research inventory",
+    "[planner_agent_1] Generated options: ['A', 'B', 'C']"
+  ],
+  "flight_options_outbound": [
+    {
+      "airline": "EVA Air",
+      "flight_number": "BR 215",
+      "departure_airport": "Taiwan Taoyuan International Airport",
+      "arrival_airport": "Singapore Changi Airport",
+      "departure_time": "2026-06-01 09:25",
+      "arrival_time": "2026-06-01 13:55",
+      "duration_min": 270,
+      "travel_class": "Economy",
+      "price_usd": 530,
+      "display": "EVA Air BR 215 (Nonstop) | Taiwan Taoyuan International Airport → Singapore Changi Airport | dep 2026-06-01 09:25 → arr 2026-06-01 13:55 | 270 min | Economy | USD 530"
+    },
+    {
+      "airline": "Philippine Airlines",
+      "flight_number": "PR 891 / PR 501",
+      "departure_airport": "Taiwan Taoyuan International Airport",
+      "arrival_airport": "Singapore Changi Airport",
+      "departure_time": "2026-06-01 09:45",
+      "arrival_time": "2026-06-01 18:55",
+      "duration_min": 550,
+      "travel_class": "Economy",
+      "price_usd": 302,
+      "display": "Philippine Airlines PR 891 / PR 501 (1 stop) | Taiwan Taoyuan International Airport → Singapore Changi Airport | dep 2026-06-01 09:45 → arr 2026-06-01 18:55 | 550 min | Economy | USD 302"
+    },
+    {
+      "airline": "XiamenAir",
+      "flight_number": "MF 888 / MF 885",
+      "departure_airport": "Taiwan Taoyuan International Airport",
+      "arrival_airport": "Singapore Changi Airport",
+      "departure_time": "2026-06-01 11:10",
+      "arrival_time": "2026-06-01 22:15",
+      "duration_min": 665,
+      "travel_class": "Economy",
+      "price_usd": 373,
+      "display": "XiamenAir MF 888 / MF 885 (1 stop) | Taiwan Taoyuan International Airport → Singapore Changi Airport | dep 2026-06-01 11:10 → arr 2026-06-01 22:15 | 665 min | Economy | USD 373"
+    }
+  ],
+  "flight_options_return": [
+    {
+      "airline": "Scoot",
+      "flight_number": "TR 872",
+      "departure_airport": "Singapore Changi Airport",
+      "arrival_airport": "Taiwan Taoyuan International Airport",
+      "departure_time": "2026-06-05 12:25",
+      "arrival_time": "2026-06-05 17:10",
+      "duration_min": 285,
+      "travel_class": "Economy",
+      "price_usd": 190,
+      "display": "Scoot TR 872 (Nonstop) | Singapore Changi Airport → Taiwan Taoyuan International Airport | dep 2026-06-05 12:25 → arr 2026-06-05 17:10 | 285 min | Economy | USD 190"
+    },
+    {
+      "airline": "STARLUX Airlines",
+      "flight_number": "JX 772",
+      "departure_airport": "Singapore Changi Airport",
+      "arrival_airport": "Taiwan Taoyuan International Airport",
+      "departure_time": "2026-06-05 14:00",
+      "arrival_time": "2026-06-05 18:50",
+      "duration_min": 290,
+      "travel_class": "Economy",
+      "price_usd": 228,
+      "display": "STARLUX Airlines JX 772 (Nonstop) | Singapore Changi Airport → Taiwan Taoyuan International Airport | dep 2026-06-05 14:00 → arr 2026-06-05 18:50 | 290 min | Economy | USD 228"
+    },
+    {
+      "airline": "China Airlines",
+      "flight_number": "CI 754",
+      "departure_airport": "Singapore Changi Airport",
+      "arrival_airport": "Taiwan Taoyuan International Airport",
+      "departure_time": "2026-06-05 13:45",
+      "arrival_time": "2026-06-05 18:35",
+      "duration_min": 290,
+      "travel_class": "Economy",
+      "price_usd": 236,
+      "display": "China Airlines CI 754 (Nonstop) | Singapore Changi Airport → Taiwan Taoyuan International Airport | dep 2026-06-05 13:45 → arr 2026-06-05 18:35 | 290 min | Economy | USD 236"
+    },
+    {
+      "airline": "EVA Air",
+      "flight_number": "BR 226",
+      "departure_airport": "Singapore Changi Airport",
+      "arrival_airport": "Taiwan Taoyuan International Airport",
+      "departure_time": "2026-06-05 13:10",
+      "arrival_time": "2026-06-05 17:45",
+      "duration_min": 275,
+      "travel_class": "Economy",
+      "price_usd": 259,
+      "display": "EVA Air BR 226 (Nonstop) | Singapore Changi Airport → Taiwan Taoyuan International Airport | dep 2026-06-05 13:10 → arr 2026-06-05 17:45 | 275 min | Economy | USD 259"
+    },
+    {
+      "airline": "EVA Air",
+      "flight_number": "BR 216",
+      "departure_airport": "Singapore Changi Airport",
+      "arrival_airport": "Taiwan Taoyuan International Airport",
+      "departure_time": "2026-06-05 15:20",
+      "arrival_time": "2026-06-05 20:00",
+      "duration_min": 280,
+      "travel_class": "Economy",
+      "price_usd": 259,
+      "display": "EVA Air BR 216 (Nonstop) | Singapore Changi Airport → Taiwan Taoyuan International Airport | dep 2026-06-05 15:20 → arr 2026-06-05 20:00 | 280 min | Economy | USD 259"
+    }
+  ],
+  "hotel_options": [
+    {
+      "name": "Hilton Garden Inn Singapore Serangoon",
+      "hotel_class": "4-star hotel",
+      "rating": 4.3,
+      "reviews": 3798,
+      "price_per_night_usd": "127",
+      "property_token": "ChoI4feEoImv_s65ARoNL2cvMTFiN2M1eGhkdxAB",
+      "description": "Warm rooms in an upscale property with an outdoor pool, a gym & an airy restaurant.",
+      "display": "Hilton Garden Inn Singapore Serangoon | 4-star hotel | ⭐ 4.3/5 (3798 reviews) | From USD 127/night"
+    },
+    {
+      "name": "Citadines Balestier Singapore - Studio",
+      "hotel_class": "",
+      "rating": 4.5041723,
+      "reviews": 1438,
+      "price_per_night_usd": "146",
+      "property_token": "ChkQ6JqmpZPC2pIMGg0vZy8xMXl3ZHN5cXR6EAI",
+      "description": "",
+      "display": "Citadines Balestier Singapore - Studio | ⭐ 4.5041723/5 (1438 reviews) | From USD 146/night"
+    },
+    {
+      "name": "Vibe Hotel Singapore Orchard",
+      "hotel_class": "4-star hotel",
+      "rating": 4.5,
+      "reviews": 1307,
+      "price_per_night_usd": "108",
+      "property_token": "ChoIgKyz4targuCWARoNL2cvMTFzM2IwZjM2cRAB",
+      "description": "Polished rooms & suites in a posh hotel offering a global restaurant, an outdoor pool & a 24/7 gym.",
+      "display": "Vibe Hotel Singapore Orchard | 4-star hotel | ⭐ 4.5/5 (1307 reviews) | From USD 108/night"
+    },
+    {
+      "name": "Hotel Boss",
+      "hotel_class": "4-star hotel",
+      "rating": 3.9,
+      "reviews": 16582,
+      "price_per_night_usd": "98",
+      "property_token": "ChoIgdGMrIbClPjmARoNL2cvMTFid2wzN3MzNBAB",
+      "description": "Sleek property offering streamlined rooms & relaxed dining, plus shops, an outdoor pool & a gym.",
+      "display": "Hotel Boss | 4-star hotel | ⭐ 3.9/5 (16582 reviews) | From USD 98/night"
+    },
+    {
+      "name": "Furama RiverFront",
+      "hotel_class": "4-star hotel",
+      "rating": 4.2,
+      "reviews": 9665,
+      "price_per_night_usd": "101",
+      "property_token": "ChgI3q6knNGEg8-TARoLL2cvMXRmYl9rMjgQAQ",
+      "description": "Polished property offering an outdoor pool & a gym, plus 2 restaurants & a lounge.",
+      "display": "Furama RiverFront | 4-star hotel | ⭐ 4.2/5 (9665 reviews) | From USD 101/night"
+    },
+    {
+      "name": "Village Hotel Albert Court",
+      "hotel_class": "4-star hotel",
+      "rating": 4.2,
+      "reviews": 2716,
+      "price_per_night_usd": "95",
+      "property_token": "ChgImvTXqtaJk56jARoLL2cvMXR3X2tydHIQAQ",
+      "description": "Chic quarters in a modern hotel offering multiple eateries, plus 2 hot tubs & a gym.",
+      "display": "Village Hotel Albert Court | 4-star hotel | ⭐ 4.2/5 (2716 reviews) | From USD 95/night"
+    }
+  ]
+}

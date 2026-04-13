@@ -1,0 +1,3205 @@
+{
+  "selected_option": "A",
+  "itinerary": [
+    {
+      "day": "Day 1",
+      "items": [
+        {
+          "time": "17:30",
+          "icon": "flight",
+          "key": "flight_outbound",
+          "name": "Singapore Airlines SQ 12 (Nonstop) | Singapore Changi Airport → Narita International Airport | dep 2026-06-01 09:25 → arr 2026-06-01 17:30 | 425 min | Economy | USD 722",
+          "cost": "SGD 975"
+        },
+        {
+          "time": "18:30",
+          "icon": "restaurant",
+          "key": "restaurant_16_rollsloth",
+          "name": "RollSloth🦥",
+          "cost": "TBC"
+        },
+        {
+          "time": "20:09",
+          "icon": "hotel",
+          "key": "hotel_stay",
+          "name": "OHANA TOKYO HOUSE",
+          "cost": "SGD 55/night"
+        }
+      ]
+    },
+    {
+      "day": "Day 2",
+      "items": [
+        {
+          "time": "09:17",
+          "icon": "activity",
+          "key": "attraction_02_meiji_jingu",
+          "name": "Meiji Jingu",
+          "cost": "TBC"
+        },
+        {
+          "time": "11:45",
+          "icon": "restaurant",
+          "key": "restaurant_09_mo_mo_paradise_shibuya_koendori",
+          "name": "MO-MO-PARADISE Shibuya Koendori",
+          "cost": "TBC"
+        },
+        {
+          "time": "13:57",
+          "icon": "activity",
+          "key": "attraction_06_zojo_ji_temple",
+          "name": "Zojo-ji Temple",
+          "cost": "TBC"
+        },
+        {
+          "time": "18:15",
+          "icon": "restaurant",
+          "key": "restaurant_03_narisawa",
+          "name": "Narisawa",
+          "cost": "TBC"
+        }
+      ]
+    },
+    {
+      "day": "Day 3",
+      "items": [
+        {
+          "time": "09:49",
+          "icon": "activity",
+          "key": "attraction_09_kiyosumi_gardens",
+          "name": "Kiyosumi Gardens",
+          "cost": "TBC"
+        },
+        {
+          "time": "12:01",
+          "icon": "restaurant",
+          "key": "restaurant_15_gyukatsu_ichinisan",
+          "name": "Gyukatsu Ichinisan",
+          "cost": "TBC"
+        },
+        {
+          "time": "13:57",
+          "icon": "activity",
+          "key": "attraction_14_edo_tokyo_museum",
+          "name": "Edo-Tokyo Museum",
+          "cost": "TBC"
+        },
+        {
+          "time": "16:42",
+          "icon": "activity",
+          "key": "attraction_16_tokyo_tower",
+          "name": "Tokyo Tower",
+          "cost": "TBC"
+        },
+        {
+          "time": "18:39",
+          "icon": "restaurant",
+          "key": "restaurant_11_t_s_tantan",
+          "name": "T’s Tantan",
+          "cost": "TBC"
+        }
+      ]
+    },
+    {
+      "day": "Day 4",
+      "items": [
+        {
+          "time": "09:41",
+          "icon": "activity",
+          "key": "attraction_05_koishikawa_korakuen",
+          "name": "Koishikawa Korakuen",
+          "cost": "TBC"
+        },
+        {
+          "time": "12:05",
+          "icon": "restaurant",
+          "key": "restaurant_02_censu_tokyo",
+          "name": "CENSU TOKYO",
+          "cost": "TBC"
+        },
+        {
+          "time": "13:58",
+          "icon": "activity",
+          "key": "attraction_18_shibuya_sky",
+          "name": "Shibuya Sky",
+          "cost": "TBC"
+        },
+        {
+          "time": "18:00",
+          "icon": "restaurant",
+          "key": "restaurant_18_grilled_wagyu_beef",
+          "name": "Grilled Wagyu Beef",
+          "cost": "TBC"
+        }
+      ]
+    },
+    {
+      "day": "Day 5",
+      "items": [
+        {
+          "time": "10:30",
+          "icon": "hotel",
+          "key": "hotel_checkout",
+          "name": "Checkout from OHANA TOKYO HOUSE",
+          "cost": "SGD 55/night"
+        },
+        {
+          "time": "10:50",
+          "icon": "activity",
+          "key": "attraction_04_rikugien_gardens",
+          "name": "Rikugien Gardens",
+          "cost": "TBC"
+        },
+        {
+          "time": "16:50",
+          "icon": "flight",
+          "key": "flight_return",
+          "name": "ZIPAIR Tokyo ZG 53 (Nonstop) | Narita International Airport → Singapore Changi Airport | dep 2026-06-05 16:50 → arr 2026-06-05 23:00 | 430 min | Economy | USD 211",
+          "cost": "SGD 285"
+        }
+      ]
+    }
+  ],
+  "option_meta": {
+    "label": "Balanced Highlights",
+    "desc": "A balanced plan that covers the strongest relevant picks for the user's stated interests with a steady full-day pace.",
+    "budget": "SGD 5000 (flight + hotel; meals/transport TBC)",
+    "style": "Balanced / top-relevance route",
+    "badge": "Best for a broad first pass through the destination"
+  },
+  "summary": {
+    "overall_summary": "This itinerary is arranged as a smooth, full-day progression that prioritizes your interests (historical, zen gardens, fine dining, and traditional cultural) while keeping each day’s stops in a logical order. It starts with an outbound nonstop flight timed for the morning, then uses meal stops after arrivals or key sightseeing blocks to maintain an easy daily rhythm, before finishing with a nonstop return flight on departure day. High-confidence, well-reviewed choices are placed into lunch and dinner slots to keep the experience consistent across the trip.",
+    "day_summaries": {
+      "Day 1": "Day 1 groups the outbound journey first, then transitions directly into an evening meal and closes with an overnight stay. The nonstop outbound flight is used to match the preferred morning timing, and RollSloth🦥 is selected for dinner because it aligns with your fine dining preference and is highly rated and well reviewed. OHANA TOKYO HOUSE follows as the end-of-day hotel pick since it fits the stated budget and is a solid quality option.",
+      "Day 2": "Day 2 is structured as a morning-to-afternoon sightseeing run with lunch and a fine-dining dinner anchoring the day. Meiji Jingu is placed first as a high-quality Shinto shrine experience, then MO-MO-PARADISE Shibuya Koendori is used as the lunch bridge because it matches your traditional cultural preference and is very well reviewed. Zojo-ji Temple continues the zen-focused theme in the afternoon, and Narisawa is saved for dinner since it matches both your fine dining and traditional cultural preferences and is highly rated and well reviewed.",
+      "Day 3": "Day 3 keeps the morning calm and garden-forward, then builds toward history and skyline views before finishing with a fine-dining meal. Kiyosumi Gardens is chosen for the morning to match your zen gardens interest, followed by Gyukatsu Ichinisan for lunch as a traditional-cultural fit with strong reviews. Edo-Tokyo Museum leads into the afternoon with a history focus, Tokyo Tower provides an observation-deck payoff later in the same sightseeing chain, and T’s Tantan closes dinner in line with your fine dining preference and vegan option.",
+      "Day 4": "Day 4 follows the same balanced pattern: zen gardens in the morning, a fine-dining lunch, an iconic observation deck in the afternoon, and a final dinner. Koishikawa Korakuen matches your zen gardens preference and is highly regarded, while CENSU TOKYO is positioned for lunch because it matches both fine dining and traditional cultural interests. Shibuya Sky is placed afterward as the afternoon observation-deck highlight, and Grilled Wagyu Beef finishes the day as a fine-dining-aligned dinner with strong positive feedback.",
+      "Day 5": "Day 5 is kept intentionally light and efficient to match the departure timeline: checkout, one last zen-garden stop, then the return flight. Rikugien Gardens is scheduled right after checkout because it continues your zen gardens theme and is well reviewed, and the plan ends with the nonstop return flight to keep the airport leg as the day’s final step."
+    }
+  },
+  "item_explanations": {
+    "by_key": {
+      "flight_outbound": {
+        "item_key": "flight_outbound",
+        "occurrence_id": "A__d01__i01__flight_outbound",
+        "day": "Day 1",
+        "time": "17:30",
+        "icon": "flight",
+        "slot": "evening",
+        "name": "Singapore Airlines SQ 12 (Nonstop) | Singapore Changi Airport → Narita International Airport | dep 2026-06-01 09:25 → arr 2026-06-01 17:30 | 425 min | Economy | USD 722",
+        "why": [
+          "flight_signal[segment=outbound; nonstop=1; dep=2026-06-01 09:25; arr=2026-06-01 17:30; duration_min=425]",
+          "time_pref_signal[pref=morning; dep=2026-06-01 09:25]"
+        ],
+        "rating": "",
+        "review_highlights": [
+          "Singapore Airlines SQ 12 (Nonstop) | Singapore Changi Airport → Narita International Airport | dep 2026-06-01 09:25 → arr 2026-06-01 17:30 | 425 min | Economy | USD 722"
+        ]
+      },
+      "restaurant_16_rollsloth": {
+        "item_key": "restaurant_16_rollsloth",
+        "occurrence_id": "A__d01__i02__restaurant_16_rollsloth",
+        "day": "Day 1",
+        "time": "18:30",
+        "icon": "restaurant",
+        "slot": "dinner",
+        "name": "RollSloth🦥",
+        "why": [
+          "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+          "content_profile[icon=restaurant; type=Restaurant; category=Restaurant; query=Best street food and local restaurants in Tokyo]",
+          "quality_signal[icon=restaurant; rating=4.9; reviews=120]"
+        ],
+        "rating": "4.9 / 5 (120 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.9; reviews=120]",
+          "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: 8:00 AM – 1:00 AM | Tuesday: 8:00 AM – 1:00 AM | Wednesday: 8...]"
+        ]
+      },
+      "hotel_stay": {
+        "item_key": "hotel_stay",
+        "occurrence_id": "A__d01__i03__hotel_stay",
+        "day": "Day 1",
+        "time": "20:09",
+        "icon": "hotel",
+        "slot": "evening",
+        "name": "OHANA TOKYO HOUSE",
+        "why": [
+          "budget_signal[price_per_night_usd=41; budget=SGD 5000]",
+          "quality_signal[icon=hotel; rating=4.33; reviews=18]",
+          "hotel_signal[key=hotel_stay; time=20:09; name=OHANA TOKYO HOUSE]"
+        ],
+        "rating": "4.3 / 5 (18 reviews)",
+        "review_highlights": [
+          "Exceptional<br>#128578; Very clean and comfortable!",
+          "Exceptional"
+        ]
+      },
+      "attraction_02_meiji_jingu": {
+        "item_key": "attraction_02_meiji_jingu",
+        "occurrence_id": "A__d02__i01__attraction_02_meiji_jingu",
+        "day": "Day 2",
+        "time": "09:17",
+        "icon": "activity",
+        "slot": "morning",
+        "name": "Meiji Jingu",
+        "why": [
+          "content_profile[icon=activity; type=Shinto Shrine; category=Shinto Shrine]",
+          "quality_signal[icon=activity; rating=4.6]",
+          "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 4:30 PM | Tuesday: 9:00 AM – 4:30 PM | Wednesday: 9...]"
+        ],
+        "rating": "4.6 / 5",
+        "review_highlights": [
+          "rating_signal[rating=4.6]",
+          "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 4:30 PM | Tuesday: 9:00 AM – 4:30 PM | Wednesday: 9...]"
+        ]
+      },
+      "restaurant_09_mo_mo_paradise_shibuya_koendori": {
+        "item_key": "restaurant_09_mo_mo_paradise_shibuya_koendori",
+        "occurrence_id": "A__d02__i02__restaurant_09_mo_mo_paradise_shibuya_koendori",
+        "day": "Day 2",
+        "time": "11:45",
+        "icon": "restaurant",
+        "slot": "lunch",
+        "name": "MO-MO-PARADISE Shibuya Koendori",
+        "why": [
+          "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]",
+          "content_profile[icon=restaurant; type=Japanese Restaurant; category=Japanese Restaurant; query=Best traditional restaurants in Tokyo]",
+          "quality_signal[icon=restaurant; rating=4.9; reviews=6118]"
+        ],
+        "rating": "4.9 / 5 (6,118 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.9; reviews=6118]",
+          "hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:30 AM – 3:00 PM, 5:00 – 10:30 PM | Tuesday: 11:30 AM – 3:0...]"
+        ]
+      },
+      "attraction_06_zojo_ji_temple": {
+        "item_key": "attraction_06_zojo_ji_temple",
+        "occurrence_id": "A__d02__i03__attraction_06_zojo_ji_temple",
+        "day": "Day 2",
+        "time": "13:57",
+        "icon": "activity",
+        "slot": "afternoon",
+        "name": "Zojo-ji Temple",
+        "why": [
+          "pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen]",
+          "content_profile[icon=activity; type=Buddhist Temple; category=Buddhist Temple; query=best zen gardens and quiet temples in Tokyo]",
+          "quality_signal[icon=activity; rating=4.5; reviews=12142]"
+        ],
+        "rating": "4.5 / 5 (12,142 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.5; reviews=12142]",
+          "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...]"
+        ]
+      },
+      "restaurant_03_narisawa": {
+        "item_key": "restaurant_03_narisawa",
+        "occurrence_id": "A__d02__i04__restaurant_03_narisawa",
+        "day": "Day 2",
+        "time": "18:15",
+        "icon": "restaurant",
+        "slot": "dinner",
+        "name": "Narisawa",
+        "why": [
+          "pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine]",
+          "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]",
+          "quality_signal[icon=restaurant; rating=4.6; reviews=705]"
+        ],
+        "rating": "4.6 / 5 (705 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.6; reviews=705]",
+          "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: Closed | Tuesday: 12:00 – 2:30 PM, 5:30 – 8:00 PM | Wednesday...]"
+        ]
+      },
+      "attraction_09_kiyosumi_gardens": {
+        "item_key": "attraction_09_kiyosumi_gardens",
+        "occurrence_id": "A__d03__i01__attraction_09_kiyosumi_gardens",
+        "day": "Day 3",
+        "time": "09:49",
+        "icon": "activity",
+        "slot": "morning",
+        "name": "Kiyosumi Gardens",
+        "why": [
+          "pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen]",
+          "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]",
+          "quality_signal[icon=activity; rating=4.4; reviews=5356]"
+        ],
+        "rating": "4.4 / 5 (5,356 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.4; reviews=5356]",
+          "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...]"
+        ]
+      },
+      "restaurant_15_gyukatsu_ichinisan": {
+        "item_key": "restaurant_15_gyukatsu_ichinisan",
+        "occurrence_id": "A__d03__i02__restaurant_15_gyukatsu_ichinisan",
+        "day": "Day 3",
+        "time": "12:01",
+        "icon": "restaurant",
+        "slot": "lunch",
+        "name": "Gyukatsu Ichinisan",
+        "why": [
+          "pref_match[pref=traditional cultural; icon=restaurant; overlap=type:Tonkatsu Restaurant]",
+          "content_profile[icon=restaurant; type=Tonkatsu Restaurant; category=Tonkatsu Restaurant; query=Best street food and local restaurants in Tokyo]",
+          "quality_signal[icon=restaurant; rating=4.8; reviews=13897]"
+        ],
+        "rating": "4.8 / 5 (13,897 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.8; reviews=13897]",
+          "hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:00 AM – 10:00 PM | Tuesday: 11:00 AM – 10:00 PM | Wednesda...]"
+        ]
+      },
+      "attraction_14_edo_tokyo_museum": {
+        "item_key": "attraction_14_edo_tokyo_museum",
+        "occurrence_id": "A__d03__i03__attraction_14_edo_tokyo_museum",
+        "day": "Day 3",
+        "time": "13:57",
+        "icon": "activity",
+        "slot": "afternoon",
+        "name": "Edo-Tokyo Museum",
+        "why": [
+          "content_profile[icon=activity; type=History Museum; category=History Museum; query=best museums in Tokyo]",
+          "quality_signal[icon=activity; rating=4.4; reviews=12832]",
+          "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: Closed | Tuesday: 9:30 AM – 5:30 PM | Wednesday: 9:30 AM – 5:...]"
+        ],
+        "rating": "4.4 / 5 (12,832 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.4; reviews=12832]",
+          "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: Closed | Tuesday: 9:30 AM – 5:30 PM | Wednesday: 9:30 AM – 5:...]"
+        ]
+      },
+      "attraction_16_tokyo_tower": {
+        "item_key": "attraction_16_tokyo_tower",
+        "occurrence_id": "A__d03__i04__attraction_16_tokyo_tower",
+        "day": "Day 3",
+        "time": "16:42",
+        "icon": "activity",
+        "slot": "afternoon",
+        "name": "Tokyo Tower",
+        "why": [
+          "content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo]",
+          "quality_signal[icon=activity; rating=4.1; reviews=146]",
+          "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 9:00 AM – 11:00 PM | Tuesday: 9:00 AM – 11:00 PM | Wednesday:...]"
+        ],
+        "rating": "4.1 / 5 (146 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.1; reviews=146]",
+          "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 9:00 AM – 11:00 PM | Tuesday: 9:00 AM – 11:00 PM | Wednesday:...]"
+        ]
+      },
+      "restaurant_11_t_s_tantan": {
+        "item_key": "restaurant_11_t_s_tantan",
+        "occurrence_id": "A__d03__i05__restaurant_11_t_s_tantan",
+        "day": "Day 3",
+        "time": "18:39",
+        "icon": "restaurant",
+        "slot": "dinner",
+        "name": "T’s Tantan",
+        "why": [
+          "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+          "content_profile[icon=restaurant; type=Vegan Restaurant; category=Vegan Restaurant; query=Best street food and local restaurants in Tokyo]",
+          "quality_signal[icon=restaurant; rating=4.6; reviews=2762]"
+        ],
+        "rating": "4.6 / 5 (2,762 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.6; reviews=2762]",
+          "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: 10:00 AM – 9:30 PM | Tuesday: 10:00 AM – 9:30 PM | Wednesday:...]"
+        ]
+      },
+      "attraction_05_koishikawa_korakuen": {
+        "item_key": "attraction_05_koishikawa_korakuen",
+        "occurrence_id": "A__d04__i01__attraction_05_koishikawa_korakuen",
+        "day": "Day 4",
+        "time": "09:41",
+        "icon": "activity",
+        "slot": "morning",
+        "name": "Koishikawa Korakuen",
+        "why": [
+          "pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen]",
+          "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]",
+          "quality_signal[icon=activity; rating=4.4; reviews=6578]"
+        ],
+        "rating": "4.4 / 5 (6,578 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.4; reviews=6578]",
+          "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 4:30 PM | Tuesday: 9:00 AM – 4:30 PM | Wednesday: 9...]"
+        ]
+      },
+      "restaurant_02_censu_tokyo": {
+        "item_key": "restaurant_02_censu_tokyo",
+        "occurrence_id": "A__d04__i02__restaurant_02_censu_tokyo",
+        "day": "Day 4",
+        "time": "12:05",
+        "icon": "restaurant",
+        "slot": "lunch",
+        "name": "CENSU TOKYO",
+        "why": [
+          "pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine]",
+          "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]",
+          "quality_signal[icon=restaurant; rating=4.7; reviews=221]"
+        ],
+        "rating": "4.7 / 5 (221 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.7; reviews=221]",
+          "hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:30 AM – 2:00 PM, 6:00 – 11:00 PM | Tuesday: 11:30 AM – 2:0...]"
+        ]
+      },
+      "attraction_18_shibuya_sky": {
+        "item_key": "attraction_18_shibuya_sky",
+        "occurrence_id": "A__d04__i03__attraction_18_shibuya_sky",
+        "day": "Day 4",
+        "time": "13:58",
+        "icon": "activity",
+        "slot": "afternoon",
+        "name": "Shibuya Sky",
+        "why": [
+          "content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo]",
+          "quality_signal[icon=activity; rating=4.6; reviews=24198]",
+          "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 10:00 AM – 10:30 PM | Tuesday: 10:00 AM – 10:30 PM | Wednesda...]"
+        ],
+        "rating": "4.6 / 5 (24,198 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.6; reviews=24198]",
+          "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 10:00 AM – 10:30 PM | Tuesday: 10:00 AM – 10:30 PM | Wednesda...]"
+        ]
+      },
+      "restaurant_18_grilled_wagyu_beef": {
+        "item_key": "restaurant_18_grilled_wagyu_beef",
+        "occurrence_id": "A__d04__i04__restaurant_18_grilled_wagyu_beef",
+        "day": "Day 4",
+        "time": "18:00",
+        "icon": "restaurant",
+        "slot": "dinner",
+        "name": "Grilled Wagyu Beef",
+        "why": [
+          "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+          "content_profile[icon=restaurant; type=Restaurant; category=Restaurant; query=Best street food and local restaurants in Tokyo]",
+          "quality_signal[icon=restaurant; rating=4.8; reviews=117]"
+        ],
+        "rating": "4.8 / 5 (117 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.8; reviews=117]",
+          "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: Open 24 hours | Tuesday: Open 24 hours | Wednesday: Open 24 h...]"
+        ]
+      },
+      "hotel_checkout": {
+        "item_key": "hotel_checkout",
+        "occurrence_id": "A__d05__i01__hotel_checkout",
+        "day": "Day 5",
+        "time": "10:30",
+        "icon": "hotel",
+        "slot": "morning",
+        "name": "Checkout from OHANA TOKYO HOUSE",
+        "why": [
+          "budget_signal[price_per_night_usd=41; budget=SGD 5000]",
+          "quality_signal[icon=hotel; rating=4.33; reviews=18]",
+          "hotel_signal[key=hotel_checkout; time=10:30; name=OHANA TOKYO HOUSE]"
+        ],
+        "rating": "4.3 / 5 (18 reviews)",
+        "review_highlights": [
+          "Exceptional<br>#128578; Very clean and comfortable!",
+          "Exceptional"
+        ]
+      },
+      "attraction_04_rikugien_gardens": {
+        "item_key": "attraction_04_rikugien_gardens",
+        "occurrence_id": "A__d05__i02__attraction_04_rikugien_gardens",
+        "day": "Day 5",
+        "time": "10:50",
+        "icon": "activity",
+        "slot": "morning",
+        "name": "Rikugien Gardens",
+        "why": [
+          "pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen]",
+          "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]",
+          "quality_signal[icon=activity; rating=4.4; reviews=10455]"
+        ],
+        "rating": "4.4 / 5 (10,455 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.4; reviews=10455]",
+          "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...]"
+        ]
+      },
+      "flight_return": {
+        "item_key": "flight_return",
+        "occurrence_id": "A__d05__i03__flight_return",
+        "day": "Day 5",
+        "time": "16:50",
+        "icon": "flight",
+        "slot": "afternoon",
+        "name": "ZIPAIR Tokyo ZG 53 (Nonstop) | Narita International Airport → Singapore Changi Airport | dep 2026-06-05 16:50 → arr 2026-06-05 23:00 | 430 min | Economy | USD 211",
+        "why": [
+          "flight_signal[segment=return; nonstop=1; dep=2026-06-05 16:50; arr=2026-06-05 23:00; duration_min=430]",
+          "time_pref_signal[pref=afternoon; dep=2026-06-05 16:50]"
+        ],
+        "rating": "",
+        "review_highlights": [
+          "ZIPAIR Tokyo ZG 53 (Nonstop) | Narita International Airport → Singapore Changi Airport | dep 2026-06-05 16:50 → arr 2026-06-05 23:00 | 430 min | Economy | USD 211"
+        ]
+      }
+    },
+    "by_occurrence": {
+      "A__d01__i01__flight_outbound": {
+        "item_key": "flight_outbound",
+        "occurrence_id": "A__d01__i01__flight_outbound",
+        "day": "Day 1",
+        "time": "17:30",
+        "icon": "flight",
+        "slot": "evening",
+        "name": "Singapore Airlines SQ 12 (Nonstop) | Singapore Changi Airport → Narita International Airport | dep 2026-06-01 09:25 → arr 2026-06-01 17:30 | 425 min | Economy | USD 722",
+        "why": [
+          "flight_signal[segment=outbound; nonstop=1; dep=2026-06-01 09:25; arr=2026-06-01 17:30; duration_min=425]",
+          "time_pref_signal[pref=morning; dep=2026-06-01 09:25]"
+        ],
+        "rating": "",
+        "review_highlights": [
+          "Singapore Airlines SQ 12 (Nonstop) | Singapore Changi Airport → Narita International Airport | dep 2026-06-01 09:25 → arr 2026-06-01 17:30 | 425 min | Economy | USD 722"
+        ]
+      },
+      "A__d01__i02__restaurant_16_rollsloth": {
+        "item_key": "restaurant_16_rollsloth",
+        "occurrence_id": "A__d01__i02__restaurant_16_rollsloth",
+        "day": "Day 1",
+        "time": "18:30",
+        "icon": "restaurant",
+        "slot": "dinner",
+        "name": "RollSloth🦥",
+        "why": [
+          "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+          "content_profile[icon=restaurant; type=Restaurant; category=Restaurant; query=Best street food and local restaurants in Tokyo]",
+          "quality_signal[icon=restaurant; rating=4.9; reviews=120]"
+        ],
+        "rating": "4.9 / 5 (120 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.9; reviews=120]",
+          "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: 8:00 AM – 1:00 AM | Tuesday: 8:00 AM – 1:00 AM | Wednesday: 8...]"
+        ]
+      },
+      "A__d01__i03__hotel_stay": {
+        "item_key": "hotel_stay",
+        "occurrence_id": "A__d01__i03__hotel_stay",
+        "day": "Day 1",
+        "time": "20:09",
+        "icon": "hotel",
+        "slot": "evening",
+        "name": "OHANA TOKYO HOUSE",
+        "why": [
+          "budget_signal[price_per_night_usd=41; budget=SGD 5000]",
+          "quality_signal[icon=hotel; rating=4.33; reviews=18]",
+          "hotel_signal[key=hotel_stay; time=20:09; name=OHANA TOKYO HOUSE]"
+        ],
+        "rating": "4.3 / 5 (18 reviews)",
+        "review_highlights": [
+          "Exceptional<br>#128578; Very clean and comfortable!",
+          "Exceptional"
+        ]
+      },
+      "A__d02__i01__attraction_02_meiji_jingu": {
+        "item_key": "attraction_02_meiji_jingu",
+        "occurrence_id": "A__d02__i01__attraction_02_meiji_jingu",
+        "day": "Day 2",
+        "time": "09:17",
+        "icon": "activity",
+        "slot": "morning",
+        "name": "Meiji Jingu",
+        "why": [
+          "content_profile[icon=activity; type=Shinto Shrine; category=Shinto Shrine]",
+          "quality_signal[icon=activity; rating=4.6]",
+          "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 4:30 PM | Tuesday: 9:00 AM – 4:30 PM | Wednesday: 9...]"
+        ],
+        "rating": "4.6 / 5",
+        "review_highlights": [
+          "rating_signal[rating=4.6]",
+          "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 4:30 PM | Tuesday: 9:00 AM – 4:30 PM | Wednesday: 9...]"
+        ]
+      },
+      "A__d02__i02__restaurant_09_mo_mo_paradise_shibuya_koendori": {
+        "item_key": "restaurant_09_mo_mo_paradise_shibuya_koendori",
+        "occurrence_id": "A__d02__i02__restaurant_09_mo_mo_paradise_shibuya_koendori",
+        "day": "Day 2",
+        "time": "11:45",
+        "icon": "restaurant",
+        "slot": "lunch",
+        "name": "MO-MO-PARADISE Shibuya Koendori",
+        "why": [
+          "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]",
+          "content_profile[icon=restaurant; type=Japanese Restaurant; category=Japanese Restaurant; query=Best traditional restaurants in Tokyo]",
+          "quality_signal[icon=restaurant; rating=4.9; reviews=6118]"
+        ],
+        "rating": "4.9 / 5 (6,118 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.9; reviews=6118]",
+          "hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:30 AM – 3:00 PM, 5:00 – 10:30 PM | Tuesday: 11:30 AM – 3:0...]"
+        ]
+      },
+      "A__d02__i03__attraction_06_zojo_ji_temple": {
+        "item_key": "attraction_06_zojo_ji_temple",
+        "occurrence_id": "A__d02__i03__attraction_06_zojo_ji_temple",
+        "day": "Day 2",
+        "time": "13:57",
+        "icon": "activity",
+        "slot": "afternoon",
+        "name": "Zojo-ji Temple",
+        "why": [
+          "pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen]",
+          "content_profile[icon=activity; type=Buddhist Temple; category=Buddhist Temple; query=best zen gardens and quiet temples in Tokyo]",
+          "quality_signal[icon=activity; rating=4.5; reviews=12142]"
+        ],
+        "rating": "4.5 / 5 (12,142 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.5; reviews=12142]",
+          "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...]"
+        ]
+      },
+      "A__d02__i04__restaurant_03_narisawa": {
+        "item_key": "restaurant_03_narisawa",
+        "occurrence_id": "A__d02__i04__restaurant_03_narisawa",
+        "day": "Day 2",
+        "time": "18:15",
+        "icon": "restaurant",
+        "slot": "dinner",
+        "name": "Narisawa",
+        "why": [
+          "pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine]",
+          "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]",
+          "quality_signal[icon=restaurant; rating=4.6; reviews=705]"
+        ],
+        "rating": "4.6 / 5 (705 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.6; reviews=705]",
+          "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: Closed | Tuesday: 12:00 – 2:30 PM, 5:30 – 8:00 PM | Wednesday...]"
+        ]
+      },
+      "A__d03__i01__attraction_09_kiyosumi_gardens": {
+        "item_key": "attraction_09_kiyosumi_gardens",
+        "occurrence_id": "A__d03__i01__attraction_09_kiyosumi_gardens",
+        "day": "Day 3",
+        "time": "09:49",
+        "icon": "activity",
+        "slot": "morning",
+        "name": "Kiyosumi Gardens",
+        "why": [
+          "pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen]",
+          "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]",
+          "quality_signal[icon=activity; rating=4.4; reviews=5356]"
+        ],
+        "rating": "4.4 / 5 (5,356 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.4; reviews=5356]",
+          "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...]"
+        ]
+      },
+      "A__d03__i02__restaurant_15_gyukatsu_ichinisan": {
+        "item_key": "restaurant_15_gyukatsu_ichinisan",
+        "occurrence_id": "A__d03__i02__restaurant_15_gyukatsu_ichinisan",
+        "day": "Day 3",
+        "time": "12:01",
+        "icon": "restaurant",
+        "slot": "lunch",
+        "name": "Gyukatsu Ichinisan",
+        "why": [
+          "pref_match[pref=traditional cultural; icon=restaurant; overlap=type:Tonkatsu Restaurant]",
+          "content_profile[icon=restaurant; type=Tonkatsu Restaurant; category=Tonkatsu Restaurant; query=Best street food and local restaurants in Tokyo]",
+          "quality_signal[icon=restaurant; rating=4.8; reviews=13897]"
+        ],
+        "rating": "4.8 / 5 (13,897 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.8; reviews=13897]",
+          "hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:00 AM – 10:00 PM | Tuesday: 11:00 AM – 10:00 PM | Wednesda...]"
+        ]
+      },
+      "A__d03__i03__attraction_14_edo_tokyo_museum": {
+        "item_key": "attraction_14_edo_tokyo_museum",
+        "occurrence_id": "A__d03__i03__attraction_14_edo_tokyo_museum",
+        "day": "Day 3",
+        "time": "13:57",
+        "icon": "activity",
+        "slot": "afternoon",
+        "name": "Edo-Tokyo Museum",
+        "why": [
+          "content_profile[icon=activity; type=History Museum; category=History Museum; query=best museums in Tokyo]",
+          "quality_signal[icon=activity; rating=4.4; reviews=12832]",
+          "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: Closed | Tuesday: 9:30 AM – 5:30 PM | Wednesday: 9:30 AM – 5:...]"
+        ],
+        "rating": "4.4 / 5 (12,832 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.4; reviews=12832]",
+          "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: Closed | Tuesday: 9:30 AM – 5:30 PM | Wednesday: 9:30 AM – 5:...]"
+        ]
+      },
+      "A__d03__i04__attraction_16_tokyo_tower": {
+        "item_key": "attraction_16_tokyo_tower",
+        "occurrence_id": "A__d03__i04__attraction_16_tokyo_tower",
+        "day": "Day 3",
+        "time": "16:42",
+        "icon": "activity",
+        "slot": "afternoon",
+        "name": "Tokyo Tower",
+        "why": [
+          "content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo]",
+          "quality_signal[icon=activity; rating=4.1; reviews=146]",
+          "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 9:00 AM – 11:00 PM | Tuesday: 9:00 AM – 11:00 PM | Wednesday:...]"
+        ],
+        "rating": "4.1 / 5 (146 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.1; reviews=146]",
+          "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 9:00 AM – 11:00 PM | Tuesday: 9:00 AM – 11:00 PM | Wednesday:...]"
+        ]
+      },
+      "A__d03__i05__restaurant_11_t_s_tantan": {
+        "item_key": "restaurant_11_t_s_tantan",
+        "occurrence_id": "A__d03__i05__restaurant_11_t_s_tantan",
+        "day": "Day 3",
+        "time": "18:39",
+        "icon": "restaurant",
+        "slot": "dinner",
+        "name": "T’s Tantan",
+        "why": [
+          "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+          "content_profile[icon=restaurant; type=Vegan Restaurant; category=Vegan Restaurant; query=Best street food and local restaurants in Tokyo]",
+          "quality_signal[icon=restaurant; rating=4.6; reviews=2762]"
+        ],
+        "rating": "4.6 / 5 (2,762 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.6; reviews=2762]",
+          "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: 10:00 AM – 9:30 PM | Tuesday: 10:00 AM – 9:30 PM | Wednesday:...]"
+        ]
+      },
+      "A__d04__i01__attraction_05_koishikawa_korakuen": {
+        "item_key": "attraction_05_koishikawa_korakuen",
+        "occurrence_id": "A__d04__i01__attraction_05_koishikawa_korakuen",
+        "day": "Day 4",
+        "time": "09:41",
+        "icon": "activity",
+        "slot": "morning",
+        "name": "Koishikawa Korakuen",
+        "why": [
+          "pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen]",
+          "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]",
+          "quality_signal[icon=activity; rating=4.4; reviews=6578]"
+        ],
+        "rating": "4.4 / 5 (6,578 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.4; reviews=6578]",
+          "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 4:30 PM | Tuesday: 9:00 AM – 4:30 PM | Wednesday: 9...]"
+        ]
+      },
+      "A__d04__i02__restaurant_02_censu_tokyo": {
+        "item_key": "restaurant_02_censu_tokyo",
+        "occurrence_id": "A__d04__i02__restaurant_02_censu_tokyo",
+        "day": "Day 4",
+        "time": "12:05",
+        "icon": "restaurant",
+        "slot": "lunch",
+        "name": "CENSU TOKYO",
+        "why": [
+          "pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine]",
+          "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]",
+          "quality_signal[icon=restaurant; rating=4.7; reviews=221]"
+        ],
+        "rating": "4.7 / 5 (221 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.7; reviews=221]",
+          "hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:30 AM – 2:00 PM, 6:00 – 11:00 PM | Tuesday: 11:30 AM – 2:0...]"
+        ]
+      },
+      "A__d04__i03__attraction_18_shibuya_sky": {
+        "item_key": "attraction_18_shibuya_sky",
+        "occurrence_id": "A__d04__i03__attraction_18_shibuya_sky",
+        "day": "Day 4",
+        "time": "13:58",
+        "icon": "activity",
+        "slot": "afternoon",
+        "name": "Shibuya Sky",
+        "why": [
+          "content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo]",
+          "quality_signal[icon=activity; rating=4.6; reviews=24198]",
+          "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 10:00 AM – 10:30 PM | Tuesday: 10:00 AM – 10:30 PM | Wednesda...]"
+        ],
+        "rating": "4.6 / 5 (24,198 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.6; reviews=24198]",
+          "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 10:00 AM – 10:30 PM | Tuesday: 10:00 AM – 10:30 PM | Wednesda...]"
+        ]
+      },
+      "A__d04__i04__restaurant_18_grilled_wagyu_beef": {
+        "item_key": "restaurant_18_grilled_wagyu_beef",
+        "occurrence_id": "A__d04__i04__restaurant_18_grilled_wagyu_beef",
+        "day": "Day 4",
+        "time": "18:00",
+        "icon": "restaurant",
+        "slot": "dinner",
+        "name": "Grilled Wagyu Beef",
+        "why": [
+          "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+          "content_profile[icon=restaurant; type=Restaurant; category=Restaurant; query=Best street food and local restaurants in Tokyo]",
+          "quality_signal[icon=restaurant; rating=4.8; reviews=117]"
+        ],
+        "rating": "4.8 / 5 (117 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.8; reviews=117]",
+          "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: Open 24 hours | Tuesday: Open 24 hours | Wednesday: Open 24 h...]"
+        ]
+      },
+      "A__d05__i01__hotel_checkout": {
+        "item_key": "hotel_checkout",
+        "occurrence_id": "A__d05__i01__hotel_checkout",
+        "day": "Day 5",
+        "time": "10:30",
+        "icon": "hotel",
+        "slot": "morning",
+        "name": "Checkout from OHANA TOKYO HOUSE",
+        "why": [
+          "budget_signal[price_per_night_usd=41; budget=SGD 5000]",
+          "quality_signal[icon=hotel; rating=4.33; reviews=18]",
+          "hotel_signal[key=hotel_checkout; time=10:30; name=OHANA TOKYO HOUSE]"
+        ],
+        "rating": "4.3 / 5 (18 reviews)",
+        "review_highlights": [
+          "Exceptional<br>#128578; Very clean and comfortable!",
+          "Exceptional"
+        ]
+      },
+      "A__d05__i02__attraction_04_rikugien_gardens": {
+        "item_key": "attraction_04_rikugien_gardens",
+        "occurrence_id": "A__d05__i02__attraction_04_rikugien_gardens",
+        "day": "Day 5",
+        "time": "10:50",
+        "icon": "activity",
+        "slot": "morning",
+        "name": "Rikugien Gardens",
+        "why": [
+          "pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen]",
+          "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]",
+          "quality_signal[icon=activity; rating=4.4; reviews=10455]"
+        ],
+        "rating": "4.4 / 5 (10,455 reviews)",
+        "review_highlights": [
+          "rating_signal[rating=4.4; reviews=10455]",
+          "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...]"
+        ]
+      },
+      "A__d05__i03__flight_return": {
+        "item_key": "flight_return",
+        "occurrence_id": "A__d05__i03__flight_return",
+        "day": "Day 5",
+        "time": "16:50",
+        "icon": "flight",
+        "slot": "afternoon",
+        "name": "ZIPAIR Tokyo ZG 53 (Nonstop) | Narita International Airport → Singapore Changi Airport | dep 2026-06-05 16:50 → arr 2026-06-05 23:00 | 430 min | Economy | USD 211",
+        "why": [
+          "flight_signal[segment=return; nonstop=1; dep=2026-06-05 16:50; arr=2026-06-05 23:00; duration_min=430]",
+          "time_pref_signal[pref=afternoon; dep=2026-06-05 16:50]"
+        ],
+        "rating": "",
+        "review_highlights": [
+          "ZIPAIR Tokyo ZG 53 (Nonstop) | Narita International Airport → Singapore Changi Airport | dep 2026-06-05 16:50 → arr 2026-06-05 23:00 | 430 min | Economy | USD 211"
+        ]
+      }
+    }
+  },
+  "evidence": {
+    "option": {
+      "option_key": "A",
+      "option_meta": {
+        "label": "Balanced Highlights",
+        "desc": "A balanced plan that covers the strongest relevant picks for the user's stated interests with a steady full-day pace.",
+        "budget": "SGD 5000 (flight + hotel; meals/transport TBC)",
+        "style": "Balanced / top-relevance route",
+        "badge": "Best for a broad first pass through the destination"
+      },
+      "preference_tags": [
+        "historical",
+        "zen gardens",
+        "fine dining",
+        "traditional cultural"
+      ],
+      "option_record": "option_summary[option=A; label=Balanced Highlights; style=Balanced / top-relevance route; prefs=historical,zen gardens,fine dining,traditional cultural]",
+      "planner_context": "planner_context[summary=Built 3 deterministic itinerary variants from the saved research inventory by choosing the highest-ranked flights, selecting distinct hotels per option, clustering attractions by lat/lng, pairing nearby lunch and dinn...]"
+    },
+    "day_order": [
+      "Day 1",
+      "Day 2",
+      "Day 3",
+      "Day 4",
+      "Day 5"
+    ],
+    "days": {
+      "Day 1": {
+        "day": "Day 1",
+        "record": "day_sequence[day=Day 1; item_count=3; sequence=stop[time=17:30; icon=flight; name=Singapore Airlines SQ 12 (Nonstop) | Singapore Changi Airport...; evidence=flight_signal[segment=outbound; nonstop=1; dep=2026-06-01 09:25; arr=2026-06-01 17:30; duration_min=425]],stop[time=18:30; icon=restaurant; name=RollSloth🦥; evidence=pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]],stop[time=20:09; icon=hotel; name=OHANA TOKYO HOUSE; evidence=budget_signal[price_per_night_usd=41; budget=SGD 5000]]]",
+        "transitions": [
+          {
+            "from_name": "the outbound nonstop flight",
+            "to_name": "RollSloth🦥",
+            "link": "arrival_to_meal",
+            "reason_hint": "RollSloth🦥 follows arrival so the evening starts with one manageable ground stop"
+          },
+          {
+            "from_name": "RollSloth🦥",
+            "to_name": "OHANA TOKYO HOUSE",
+            "link": "meal_to_overnight",
+            "reason_hint": "OHANA TOKYO HOUSE comes after RollSloth🦥 so the day closes into the overnight instead of reopening the route"
+          }
+        ],
+        "items": [
+          {
+            "item_key": "flight_outbound",
+            "occurrence_id": "A__d01__i01__flight_outbound",
+            "time": "17:30",
+            "icon": "flight",
+            "name": "Singapore Airlines SQ 12 (Nonstop) | Singapore Changi Airport → Narita International Airport | dep 2026-06-01 09:25 → arr 2026-06-01 17:30 | 425 min | Economy | USD 722",
+            "slot": "evening",
+            "top_why": [
+              "flight_signal[segment=outbound; nonstop=1; dep=2026-06-01 09:25; arr=2026-06-01 17:30; duration_min=425]",
+              "time_pref_signal[pref=morning; dep=2026-06-01 09:25]"
+            ],
+            "top_why_raw": [
+              "flight_signal[segment=outbound; nonstop=1; dep=2026-06-01 09:25; arr=2026-06-01 17:30; duration_min=425]",
+              "time_pref_signal[pref=morning; dep=2026-06-01 09:25]"
+            ],
+            "rating": "",
+            "review_highlights": [
+              "Singapore Airlines SQ 12 (Nonstop) | Singapore Changi Airport → Narita International Airport | dep 2026-06-01 09:25 → arr 2026-06-01 17:30 | 425 min | Economy | USD 722"
+            ]
+          },
+          {
+            "item_key": "restaurant_16_rollsloth",
+            "occurrence_id": "A__d01__i02__restaurant_16_rollsloth",
+            "time": "18:30",
+            "icon": "restaurant",
+            "name": "RollSloth🦥",
+            "slot": "dinner",
+            "top_why": [
+              "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+              "content_profile[icon=restaurant; type=Restaurant; category=Restaurant; query=Best street food and local restaurants in Tokyo]"
+            ],
+            "top_why_raw": [
+              "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+              "content_profile[icon=restaurant; type=Restaurant; category=Restaurant; query=Best street food and local restaurants in Tokyo]",
+              "quality_signal[icon=restaurant; rating=4.9; reviews=120]",
+              "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: 8:00 AM – 1:00 AM | Tuesday: 8:00 AM – 1:00 AM | Wednesday: 8...]",
+              "route_signal[icon=restaurant]"
+            ],
+            "rating": "4.9 / 5 (120 reviews)",
+            "review_highlights": [
+              "rating_signal[rating=4.9; reviews=120]"
+            ]
+          },
+          {
+            "item_key": "hotel_stay",
+            "occurrence_id": "A__d01__i03__hotel_stay",
+            "time": "20:09",
+            "icon": "hotel",
+            "name": "OHANA TOKYO HOUSE",
+            "slot": "evening",
+            "top_why": [
+              "budget_signal[price_per_night_usd=41; budget=SGD 5000]",
+              "quality_signal[icon=hotel; rating=4.33; reviews=18]"
+            ],
+            "top_why_raw": [
+              "budget_signal[price_per_night_usd=41; budget=SGD 5000]",
+              "quality_signal[icon=hotel; rating=4.33; reviews=18]",
+              "hotel_signal[key=hotel_stay; time=20:09; name=OHANA TOKYO HOUSE]"
+            ],
+            "rating": "4.3 / 5 (18 reviews)",
+            "review_highlights": [
+              "Exceptional<br>#128578; Very clean and comfortable!"
+            ]
+          }
+        ]
+      },
+      "Day 2": {
+        "day": "Day 2",
+        "record": "day_sequence[day=Day 2; item_count=4; sequence=stop[time=09:17; icon=activity; name=Meiji Jingu; evidence=content_profile[icon=activity; type=Shinto Shrine; category=Shinto Shrine]],stop[time=11:45; icon=restaurant; name=MO-MO-PARADISE Shibuya Koendori; evidence=pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]],stop[time=13:57; icon=activity; name=Zojo-ji Temple; evidence=pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen]],stop[time=18:15; icon=restaurant; name=Narisawa; evidence=pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine]]]",
+        "transitions": [
+          {
+            "from_name": "Meiji Jingu",
+            "to_name": "MO-MO-PARADISE Shibuya Koendori",
+            "link": "morning_to_lunch_bridge",
+            "reason_hint": "MO-MO-PARADISE Shibuya Koendori is used as the lunch bridge after Meiji Jingu instead of creating a separate detour over about 1.7 km"
+          },
+          {
+            "from_name": "MO-MO-PARADISE Shibuya Koendori",
+            "to_name": "Zojo-ji Temple",
+            "link": "lunch_to_afternoon_bridge",
+            "reason_hint": "Zojo-ji Temple resumes the afternoon block after lunch so the same-day run stays intact over about 4.4 km"
+          },
+          {
+            "from_name": "Zojo-ji Temple",
+            "to_name": "Narisawa",
+            "link": "activity_to_dinner_close",
+            "reason_hint": "Narisawa closes the day after Zojo-ji Temple rather than adding another activity over about 2.9 km"
+          }
+        ],
+        "items": [
+          {
+            "item_key": "attraction_02_meiji_jingu",
+            "occurrence_id": "A__d02__i01__attraction_02_meiji_jingu",
+            "time": "09:17",
+            "icon": "activity",
+            "name": "Meiji Jingu",
+            "slot": "morning",
+            "top_why": [
+              "content_profile[icon=activity; type=Shinto Shrine; category=Shinto Shrine]",
+              "quality_signal[icon=activity; rating=4.6]"
+            ],
+            "top_why_raw": [
+              "content_profile[icon=activity; type=Shinto Shrine; category=Shinto Shrine]",
+              "quality_signal[icon=activity; rating=4.6]",
+              "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 4:30 PM | Tuesday: 9:00 AM – 4:30 PM | Wednesday: 9...]",
+              "route_signal[icon=activity; next_km=1.7]"
+            ],
+            "rating": "4.6 / 5",
+            "review_highlights": [
+              "rating_signal[rating=4.6]"
+            ]
+          },
+          {
+            "item_key": "restaurant_09_mo_mo_paradise_shibuya_koendori",
+            "occurrence_id": "A__d02__i02__restaurant_09_mo_mo_paradise_shibuya_koendori",
+            "time": "11:45",
+            "icon": "restaurant",
+            "name": "MO-MO-PARADISE Shibuya Koendori",
+            "slot": "lunch",
+            "top_why": [
+              "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]",
+              "content_profile[icon=restaurant; type=Japanese Restaurant; category=Japanese Restaurant; query=Best traditional restaurants in Tokyo]"
+            ],
+            "top_why_raw": [
+              "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]",
+              "content_profile[icon=restaurant; type=Japanese Restaurant; category=Japanese Restaurant; query=Best traditional restaurants in Tokyo]",
+              "quality_signal[icon=restaurant; rating=4.9; reviews=6118]",
+              "hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:30 AM – 3:00 PM, 5:00 – 10:30 PM | Tuesday: 11:30 AM – 3:0...]",
+              "route_signal[icon=restaurant; prev_km=1.7; next_km=4.36; total_km=6.06]"
+            ],
+            "rating": "4.9 / 5 (6,118 reviews)",
+            "review_highlights": [
+              "rating_signal[rating=4.9; reviews=6118]"
+            ]
+          },
+          {
+            "item_key": "attraction_06_zojo_ji_temple",
+            "occurrence_id": "A__d02__i03__attraction_06_zojo_ji_temple",
+            "time": "13:57",
+            "icon": "activity",
+            "name": "Zojo-ji Temple",
+            "slot": "afternoon",
+            "top_why": [
+              "pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen]",
+              "content_profile[icon=activity; type=Buddhist Temple; category=Buddhist Temple; query=best zen gardens and quiet temples in Tokyo]"
+            ],
+            "top_why_raw": [
+              "pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen]",
+              "content_profile[icon=activity; type=Buddhist Temple; category=Buddhist Temple; query=best zen gardens and quiet temples in Tokyo]",
+              "quality_signal[icon=activity; rating=4.5; reviews=12142]",
+              "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...]",
+              "route_signal[icon=activity; prev_km=4.36; next_km=2.85; total_km=7.22]"
+            ],
+            "rating": "4.5 / 5 (12,142 reviews)",
+            "review_highlights": [
+              "rating_signal[rating=4.5; reviews=12142]"
+            ]
+          },
+          {
+            "item_key": "restaurant_03_narisawa",
+            "occurrence_id": "A__d02__i04__restaurant_03_narisawa",
+            "time": "18:15",
+            "icon": "restaurant",
+            "name": "Narisawa",
+            "slot": "dinner",
+            "top_why": [
+              "pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine]",
+              "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]"
+            ],
+            "top_why_raw": [
+              "pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine]",
+              "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]",
+              "quality_signal[icon=restaurant; rating=4.6; reviews=705]",
+              "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: Closed | Tuesday: 12:00 – 2:30 PM, 5:30 – 8:00 PM | Wednesday...]",
+              "route_signal[icon=restaurant; prev_km=2.85]"
+            ],
+            "rating": "4.6 / 5 (705 reviews)",
+            "review_highlights": [
+              "rating_signal[rating=4.6; reviews=705]"
+            ]
+          }
+        ]
+      },
+      "Day 3": {
+        "day": "Day 3",
+        "record": "day_sequence[day=Day 3; item_count=5; sequence=stop[time=09:49; icon=activity; name=Kiyosumi Gardens; evidence=pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen]],stop[time=12:01; icon=restaurant; name=Gyukatsu Ichinisan; evidence=pref_match[pref=traditional cultural; icon=restaurant; overlap=type:Tonkatsu Restaurant]],stop[time=13:57; icon=activity; name=Edo-Tokyo Museum; evidence=content_profile[icon=activity; type=History Museum; category=History Museum; query=best museums in Tokyo]],stop[time=16:42; icon=activity; name=Tokyo Tower; evidence=content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo]],stop[time=18:39; icon=restaurant; name=T’s Tantan; evidence=pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]]]",
+        "transitions": [
+          {
+            "from_name": "Kiyosumi Gardens",
+            "to_name": "Gyukatsu Ichinisan",
+            "link": "morning_to_lunch_bridge",
+            "reason_hint": "Gyukatsu Ichinisan is used as the lunch bridge after Kiyosumi Gardens instead of creating a separate detour over about 3.4 km"
+          },
+          {
+            "from_name": "Gyukatsu Ichinisan",
+            "to_name": "Edo-Tokyo Museum",
+            "link": "lunch_to_afternoon_bridge",
+            "reason_hint": "Edo-Tokyo Museum resumes the afternoon block after lunch so the same-day run stays intact over about 2.4 km"
+          },
+          {
+            "from_name": "Edo-Tokyo Museum",
+            "to_name": "Tokyo Tower",
+            "link": "same_day_sightseeing_chain",
+            "reason_hint": "Tokyo Tower stays on the same day as Edo-Tokyo Museum to keep the sightseeing chain continuous over about 6.2 km"
+          },
+          {
+            "from_name": "Tokyo Tower",
+            "to_name": "T’s Tantan",
+            "link": "activity_to_dinner_close",
+            "reason_hint": "T’s Tantan closes the day after Tokyo Tower rather than adding another activity over about 3.0 km"
+          }
+        ],
+        "items": [
+          {
+            "item_key": "attraction_09_kiyosumi_gardens",
+            "occurrence_id": "A__d03__i01__attraction_09_kiyosumi_gardens",
+            "time": "09:49",
+            "icon": "activity",
+            "name": "Kiyosumi Gardens",
+            "slot": "morning",
+            "top_why": [
+              "pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen]",
+              "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]"
+            ],
+            "top_why_raw": [
+              "pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen]",
+              "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]",
+              "quality_signal[icon=activity; rating=4.4; reviews=5356]",
+              "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...]",
+              "route_signal[icon=activity; next_km=3.36]"
+            ],
+            "rating": "4.4 / 5 (5,356 reviews)",
+            "review_highlights": [
+              "rating_signal[rating=4.4; reviews=5356]"
+            ]
+          },
+          {
+            "item_key": "restaurant_15_gyukatsu_ichinisan",
+            "occurrence_id": "A__d03__i02__restaurant_15_gyukatsu_ichinisan",
+            "time": "12:01",
+            "icon": "restaurant",
+            "name": "Gyukatsu Ichinisan",
+            "slot": "lunch",
+            "top_why": [
+              "pref_match[pref=traditional cultural; icon=restaurant; overlap=type:Tonkatsu Restaurant]",
+              "content_profile[icon=restaurant; type=Tonkatsu Restaurant; category=Tonkatsu Restaurant; query=Best street food and local restaurants in Tokyo]"
+            ],
+            "top_why_raw": [
+              "pref_match[pref=traditional cultural; icon=restaurant; overlap=type:Tonkatsu Restaurant]",
+              "content_profile[icon=restaurant; type=Tonkatsu Restaurant; category=Tonkatsu Restaurant; query=Best street food and local restaurants in Tokyo]",
+              "quality_signal[icon=restaurant; rating=4.8; reviews=13897]",
+              "hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:00 AM – 10:00 PM | Tuesday: 11:00 AM – 10:00 PM | Wednesda...]",
+              "route_signal[icon=restaurant; prev_km=3.36; next_km=2.35; total_km=5.71]"
+            ],
+            "rating": "4.8 / 5 (13,897 reviews)",
+            "review_highlights": [
+              "rating_signal[rating=4.8; reviews=13897]"
+            ]
+          },
+          {
+            "item_key": "attraction_14_edo_tokyo_museum",
+            "occurrence_id": "A__d03__i03__attraction_14_edo_tokyo_museum",
+            "time": "13:57",
+            "icon": "activity",
+            "name": "Edo-Tokyo Museum",
+            "slot": "afternoon",
+            "top_why": [
+              "content_profile[icon=activity; type=History Museum; category=History Museum; query=best museums in Tokyo]",
+              "quality_signal[icon=activity; rating=4.4; reviews=12832]"
+            ],
+            "top_why_raw": [
+              "content_profile[icon=activity; type=History Museum; category=History Museum; query=best museums in Tokyo]",
+              "quality_signal[icon=activity; rating=4.4; reviews=12832]",
+              "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: Closed | Tuesday: 9:30 AM – 5:30 PM | Wednesday: 9:30 AM – 5:...]",
+              "route_signal[icon=activity; prev_km=2.35; next_km=6.2; total_km=8.55]"
+            ],
+            "rating": "4.4 / 5 (12,832 reviews)",
+            "review_highlights": [
+              "rating_signal[rating=4.4; reviews=12832]"
+            ]
+          },
+          {
+            "item_key": "attraction_16_tokyo_tower",
+            "occurrence_id": "A__d03__i04__attraction_16_tokyo_tower",
+            "time": "16:42",
+            "icon": "activity",
+            "name": "Tokyo Tower",
+            "slot": "afternoon",
+            "top_why": [
+              "content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo]",
+              "quality_signal[icon=activity; rating=4.1; reviews=146]"
+            ],
+            "top_why_raw": [
+              "content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo]",
+              "quality_signal[icon=activity; rating=4.1; reviews=146]",
+              "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 9:00 AM – 11:00 PM | Tuesday: 9:00 AM – 11:00 PM | Wednesday:...]",
+              "route_signal[icon=activity; prev_km=6.2; next_km=3.05; total_km=9.25]"
+            ],
+            "rating": "4.1 / 5 (146 reviews)",
+            "review_highlights": [
+              "rating_signal[rating=4.1; reviews=146]"
+            ]
+          },
+          {
+            "item_key": "restaurant_11_t_s_tantan",
+            "occurrence_id": "A__d03__i05__restaurant_11_t_s_tantan",
+            "time": "18:39",
+            "icon": "restaurant",
+            "name": "T’s Tantan",
+            "slot": "dinner",
+            "top_why": [
+              "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+              "content_profile[icon=restaurant; type=Vegan Restaurant; category=Vegan Restaurant; query=Best street food and local restaurants in Tokyo]"
+            ],
+            "top_why_raw": [
+              "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+              "content_profile[icon=restaurant; type=Vegan Restaurant; category=Vegan Restaurant; query=Best street food and local restaurants in Tokyo]",
+              "quality_signal[icon=restaurant; rating=4.6; reviews=2762]",
+              "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: 10:00 AM – 9:30 PM | Tuesday: 10:00 AM – 9:30 PM | Wednesday:...]",
+              "route_signal[icon=restaurant; prev_km=3.05]"
+            ],
+            "rating": "4.6 / 5 (2,762 reviews)",
+            "review_highlights": [
+              "rating_signal[rating=4.6; reviews=2762]"
+            ]
+          }
+        ]
+      },
+      "Day 4": {
+        "day": "Day 4",
+        "record": "day_sequence[day=Day 4; item_count=4; sequence=stop[time=09:41; icon=activity; name=Koishikawa Korakuen; evidence=pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen]],stop[time=12:05; icon=restaurant; name=CENSU TOKYO; evidence=pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine]],stop[time=13:58; icon=activity; name=Shibuya Sky; evidence=content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo]],stop[time=18:00; icon=restaurant; name=Grilled Wagyu Beef; evidence=pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]]]",
+        "transitions": [
+          {
+            "from_name": "Koishikawa Korakuen",
+            "to_name": "CENSU TOKYO",
+            "link": "morning_to_lunch_bridge",
+            "reason_hint": "CENSU TOKYO is used as the lunch bridge after Koishikawa Korakuen instead of creating a separate detour over about 4.8 km"
+          },
+          {
+            "from_name": "CENSU TOKYO",
+            "to_name": "Shibuya Sky",
+            "link": "lunch_to_afternoon_bridge",
+            "reason_hint": "Shibuya Sky resumes the afternoon block after lunch so the same-day run stays intact over about 2.0 km"
+          },
+          {
+            "from_name": "Shibuya Sky",
+            "to_name": "Grilled Wagyu Beef",
+            "link": "activity_to_dinner_close",
+            "reason_hint": "Grilled Wagyu Beef closes the day after Shibuya Sky rather than adding another activity over about 6.2 km"
+          }
+        ],
+        "items": [
+          {
+            "item_key": "attraction_05_koishikawa_korakuen",
+            "occurrence_id": "A__d04__i01__attraction_05_koishikawa_korakuen",
+            "time": "09:41",
+            "icon": "activity",
+            "name": "Koishikawa Korakuen",
+            "slot": "morning",
+            "top_why": [
+              "pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen]",
+              "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]"
+            ],
+            "top_why_raw": [
+              "pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen]",
+              "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]",
+              "quality_signal[icon=activity; rating=4.4; reviews=6578]",
+              "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 4:30 PM | Tuesday: 9:00 AM – 4:30 PM | Wednesday: 9...]",
+              "route_signal[icon=activity; next_km=4.82]"
+            ],
+            "rating": "4.4 / 5 (6,578 reviews)",
+            "review_highlights": [
+              "rating_signal[rating=4.4; reviews=6578]"
+            ]
+          },
+          {
+            "item_key": "restaurant_02_censu_tokyo",
+            "occurrence_id": "A__d04__i02__restaurant_02_censu_tokyo",
+            "time": "12:05",
+            "icon": "restaurant",
+            "name": "CENSU TOKYO",
+            "slot": "lunch",
+            "top_why": [
+              "pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine]",
+              "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]"
+            ],
+            "top_why_raw": [
+              "pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine]",
+              "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]",
+              "quality_signal[icon=restaurant; rating=4.7; reviews=221]",
+              "hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:30 AM – 2:00 PM, 6:00 – 11:00 PM | Tuesday: 11:30 AM – 2:0...]",
+              "route_signal[icon=restaurant; prev_km=4.82; next_km=1.98; total_km=6.8]"
+            ],
+            "rating": "4.7 / 5 (221 reviews)",
+            "review_highlights": [
+              "rating_signal[rating=4.7; reviews=221]"
+            ]
+          },
+          {
+            "item_key": "attraction_18_shibuya_sky",
+            "occurrence_id": "A__d04__i03__attraction_18_shibuya_sky",
+            "time": "13:58",
+            "icon": "activity",
+            "name": "Shibuya Sky",
+            "slot": "afternoon",
+            "top_why": [
+              "content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo]",
+              "quality_signal[icon=activity; rating=4.6; reviews=24198]"
+            ],
+            "top_why_raw": [
+              "content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo]",
+              "quality_signal[icon=activity; rating=4.6; reviews=24198]",
+              "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 10:00 AM – 10:30 PM | Tuesday: 10:00 AM – 10:30 PM | Wednesda...]",
+              "route_signal[icon=activity; prev_km=1.98; next_km=6.19; total_km=8.17]"
+            ],
+            "rating": "4.6 / 5 (24,198 reviews)",
+            "review_highlights": [
+              "rating_signal[rating=4.6; reviews=24198]"
+            ]
+          },
+          {
+            "item_key": "restaurant_18_grilled_wagyu_beef",
+            "occurrence_id": "A__d04__i04__restaurant_18_grilled_wagyu_beef",
+            "time": "18:00",
+            "icon": "restaurant",
+            "name": "Grilled Wagyu Beef",
+            "slot": "dinner",
+            "top_why": [
+              "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+              "content_profile[icon=restaurant; type=Restaurant; category=Restaurant; query=Best street food and local restaurants in Tokyo]"
+            ],
+            "top_why_raw": [
+              "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+              "content_profile[icon=restaurant; type=Restaurant; category=Restaurant; query=Best street food and local restaurants in Tokyo]",
+              "quality_signal[icon=restaurant; rating=4.8; reviews=117]",
+              "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: Open 24 hours | Tuesday: Open 24 hours | Wednesday: Open 24 h...]",
+              "route_signal[icon=restaurant; prev_km=6.19]"
+            ],
+            "rating": "4.8 / 5 (117 reviews)",
+            "review_highlights": [
+              "rating_signal[rating=4.8; reviews=117]"
+            ]
+          }
+        ]
+      },
+      "Day 5": {
+        "day": "Day 5",
+        "record": "day_sequence[day=Day 5; item_count=3; sequence=stop[time=10:30; icon=hotel; name=Checkout from OHANA TOKYO HOUSE; evidence=budget_signal[price_per_night_usd=41; budget=SGD 5000]],stop[time=10:50; icon=activity; name=Rikugien Gardens; evidence=pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen]],stop[time=16:50; icon=flight; name=ZIPAIR Tokyo ZG 53 (Nonstop) | Narita International Airport →...; evidence=flight_signal[segment=return; nonstop=1; dep=2026-06-05 16:50; arr=2026-06-05 23:00; duration_min=430]]]",
+        "transitions": [
+          {
+            "from_name": "hotel checkout from OHANA TOKYO HOUSE",
+            "to_name": "Rikugien Gardens",
+            "link": "checkout_to_last_visit",
+            "reason_hint": "Rikugien Gardens is kept right after checkout so the last sightseeing piece still connects to the departure day"
+          },
+          {
+            "from_name": "Rikugien Gardens",
+            "to_name": "the return nonstop flight",
+            "link": "last_stop_to_airport",
+            "reason_hint": "the return nonstop flight remains last so the airport leg stays anchored at the end of the day"
+          }
+        ],
+        "items": [
+          {
+            "item_key": "hotel_checkout",
+            "occurrence_id": "A__d05__i01__hotel_checkout",
+            "time": "10:30",
+            "icon": "hotel",
+            "name": "Checkout from OHANA TOKYO HOUSE",
+            "slot": "morning",
+            "top_why": [
+              "budget_signal[price_per_night_usd=41; budget=SGD 5000]",
+              "quality_signal[icon=hotel; rating=4.33; reviews=18]"
+            ],
+            "top_why_raw": [
+              "budget_signal[price_per_night_usd=41; budget=SGD 5000]",
+              "quality_signal[icon=hotel; rating=4.33; reviews=18]",
+              "hotel_signal[key=hotel_checkout; time=10:30; name=OHANA TOKYO HOUSE]"
+            ],
+            "rating": "4.3 / 5 (18 reviews)",
+            "review_highlights": [
+              "Exceptional<br>#128578; Very clean and comfortable!"
+            ]
+          },
+          {
+            "item_key": "attraction_04_rikugien_gardens",
+            "occurrence_id": "A__d05__i02__attraction_04_rikugien_gardens",
+            "time": "10:50",
+            "icon": "activity",
+            "name": "Rikugien Gardens",
+            "slot": "morning",
+            "top_why": [
+              "pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen]",
+              "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]"
+            ],
+            "top_why_raw": [
+              "pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen]",
+              "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]",
+              "quality_signal[icon=activity; rating=4.4; reviews=10455]",
+              "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...]",
+              "route_signal[icon=activity]"
+            ],
+            "rating": "4.4 / 5 (10,455 reviews)",
+            "review_highlights": [
+              "rating_signal[rating=4.4; reviews=10455]"
+            ]
+          },
+          {
+            "item_key": "flight_return",
+            "occurrence_id": "A__d05__i03__flight_return",
+            "time": "16:50",
+            "icon": "flight",
+            "name": "ZIPAIR Tokyo ZG 53 (Nonstop) | Narita International Airport → Singapore Changi Airport | dep 2026-06-05 16:50 → arr 2026-06-05 23:00 | 430 min | Economy | USD 211",
+            "slot": "afternoon",
+            "top_why": [
+              "flight_signal[segment=return; nonstop=1; dep=2026-06-05 16:50; arr=2026-06-05 23:00; duration_min=430]",
+              "time_pref_signal[pref=afternoon; dep=2026-06-05 16:50]"
+            ],
+            "top_why_raw": [
+              "flight_signal[segment=return; nonstop=1; dep=2026-06-05 16:50; arr=2026-06-05 23:00; duration_min=430]",
+              "time_pref_signal[pref=afternoon; dep=2026-06-05 16:50]"
+            ],
+            "rating": "",
+            "review_highlights": [
+              "ZIPAIR Tokyo ZG 53 (Nonstop) | Narita International Airport → Singapore Changi Airport | dep 2026-06-05 16:50 → arr 2026-06-05 23:00 | 430 min | Economy | USD 211"
+            ]
+          }
+        ]
+      }
+    },
+    "items": {
+      "by_key": {
+        "flight_outbound": {
+          "item_key": "flight_outbound",
+          "name": "Singapore Airlines SQ 12 (Nonstop) | Singapore Changi Airport → Narita International Airport | dep 2026-06-01 09:25 → arr 2026-06-01 17:30 | 425 min | Economy | USD 722",
+          "time": "17:30",
+          "icon": "flight",
+          "slot": "evening",
+          "matches": [
+            "flight_signal[segment=outbound; nonstop=1; dep=2026-06-01 09:25; arr=2026-06-01 17:30; duration_min=425]",
+            "time_pref_signal[pref=morning; dep=2026-06-01 09:25]"
+          ],
+          "all_matches": [
+            "flight_signal[segment=outbound; nonstop=1; dep=2026-06-01 09:25; arr=2026-06-01 17:30; duration_min=425]",
+            "time_pref_signal[pref=morning; dep=2026-06-01 09:25]"
+          ],
+          "rating": "",
+          "review_highlights": [
+            "Singapore Airlines SQ 12 (Nonstop) | Singapore Changi Airport → Narita International Airport | dep 2026-06-01 09:25 → arr 2026-06-01 17:30 | 425 min | Economy | USD 722"
+          ],
+          "chain_of_thought": "item_signal[day=Day 1; time=17:30; icon=flight; slot=evening; name=Singapore Airlines SQ 12 (Nonstop) | Singapore Changi Airport → Narita Intern...; evidence=flight_signal[segment=outbound; nonstop=1; dep=2026-06-01 09:25; arr=2026-06-01 17:30; duration_min=425],time_pref_signal[pref=morning; dep=2026-06-01 09:25]]",
+          "occurrence_id": "A__d01__i01__flight_outbound",
+          "option": "A",
+          "day": "Day 1"
+        },
+        "restaurant_16_rollsloth": {
+          "item_key": "restaurant_16_rollsloth",
+          "name": "RollSloth🦥",
+          "time": "18:30",
+          "icon": "restaurant",
+          "slot": "dinner",
+          "matches": [
+            "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+            "content_profile[icon=restaurant; type=Restaurant; category=Restaurant; query=Best street food and local restaurants in Tokyo]",
+            "quality_signal[icon=restaurant; rating=4.9; reviews=120]"
+          ],
+          "all_matches": [
+            "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+            "content_profile[icon=restaurant; type=Restaurant; category=Restaurant; query=Best street food and local restaurants in Tokyo]",
+            "quality_signal[icon=restaurant; rating=4.9; reviews=120]",
+            "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: 8:00 AM – 1:00 AM | Tuesday: 8:00 AM – 1:00 AM | Wednesday: 8...]",
+            "route_signal[icon=restaurant]"
+          ],
+          "rating": "4.9 / 5 (120 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.9; reviews=120]",
+            "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: 8:00 AM – 1:00 AM | Tuesday: 8:00 AM – 1:00 AM | Wednesday: 8...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 1; time=18:30; icon=restaurant; slot=dinner; name=RollSloth🦥; evidence=pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner],content_profile[icon=restaurant; type=Restaurant; category=Restaurant; query=Best street food and local restaurants in Tokyo],quality_signal[icon=restaurant; rating=4.9; reviews=120],hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: 8:00 AM – 1:00 AM | Tuesday: 8:00 AM – 1:00 AM | Wednesday: 8...],route_signal[icon=restaurant]]",
+          "occurrence_id": "A__d01__i02__restaurant_16_rollsloth",
+          "option": "A",
+          "day": "Day 1"
+        },
+        "hotel_stay": {
+          "item_key": "hotel_stay",
+          "name": "OHANA TOKYO HOUSE",
+          "time": "20:09",
+          "icon": "hotel",
+          "slot": "evening",
+          "matches": [
+            "budget_signal[price_per_night_usd=41; budget=SGD 5000]",
+            "quality_signal[icon=hotel; rating=4.33; reviews=18]",
+            "hotel_signal[key=hotel_stay; time=20:09; name=OHANA TOKYO HOUSE]"
+          ],
+          "all_matches": [
+            "budget_signal[price_per_night_usd=41; budget=SGD 5000]",
+            "quality_signal[icon=hotel; rating=4.33; reviews=18]",
+            "hotel_signal[key=hotel_stay; time=20:09; name=OHANA TOKYO HOUSE]"
+          ],
+          "rating": "4.3 / 5 (18 reviews)",
+          "review_highlights": [
+            "Exceptional<br>#128578; Very clean and comfortable!",
+            "Exceptional"
+          ],
+          "chain_of_thought": "item_signal[day=Day 1; time=20:09; icon=hotel; slot=evening; name=OHANA TOKYO HOUSE; evidence=budget_signal[price_per_night_usd=41; budget=SGD 5000],quality_signal[icon=hotel; rating=4.33; reviews=18],hotel_signal[key=hotel_stay; time=20:09; name=OHANA TOKYO HOUSE]]",
+          "occurrence_id": "A__d01__i03__hotel_stay",
+          "option": "A",
+          "day": "Day 1"
+        },
+        "attraction_02_meiji_jingu": {
+          "item_key": "attraction_02_meiji_jingu",
+          "name": "Meiji Jingu",
+          "time": "09:17",
+          "icon": "activity",
+          "slot": "morning",
+          "matches": [
+            "content_profile[icon=activity; type=Shinto Shrine; category=Shinto Shrine]",
+            "quality_signal[icon=activity; rating=4.6]",
+            "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 4:30 PM | Tuesday: 9:00 AM – 4:30 PM | Wednesday: 9...]"
+          ],
+          "all_matches": [
+            "content_profile[icon=activity; type=Shinto Shrine; category=Shinto Shrine]",
+            "quality_signal[icon=activity; rating=4.6]",
+            "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 4:30 PM | Tuesday: 9:00 AM – 4:30 PM | Wednesday: 9...]",
+            "route_signal[icon=activity; next_km=1.7]"
+          ],
+          "rating": "4.6 / 5",
+          "review_highlights": [
+            "rating_signal[rating=4.6]",
+            "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 4:30 PM | Tuesday: 9:00 AM – 4:30 PM | Wednesday: 9...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 2; time=09:17; icon=activity; slot=morning; name=Meiji Jingu; evidence=content_profile[icon=activity; type=Shinto Shrine; category=Shinto Shrine],quality_signal[icon=activity; rating=4.6],hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 4:30 PM | Tuesday: 9:00 AM – 4:30 PM | Wednesday: 9...],route_signal[icon=activity; next_km=1.7]]",
+          "occurrence_id": "A__d02__i01__attraction_02_meiji_jingu",
+          "option": "A",
+          "day": "Day 2"
+        },
+        "restaurant_09_mo_mo_paradise_shibuya_koendori": {
+          "item_key": "restaurant_09_mo_mo_paradise_shibuya_koendori",
+          "name": "MO-MO-PARADISE Shibuya Koendori",
+          "time": "11:45",
+          "icon": "restaurant",
+          "slot": "lunch",
+          "matches": [
+            "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]",
+            "content_profile[icon=restaurant; type=Japanese Restaurant; category=Japanese Restaurant; query=Best traditional restaurants in Tokyo]",
+            "quality_signal[icon=restaurant; rating=4.9; reviews=6118]"
+          ],
+          "all_matches": [
+            "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]",
+            "content_profile[icon=restaurant; type=Japanese Restaurant; category=Japanese Restaurant; query=Best traditional restaurants in Tokyo]",
+            "quality_signal[icon=restaurant; rating=4.9; reviews=6118]",
+            "hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:30 AM – 3:00 PM, 5:00 – 10:30 PM | Tuesday: 11:30 AM – 3:0...]",
+            "route_signal[icon=restaurant; prev_km=1.7; next_km=4.36; total_km=6.06]"
+          ],
+          "rating": "4.9 / 5 (6,118 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.9; reviews=6118]",
+            "hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:30 AM – 3:00 PM, 5:00 – 10:30 PM | Tuesday: 11:30 AM – 3:0...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 2; time=11:45; icon=restaurant; slot=lunch; name=MO-MO-PARADISE Shibuya Koendori; evidence=pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional],content_profile[icon=restaurant; type=Japanese Restaurant; category=Japanese Restaurant; query=Best traditional restaurants in Tokyo],quality_signal[icon=restaurant; rating=4.9; reviews=6118],hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:30 AM – 3:00 PM, 5:00 – 10:30 PM | Tuesday: 11:30 AM – 3:0...],route_signal[icon=restaurant; prev_km=1.7; next_km=4.36; total_km=6.06]]",
+          "occurrence_id": "A__d02__i02__restaurant_09_mo_mo_paradise_shibuya_koendori",
+          "option": "A",
+          "day": "Day 2"
+        },
+        "attraction_06_zojo_ji_temple": {
+          "item_key": "attraction_06_zojo_ji_temple",
+          "name": "Zojo-ji Temple",
+          "time": "13:57",
+          "icon": "activity",
+          "slot": "afternoon",
+          "matches": [
+            "pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen]",
+            "content_profile[icon=activity; type=Buddhist Temple; category=Buddhist Temple; query=best zen gardens and quiet temples in Tokyo]",
+            "quality_signal[icon=activity; rating=4.5; reviews=12142]"
+          ],
+          "all_matches": [
+            "pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen]",
+            "content_profile[icon=activity; type=Buddhist Temple; category=Buddhist Temple; query=best zen gardens and quiet temples in Tokyo]",
+            "quality_signal[icon=activity; rating=4.5; reviews=12142]",
+            "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...]",
+            "route_signal[icon=activity; prev_km=4.36; next_km=2.85; total_km=7.22]"
+          ],
+          "rating": "4.5 / 5 (12,142 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.5; reviews=12142]",
+            "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 2; time=13:57; icon=activity; slot=afternoon; name=Zojo-ji Temple; evidence=pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen],content_profile[icon=activity; type=Buddhist Temple; category=Buddhist Temple; query=best zen gardens and quiet temples in Tokyo],quality_signal[icon=activity; rating=4.5; reviews=12142],hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...],route_signal[icon=activity; prev_km=4.36; next_km=2.85; total_km=7.22]]",
+          "occurrence_id": "A__d02__i03__attraction_06_zojo_ji_temple",
+          "option": "A",
+          "day": "Day 2"
+        },
+        "restaurant_03_narisawa": {
+          "item_key": "restaurant_03_narisawa",
+          "name": "Narisawa",
+          "time": "18:15",
+          "icon": "restaurant",
+          "slot": "dinner",
+          "matches": [
+            "pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine]",
+            "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]",
+            "quality_signal[icon=restaurant; rating=4.6; reviews=705]"
+          ],
+          "all_matches": [
+            "pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine]",
+            "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]",
+            "quality_signal[icon=restaurant; rating=4.6; reviews=705]",
+            "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: Closed | Tuesday: 12:00 – 2:30 PM, 5:30 – 8:00 PM | Wednesday...]",
+            "route_signal[icon=restaurant; prev_km=2.85]"
+          ],
+          "rating": "4.6 / 5 (705 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.6; reviews=705]",
+            "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: Closed | Tuesday: 12:00 – 2:30 PM, 5:30 – 8:00 PM | Wednesday...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 2; time=18:15; icon=restaurant; slot=dinner; name=Narisawa; evidence=pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine],pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional],quality_signal[icon=restaurant; rating=4.6; reviews=705],hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: Closed | Tuesday: 12:00 – 2:30 PM, 5:30 – 8:00 PM | Wednesday...],route_signal[icon=restaurant; prev_km=2.85]]",
+          "occurrence_id": "A__d02__i04__restaurant_03_narisawa",
+          "option": "A",
+          "day": "Day 2"
+        },
+        "attraction_09_kiyosumi_gardens": {
+          "item_key": "attraction_09_kiyosumi_gardens",
+          "name": "Kiyosumi Gardens",
+          "time": "09:49",
+          "icon": "activity",
+          "slot": "morning",
+          "matches": [
+            "pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen]",
+            "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]",
+            "quality_signal[icon=activity; rating=4.4; reviews=5356]"
+          ],
+          "all_matches": [
+            "pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen]",
+            "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]",
+            "quality_signal[icon=activity; rating=4.4; reviews=5356]",
+            "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...]",
+            "route_signal[icon=activity; next_km=3.36]"
+          ],
+          "rating": "4.4 / 5 (5,356 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.4; reviews=5356]",
+            "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 3; time=09:49; icon=activity; slot=morning; name=Kiyosumi Gardens; evidence=pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen],content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo],quality_signal[icon=activity; rating=4.4; reviews=5356],hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...],route_signal[icon=activity; next_km=3.36]]",
+          "occurrence_id": "A__d03__i01__attraction_09_kiyosumi_gardens",
+          "option": "A",
+          "day": "Day 3"
+        },
+        "restaurant_15_gyukatsu_ichinisan": {
+          "item_key": "restaurant_15_gyukatsu_ichinisan",
+          "name": "Gyukatsu Ichinisan",
+          "time": "12:01",
+          "icon": "restaurant",
+          "slot": "lunch",
+          "matches": [
+            "pref_match[pref=traditional cultural; icon=restaurant; overlap=type:Tonkatsu Restaurant]",
+            "content_profile[icon=restaurant; type=Tonkatsu Restaurant; category=Tonkatsu Restaurant; query=Best street food and local restaurants in Tokyo]",
+            "quality_signal[icon=restaurant; rating=4.8; reviews=13897]"
+          ],
+          "all_matches": [
+            "pref_match[pref=traditional cultural; icon=restaurant; overlap=type:Tonkatsu Restaurant]",
+            "content_profile[icon=restaurant; type=Tonkatsu Restaurant; category=Tonkatsu Restaurant; query=Best street food and local restaurants in Tokyo]",
+            "quality_signal[icon=restaurant; rating=4.8; reviews=13897]",
+            "hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:00 AM – 10:00 PM | Tuesday: 11:00 AM – 10:00 PM | Wednesda...]",
+            "route_signal[icon=restaurant; prev_km=3.36; next_km=2.35; total_km=5.71]"
+          ],
+          "rating": "4.8 / 5 (13,897 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.8; reviews=13897]",
+            "hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:00 AM – 10:00 PM | Tuesday: 11:00 AM – 10:00 PM | Wednesda...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 3; time=12:01; icon=restaurant; slot=lunch; name=Gyukatsu Ichinisan; evidence=pref_match[pref=traditional cultural; icon=restaurant; overlap=type:Tonkatsu Restaurant],content_profile[icon=restaurant; type=Tonkatsu Restaurant; category=Tonkatsu Restaurant; query=Best street food and local restaurants in Tokyo],quality_signal[icon=restaurant; rating=4.8; reviews=13897],hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:00 AM – 10:00 PM | Tuesday: 11:00 AM – 10:00 PM | Wednesda...],route_signal[icon=restaurant; prev_km=3.36; next_km=2.35; total_km=5.71]]",
+          "occurrence_id": "A__d03__i02__restaurant_15_gyukatsu_ichinisan",
+          "option": "A",
+          "day": "Day 3"
+        },
+        "attraction_14_edo_tokyo_museum": {
+          "item_key": "attraction_14_edo_tokyo_museum",
+          "name": "Edo-Tokyo Museum",
+          "time": "13:57",
+          "icon": "activity",
+          "slot": "afternoon",
+          "matches": [
+            "content_profile[icon=activity; type=History Museum; category=History Museum; query=best museums in Tokyo]",
+            "quality_signal[icon=activity; rating=4.4; reviews=12832]",
+            "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: Closed | Tuesday: 9:30 AM – 5:30 PM | Wednesday: 9:30 AM – 5:...]"
+          ],
+          "all_matches": [
+            "content_profile[icon=activity; type=History Museum; category=History Museum; query=best museums in Tokyo]",
+            "quality_signal[icon=activity; rating=4.4; reviews=12832]",
+            "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: Closed | Tuesday: 9:30 AM – 5:30 PM | Wednesday: 9:30 AM – 5:...]",
+            "route_signal[icon=activity; prev_km=2.35; next_km=6.2; total_km=8.55]"
+          ],
+          "rating": "4.4 / 5 (12,832 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.4; reviews=12832]",
+            "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: Closed | Tuesday: 9:30 AM – 5:30 PM | Wednesday: 9:30 AM – 5:...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 3; time=13:57; icon=activity; slot=afternoon; name=Edo-Tokyo Museum; evidence=content_profile[icon=activity; type=History Museum; category=History Museum; query=best museums in Tokyo],quality_signal[icon=activity; rating=4.4; reviews=12832],hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: Closed | Tuesday: 9:30 AM – 5:30 PM | Wednesday: 9:30 AM – 5:...],route_signal[icon=activity; prev_km=2.35; next_km=6.2; total_km=8.55]]",
+          "occurrence_id": "A__d03__i03__attraction_14_edo_tokyo_museum",
+          "option": "A",
+          "day": "Day 3"
+        },
+        "attraction_16_tokyo_tower": {
+          "item_key": "attraction_16_tokyo_tower",
+          "name": "Tokyo Tower",
+          "time": "16:42",
+          "icon": "activity",
+          "slot": "afternoon",
+          "matches": [
+            "content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo]",
+            "quality_signal[icon=activity; rating=4.1; reviews=146]",
+            "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 9:00 AM – 11:00 PM | Tuesday: 9:00 AM – 11:00 PM | Wednesday:...]"
+          ],
+          "all_matches": [
+            "content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo]",
+            "quality_signal[icon=activity; rating=4.1; reviews=146]",
+            "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 9:00 AM – 11:00 PM | Tuesday: 9:00 AM – 11:00 PM | Wednesday:...]",
+            "route_signal[icon=activity; prev_km=6.2; next_km=3.05; total_km=9.25]"
+          ],
+          "rating": "4.1 / 5 (146 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.1; reviews=146]",
+            "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 9:00 AM – 11:00 PM | Tuesday: 9:00 AM – 11:00 PM | Wednesday:...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 3; time=16:42; icon=activity; slot=afternoon; name=Tokyo Tower; evidence=content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo],quality_signal[icon=activity; rating=4.1; reviews=146],hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 9:00 AM – 11:00 PM | Tuesday: 9:00 AM – 11:00 PM | Wednesday:...],route_signal[icon=activity; prev_km=6.2; next_km=3.05; total_km=9.25]]",
+          "occurrence_id": "A__d03__i04__attraction_16_tokyo_tower",
+          "option": "A",
+          "day": "Day 3"
+        },
+        "restaurant_11_t_s_tantan": {
+          "item_key": "restaurant_11_t_s_tantan",
+          "name": "T’s Tantan",
+          "time": "18:39",
+          "icon": "restaurant",
+          "slot": "dinner",
+          "matches": [
+            "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+            "content_profile[icon=restaurant; type=Vegan Restaurant; category=Vegan Restaurant; query=Best street food and local restaurants in Tokyo]",
+            "quality_signal[icon=restaurant; rating=4.6; reviews=2762]"
+          ],
+          "all_matches": [
+            "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+            "content_profile[icon=restaurant; type=Vegan Restaurant; category=Vegan Restaurant; query=Best street food and local restaurants in Tokyo]",
+            "quality_signal[icon=restaurant; rating=4.6; reviews=2762]",
+            "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: 10:00 AM – 9:30 PM | Tuesday: 10:00 AM – 9:30 PM | Wednesday:...]",
+            "route_signal[icon=restaurant; prev_km=3.05]"
+          ],
+          "rating": "4.6 / 5 (2,762 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.6; reviews=2762]",
+            "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: 10:00 AM – 9:30 PM | Tuesday: 10:00 AM – 9:30 PM | Wednesday:...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 3; time=18:39; icon=restaurant; slot=dinner; name=T’s Tantan; evidence=pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner],content_profile[icon=restaurant; type=Vegan Restaurant; category=Vegan Restaurant; query=Best street food and local restaurants in Tokyo],quality_signal[icon=restaurant; rating=4.6; reviews=2762],hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: 10:00 AM – 9:30 PM | Tuesday: 10:00 AM – 9:30 PM | Wednesday:...],route_signal[icon=restaurant; prev_km=3.05]]",
+          "occurrence_id": "A__d03__i05__restaurant_11_t_s_tantan",
+          "option": "A",
+          "day": "Day 3"
+        },
+        "attraction_05_koishikawa_korakuen": {
+          "item_key": "attraction_05_koishikawa_korakuen",
+          "name": "Koishikawa Korakuen",
+          "time": "09:41",
+          "icon": "activity",
+          "slot": "morning",
+          "matches": [
+            "pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen]",
+            "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]",
+            "quality_signal[icon=activity; rating=4.4; reviews=6578]"
+          ],
+          "all_matches": [
+            "pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen]",
+            "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]",
+            "quality_signal[icon=activity; rating=4.4; reviews=6578]",
+            "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 4:30 PM | Tuesday: 9:00 AM – 4:30 PM | Wednesday: 9...]",
+            "route_signal[icon=activity; next_km=4.82]"
+          ],
+          "rating": "4.4 / 5 (6,578 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.4; reviews=6578]",
+            "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 4:30 PM | Tuesday: 9:00 AM – 4:30 PM | Wednesday: 9...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 4; time=09:41; icon=activity; slot=morning; name=Koishikawa Korakuen; evidence=pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen],content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo],quality_signal[icon=activity; rating=4.4; reviews=6578],hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 4:30 PM | Tuesday: 9:00 AM – 4:30 PM | Wednesday: 9...],route_signal[icon=activity; next_km=4.82]]",
+          "occurrence_id": "A__d04__i01__attraction_05_koishikawa_korakuen",
+          "option": "A",
+          "day": "Day 4"
+        },
+        "restaurant_02_censu_tokyo": {
+          "item_key": "restaurant_02_censu_tokyo",
+          "name": "CENSU TOKYO",
+          "time": "12:05",
+          "icon": "restaurant",
+          "slot": "lunch",
+          "matches": [
+            "pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine]",
+            "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]",
+            "quality_signal[icon=restaurant; rating=4.7; reviews=221]"
+          ],
+          "all_matches": [
+            "pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine]",
+            "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]",
+            "quality_signal[icon=restaurant; rating=4.7; reviews=221]",
+            "hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:30 AM – 2:00 PM, 6:00 – 11:00 PM | Tuesday: 11:30 AM – 2:0...]",
+            "route_signal[icon=restaurant; prev_km=4.82; next_km=1.98; total_km=6.8]"
+          ],
+          "rating": "4.7 / 5 (221 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.7; reviews=221]",
+            "hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:30 AM – 2:00 PM, 6:00 – 11:00 PM | Tuesday: 11:30 AM – 2:0...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 4; time=12:05; icon=restaurant; slot=lunch; name=CENSU TOKYO; evidence=pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine],pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional],quality_signal[icon=restaurant; rating=4.7; reviews=221],hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:30 AM – 2:00 PM, 6:00 – 11:00 PM | Tuesday: 11:30 AM – 2:0...],route_signal[icon=restaurant; prev_km=4.82; next_km=1.98; total_km=6.8]]",
+          "occurrence_id": "A__d04__i02__restaurant_02_censu_tokyo",
+          "option": "A",
+          "day": "Day 4"
+        },
+        "attraction_18_shibuya_sky": {
+          "item_key": "attraction_18_shibuya_sky",
+          "name": "Shibuya Sky",
+          "time": "13:58",
+          "icon": "activity",
+          "slot": "afternoon",
+          "matches": [
+            "content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo]",
+            "quality_signal[icon=activity; rating=4.6; reviews=24198]",
+            "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 10:00 AM – 10:30 PM | Tuesday: 10:00 AM – 10:30 PM | Wednesda...]"
+          ],
+          "all_matches": [
+            "content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo]",
+            "quality_signal[icon=activity; rating=4.6; reviews=24198]",
+            "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 10:00 AM – 10:30 PM | Tuesday: 10:00 AM – 10:30 PM | Wednesda...]",
+            "route_signal[icon=activity; prev_km=1.98; next_km=6.19; total_km=8.17]"
+          ],
+          "rating": "4.6 / 5 (24,198 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.6; reviews=24198]",
+            "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 10:00 AM – 10:30 PM | Tuesday: 10:00 AM – 10:30 PM | Wednesda...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 4; time=13:58; icon=activity; slot=afternoon; name=Shibuya Sky; evidence=content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo],quality_signal[icon=activity; rating=4.6; reviews=24198],hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 10:00 AM – 10:30 PM | Tuesday: 10:00 AM – 10:30 PM | Wednesda...],route_signal[icon=activity; prev_km=1.98; next_km=6.19; total_km=8.17]]",
+          "occurrence_id": "A__d04__i03__attraction_18_shibuya_sky",
+          "option": "A",
+          "day": "Day 4"
+        },
+        "restaurant_18_grilled_wagyu_beef": {
+          "item_key": "restaurant_18_grilled_wagyu_beef",
+          "name": "Grilled Wagyu Beef",
+          "time": "18:00",
+          "icon": "restaurant",
+          "slot": "dinner",
+          "matches": [
+            "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+            "content_profile[icon=restaurant; type=Restaurant; category=Restaurant; query=Best street food and local restaurants in Tokyo]",
+            "quality_signal[icon=restaurant; rating=4.8; reviews=117]"
+          ],
+          "all_matches": [
+            "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+            "content_profile[icon=restaurant; type=Restaurant; category=Restaurant; query=Best street food and local restaurants in Tokyo]",
+            "quality_signal[icon=restaurant; rating=4.8; reviews=117]",
+            "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: Open 24 hours | Tuesday: Open 24 hours | Wednesday: Open 24 h...]",
+            "route_signal[icon=restaurant; prev_km=6.19]"
+          ],
+          "rating": "4.8 / 5 (117 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.8; reviews=117]",
+            "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: Open 24 hours | Tuesday: Open 24 hours | Wednesday: Open 24 h...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 4; time=18:00; icon=restaurant; slot=dinner; name=Grilled Wagyu Beef; evidence=pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner],content_profile[icon=restaurant; type=Restaurant; category=Restaurant; query=Best street food and local restaurants in Tokyo],quality_signal[icon=restaurant; rating=4.8; reviews=117],hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: Open 24 hours | Tuesday: Open 24 hours | Wednesday: Open 24 h...],route_signal[icon=restaurant; prev_km=6.19]]",
+          "occurrence_id": "A__d04__i04__restaurant_18_grilled_wagyu_beef",
+          "option": "A",
+          "day": "Day 4"
+        },
+        "hotel_checkout": {
+          "item_key": "hotel_checkout",
+          "name": "Checkout from OHANA TOKYO HOUSE",
+          "time": "10:30",
+          "icon": "hotel",
+          "slot": "morning",
+          "matches": [
+            "budget_signal[price_per_night_usd=41; budget=SGD 5000]",
+            "quality_signal[icon=hotel; rating=4.33; reviews=18]",
+            "hotel_signal[key=hotel_checkout; time=10:30; name=OHANA TOKYO HOUSE]"
+          ],
+          "all_matches": [
+            "budget_signal[price_per_night_usd=41; budget=SGD 5000]",
+            "quality_signal[icon=hotel; rating=4.33; reviews=18]",
+            "hotel_signal[key=hotel_checkout; time=10:30; name=OHANA TOKYO HOUSE]"
+          ],
+          "rating": "4.3 / 5 (18 reviews)",
+          "review_highlights": [
+            "Exceptional<br>#128578; Very clean and comfortable!",
+            "Exceptional"
+          ],
+          "chain_of_thought": "item_signal[day=Day 5; time=10:30; icon=hotel; slot=morning; name=Checkout from OHANA TOKYO HOUSE; evidence=budget_signal[price_per_night_usd=41; budget=SGD 5000],quality_signal[icon=hotel; rating=4.33; reviews=18],hotel_signal[key=hotel_checkout; time=10:30; name=OHANA TOKYO HOUSE]]",
+          "occurrence_id": "A__d05__i01__hotel_checkout",
+          "option": "A",
+          "day": "Day 5"
+        },
+        "attraction_04_rikugien_gardens": {
+          "item_key": "attraction_04_rikugien_gardens",
+          "name": "Rikugien Gardens",
+          "time": "10:50",
+          "icon": "activity",
+          "slot": "morning",
+          "matches": [
+            "pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen]",
+            "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]",
+            "quality_signal[icon=activity; rating=4.4; reviews=10455]"
+          ],
+          "all_matches": [
+            "pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen]",
+            "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]",
+            "quality_signal[icon=activity; rating=4.4; reviews=10455]",
+            "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...]",
+            "route_signal[icon=activity]"
+          ],
+          "rating": "4.4 / 5 (10,455 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.4; reviews=10455]",
+            "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 5; time=10:50; icon=activity; slot=morning; name=Rikugien Gardens; evidence=pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen],content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo],quality_signal[icon=activity; rating=4.4; reviews=10455],hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...],route_signal[icon=activity]]",
+          "occurrence_id": "A__d05__i02__attraction_04_rikugien_gardens",
+          "option": "A",
+          "day": "Day 5"
+        },
+        "flight_return": {
+          "item_key": "flight_return",
+          "name": "ZIPAIR Tokyo ZG 53 (Nonstop) | Narita International Airport → Singapore Changi Airport | dep 2026-06-05 16:50 → arr 2026-06-05 23:00 | 430 min | Economy | USD 211",
+          "time": "16:50",
+          "icon": "flight",
+          "slot": "afternoon",
+          "matches": [
+            "flight_signal[segment=return; nonstop=1; dep=2026-06-05 16:50; arr=2026-06-05 23:00; duration_min=430]",
+            "time_pref_signal[pref=afternoon; dep=2026-06-05 16:50]"
+          ],
+          "all_matches": [
+            "flight_signal[segment=return; nonstop=1; dep=2026-06-05 16:50; arr=2026-06-05 23:00; duration_min=430]",
+            "time_pref_signal[pref=afternoon; dep=2026-06-05 16:50]"
+          ],
+          "rating": "",
+          "review_highlights": [
+            "ZIPAIR Tokyo ZG 53 (Nonstop) | Narita International Airport → Singapore Changi Airport | dep 2026-06-05 16:50 → arr 2026-06-05 23:00 | 430 min | Economy | USD 211"
+          ],
+          "chain_of_thought": "item_signal[day=Day 5; time=16:50; icon=flight; slot=afternoon; name=ZIPAIR Tokyo ZG 53 (Nonstop) | Narita International Airport → Singapore Chang...; evidence=flight_signal[segment=return; nonstop=1; dep=2026-06-05 16:50; arr=2026-06-05 23:00; duration_min=430],time_pref_signal[pref=afternoon; dep=2026-06-05 16:50]]",
+          "occurrence_id": "A__d05__i03__flight_return",
+          "option": "A",
+          "day": "Day 5"
+        }
+      },
+      "by_occurrence": {
+        "A__d01__i01__flight_outbound": {
+          "item_key": "flight_outbound",
+          "name": "Singapore Airlines SQ 12 (Nonstop) | Singapore Changi Airport → Narita International Airport | dep 2026-06-01 09:25 → arr 2026-06-01 17:30 | 425 min | Economy | USD 722",
+          "time": "17:30",
+          "icon": "flight",
+          "slot": "evening",
+          "matches": [
+            "flight_signal[segment=outbound; nonstop=1; dep=2026-06-01 09:25; arr=2026-06-01 17:30; duration_min=425]",
+            "time_pref_signal[pref=morning; dep=2026-06-01 09:25]"
+          ],
+          "all_matches": [
+            "flight_signal[segment=outbound; nonstop=1; dep=2026-06-01 09:25; arr=2026-06-01 17:30; duration_min=425]",
+            "time_pref_signal[pref=morning; dep=2026-06-01 09:25]"
+          ],
+          "rating": "",
+          "review_highlights": [
+            "Singapore Airlines SQ 12 (Nonstop) | Singapore Changi Airport → Narita International Airport | dep 2026-06-01 09:25 → arr 2026-06-01 17:30 | 425 min | Economy | USD 722"
+          ],
+          "chain_of_thought": "item_signal[day=Day 1; time=17:30; icon=flight; slot=evening; name=Singapore Airlines SQ 12 (Nonstop) | Singapore Changi Airport → Narita Intern...; evidence=flight_signal[segment=outbound; nonstop=1; dep=2026-06-01 09:25; arr=2026-06-01 17:30; duration_min=425],time_pref_signal[pref=morning; dep=2026-06-01 09:25]]",
+          "occurrence_id": "A__d01__i01__flight_outbound",
+          "option": "A",
+          "day": "Day 1"
+        },
+        "A__d01__i02__restaurant_16_rollsloth": {
+          "item_key": "restaurant_16_rollsloth",
+          "name": "RollSloth🦥",
+          "time": "18:30",
+          "icon": "restaurant",
+          "slot": "dinner",
+          "matches": [
+            "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+            "content_profile[icon=restaurant; type=Restaurant; category=Restaurant; query=Best street food and local restaurants in Tokyo]",
+            "quality_signal[icon=restaurant; rating=4.9; reviews=120]"
+          ],
+          "all_matches": [
+            "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+            "content_profile[icon=restaurant; type=Restaurant; category=Restaurant; query=Best street food and local restaurants in Tokyo]",
+            "quality_signal[icon=restaurant; rating=4.9; reviews=120]",
+            "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: 8:00 AM – 1:00 AM | Tuesday: 8:00 AM – 1:00 AM | Wednesday: 8...]",
+            "route_signal[icon=restaurant]"
+          ],
+          "rating": "4.9 / 5 (120 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.9; reviews=120]",
+            "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: 8:00 AM – 1:00 AM | Tuesday: 8:00 AM – 1:00 AM | Wednesday: 8...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 1; time=18:30; icon=restaurant; slot=dinner; name=RollSloth🦥; evidence=pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner],content_profile[icon=restaurant; type=Restaurant; category=Restaurant; query=Best street food and local restaurants in Tokyo],quality_signal[icon=restaurant; rating=4.9; reviews=120],hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: 8:00 AM – 1:00 AM | Tuesday: 8:00 AM – 1:00 AM | Wednesday: 8...],route_signal[icon=restaurant]]",
+          "occurrence_id": "A__d01__i02__restaurant_16_rollsloth",
+          "option": "A",
+          "day": "Day 1"
+        },
+        "A__d01__i03__hotel_stay": {
+          "item_key": "hotel_stay",
+          "name": "OHANA TOKYO HOUSE",
+          "time": "20:09",
+          "icon": "hotel",
+          "slot": "evening",
+          "matches": [
+            "budget_signal[price_per_night_usd=41; budget=SGD 5000]",
+            "quality_signal[icon=hotel; rating=4.33; reviews=18]",
+            "hotel_signal[key=hotel_stay; time=20:09; name=OHANA TOKYO HOUSE]"
+          ],
+          "all_matches": [
+            "budget_signal[price_per_night_usd=41; budget=SGD 5000]",
+            "quality_signal[icon=hotel; rating=4.33; reviews=18]",
+            "hotel_signal[key=hotel_stay; time=20:09; name=OHANA TOKYO HOUSE]"
+          ],
+          "rating": "4.3 / 5 (18 reviews)",
+          "review_highlights": [
+            "Exceptional<br>#128578; Very clean and comfortable!",
+            "Exceptional"
+          ],
+          "chain_of_thought": "item_signal[day=Day 1; time=20:09; icon=hotel; slot=evening; name=OHANA TOKYO HOUSE; evidence=budget_signal[price_per_night_usd=41; budget=SGD 5000],quality_signal[icon=hotel; rating=4.33; reviews=18],hotel_signal[key=hotel_stay; time=20:09; name=OHANA TOKYO HOUSE]]",
+          "occurrence_id": "A__d01__i03__hotel_stay",
+          "option": "A",
+          "day": "Day 1"
+        },
+        "A__d02__i01__attraction_02_meiji_jingu": {
+          "item_key": "attraction_02_meiji_jingu",
+          "name": "Meiji Jingu",
+          "time": "09:17",
+          "icon": "activity",
+          "slot": "morning",
+          "matches": [
+            "content_profile[icon=activity; type=Shinto Shrine; category=Shinto Shrine]",
+            "quality_signal[icon=activity; rating=4.6]",
+            "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 4:30 PM | Tuesday: 9:00 AM – 4:30 PM | Wednesday: 9...]"
+          ],
+          "all_matches": [
+            "content_profile[icon=activity; type=Shinto Shrine; category=Shinto Shrine]",
+            "quality_signal[icon=activity; rating=4.6]",
+            "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 4:30 PM | Tuesday: 9:00 AM – 4:30 PM | Wednesday: 9...]",
+            "route_signal[icon=activity; next_km=1.7]"
+          ],
+          "rating": "4.6 / 5",
+          "review_highlights": [
+            "rating_signal[rating=4.6]",
+            "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 4:30 PM | Tuesday: 9:00 AM – 4:30 PM | Wednesday: 9...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 2; time=09:17; icon=activity; slot=morning; name=Meiji Jingu; evidence=content_profile[icon=activity; type=Shinto Shrine; category=Shinto Shrine],quality_signal[icon=activity; rating=4.6],hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 4:30 PM | Tuesday: 9:00 AM – 4:30 PM | Wednesday: 9...],route_signal[icon=activity; next_km=1.7]]",
+          "occurrence_id": "A__d02__i01__attraction_02_meiji_jingu",
+          "option": "A",
+          "day": "Day 2"
+        },
+        "A__d02__i02__restaurant_09_mo_mo_paradise_shibuya_koendori": {
+          "item_key": "restaurant_09_mo_mo_paradise_shibuya_koendori",
+          "name": "MO-MO-PARADISE Shibuya Koendori",
+          "time": "11:45",
+          "icon": "restaurant",
+          "slot": "lunch",
+          "matches": [
+            "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]",
+            "content_profile[icon=restaurant; type=Japanese Restaurant; category=Japanese Restaurant; query=Best traditional restaurants in Tokyo]",
+            "quality_signal[icon=restaurant; rating=4.9; reviews=6118]"
+          ],
+          "all_matches": [
+            "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]",
+            "content_profile[icon=restaurant; type=Japanese Restaurant; category=Japanese Restaurant; query=Best traditional restaurants in Tokyo]",
+            "quality_signal[icon=restaurant; rating=4.9; reviews=6118]",
+            "hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:30 AM – 3:00 PM, 5:00 – 10:30 PM | Tuesday: 11:30 AM – 3:0...]",
+            "route_signal[icon=restaurant; prev_km=1.7; next_km=4.36; total_km=6.06]"
+          ],
+          "rating": "4.9 / 5 (6,118 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.9; reviews=6118]",
+            "hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:30 AM – 3:00 PM, 5:00 – 10:30 PM | Tuesday: 11:30 AM – 3:0...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 2; time=11:45; icon=restaurant; slot=lunch; name=MO-MO-PARADISE Shibuya Koendori; evidence=pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional],content_profile[icon=restaurant; type=Japanese Restaurant; category=Japanese Restaurant; query=Best traditional restaurants in Tokyo],quality_signal[icon=restaurant; rating=4.9; reviews=6118],hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:30 AM – 3:00 PM, 5:00 – 10:30 PM | Tuesday: 11:30 AM – 3:0...],route_signal[icon=restaurant; prev_km=1.7; next_km=4.36; total_km=6.06]]",
+          "occurrence_id": "A__d02__i02__restaurant_09_mo_mo_paradise_shibuya_koendori",
+          "option": "A",
+          "day": "Day 2"
+        },
+        "A__d02__i03__attraction_06_zojo_ji_temple": {
+          "item_key": "attraction_06_zojo_ji_temple",
+          "name": "Zojo-ji Temple",
+          "time": "13:57",
+          "icon": "activity",
+          "slot": "afternoon",
+          "matches": [
+            "pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen]",
+            "content_profile[icon=activity; type=Buddhist Temple; category=Buddhist Temple; query=best zen gardens and quiet temples in Tokyo]",
+            "quality_signal[icon=activity; rating=4.5; reviews=12142]"
+          ],
+          "all_matches": [
+            "pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen]",
+            "content_profile[icon=activity; type=Buddhist Temple; category=Buddhist Temple; query=best zen gardens and quiet temples in Tokyo]",
+            "quality_signal[icon=activity; rating=4.5; reviews=12142]",
+            "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...]",
+            "route_signal[icon=activity; prev_km=4.36; next_km=2.85; total_km=7.22]"
+          ],
+          "rating": "4.5 / 5 (12,142 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.5; reviews=12142]",
+            "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 2; time=13:57; icon=activity; slot=afternoon; name=Zojo-ji Temple; evidence=pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen],content_profile[icon=activity; type=Buddhist Temple; category=Buddhist Temple; query=best zen gardens and quiet temples in Tokyo],quality_signal[icon=activity; rating=4.5; reviews=12142],hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...],route_signal[icon=activity; prev_km=4.36; next_km=2.85; total_km=7.22]]",
+          "occurrence_id": "A__d02__i03__attraction_06_zojo_ji_temple",
+          "option": "A",
+          "day": "Day 2"
+        },
+        "A__d02__i04__restaurant_03_narisawa": {
+          "item_key": "restaurant_03_narisawa",
+          "name": "Narisawa",
+          "time": "18:15",
+          "icon": "restaurant",
+          "slot": "dinner",
+          "matches": [
+            "pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine]",
+            "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]",
+            "quality_signal[icon=restaurant; rating=4.6; reviews=705]"
+          ],
+          "all_matches": [
+            "pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine]",
+            "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]",
+            "quality_signal[icon=restaurant; rating=4.6; reviews=705]",
+            "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: Closed | Tuesday: 12:00 – 2:30 PM, 5:30 – 8:00 PM | Wednesday...]",
+            "route_signal[icon=restaurant; prev_km=2.85]"
+          ],
+          "rating": "4.6 / 5 (705 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.6; reviews=705]",
+            "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: Closed | Tuesday: 12:00 – 2:30 PM, 5:30 – 8:00 PM | Wednesday...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 2; time=18:15; icon=restaurant; slot=dinner; name=Narisawa; evidence=pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine],pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional],quality_signal[icon=restaurant; rating=4.6; reviews=705],hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: Closed | Tuesday: 12:00 – 2:30 PM, 5:30 – 8:00 PM | Wednesday...],route_signal[icon=restaurant; prev_km=2.85]]",
+          "occurrence_id": "A__d02__i04__restaurant_03_narisawa",
+          "option": "A",
+          "day": "Day 2"
+        },
+        "A__d03__i01__attraction_09_kiyosumi_gardens": {
+          "item_key": "attraction_09_kiyosumi_gardens",
+          "name": "Kiyosumi Gardens",
+          "time": "09:49",
+          "icon": "activity",
+          "slot": "morning",
+          "matches": [
+            "pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen]",
+            "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]",
+            "quality_signal[icon=activity; rating=4.4; reviews=5356]"
+          ],
+          "all_matches": [
+            "pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen]",
+            "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]",
+            "quality_signal[icon=activity; rating=4.4; reviews=5356]",
+            "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...]",
+            "route_signal[icon=activity; next_km=3.36]"
+          ],
+          "rating": "4.4 / 5 (5,356 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.4; reviews=5356]",
+            "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 3; time=09:49; icon=activity; slot=morning; name=Kiyosumi Gardens; evidence=pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen],content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo],quality_signal[icon=activity; rating=4.4; reviews=5356],hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...],route_signal[icon=activity; next_km=3.36]]",
+          "occurrence_id": "A__d03__i01__attraction_09_kiyosumi_gardens",
+          "option": "A",
+          "day": "Day 3"
+        },
+        "A__d03__i02__restaurant_15_gyukatsu_ichinisan": {
+          "item_key": "restaurant_15_gyukatsu_ichinisan",
+          "name": "Gyukatsu Ichinisan",
+          "time": "12:01",
+          "icon": "restaurant",
+          "slot": "lunch",
+          "matches": [
+            "pref_match[pref=traditional cultural; icon=restaurant; overlap=type:Tonkatsu Restaurant]",
+            "content_profile[icon=restaurant; type=Tonkatsu Restaurant; category=Tonkatsu Restaurant; query=Best street food and local restaurants in Tokyo]",
+            "quality_signal[icon=restaurant; rating=4.8; reviews=13897]"
+          ],
+          "all_matches": [
+            "pref_match[pref=traditional cultural; icon=restaurant; overlap=type:Tonkatsu Restaurant]",
+            "content_profile[icon=restaurant; type=Tonkatsu Restaurant; category=Tonkatsu Restaurant; query=Best street food and local restaurants in Tokyo]",
+            "quality_signal[icon=restaurant; rating=4.8; reviews=13897]",
+            "hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:00 AM – 10:00 PM | Tuesday: 11:00 AM – 10:00 PM | Wednesda...]",
+            "route_signal[icon=restaurant; prev_km=3.36; next_km=2.35; total_km=5.71]"
+          ],
+          "rating": "4.8 / 5 (13,897 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.8; reviews=13897]",
+            "hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:00 AM – 10:00 PM | Tuesday: 11:00 AM – 10:00 PM | Wednesda...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 3; time=12:01; icon=restaurant; slot=lunch; name=Gyukatsu Ichinisan; evidence=pref_match[pref=traditional cultural; icon=restaurant; overlap=type:Tonkatsu Restaurant],content_profile[icon=restaurant; type=Tonkatsu Restaurant; category=Tonkatsu Restaurant; query=Best street food and local restaurants in Tokyo],quality_signal[icon=restaurant; rating=4.8; reviews=13897],hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:00 AM – 10:00 PM | Tuesday: 11:00 AM – 10:00 PM | Wednesda...],route_signal[icon=restaurant; prev_km=3.36; next_km=2.35; total_km=5.71]]",
+          "occurrence_id": "A__d03__i02__restaurant_15_gyukatsu_ichinisan",
+          "option": "A",
+          "day": "Day 3"
+        },
+        "A__d03__i03__attraction_14_edo_tokyo_museum": {
+          "item_key": "attraction_14_edo_tokyo_museum",
+          "name": "Edo-Tokyo Museum",
+          "time": "13:57",
+          "icon": "activity",
+          "slot": "afternoon",
+          "matches": [
+            "content_profile[icon=activity; type=History Museum; category=History Museum; query=best museums in Tokyo]",
+            "quality_signal[icon=activity; rating=4.4; reviews=12832]",
+            "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: Closed | Tuesday: 9:30 AM – 5:30 PM | Wednesday: 9:30 AM – 5:...]"
+          ],
+          "all_matches": [
+            "content_profile[icon=activity; type=History Museum; category=History Museum; query=best museums in Tokyo]",
+            "quality_signal[icon=activity; rating=4.4; reviews=12832]",
+            "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: Closed | Tuesday: 9:30 AM – 5:30 PM | Wednesday: 9:30 AM – 5:...]",
+            "route_signal[icon=activity; prev_km=2.35; next_km=6.2; total_km=8.55]"
+          ],
+          "rating": "4.4 / 5 (12,832 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.4; reviews=12832]",
+            "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: Closed | Tuesday: 9:30 AM – 5:30 PM | Wednesday: 9:30 AM – 5:...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 3; time=13:57; icon=activity; slot=afternoon; name=Edo-Tokyo Museum; evidence=content_profile[icon=activity; type=History Museum; category=History Museum; query=best museums in Tokyo],quality_signal[icon=activity; rating=4.4; reviews=12832],hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: Closed | Tuesday: 9:30 AM – 5:30 PM | Wednesday: 9:30 AM – 5:...],route_signal[icon=activity; prev_km=2.35; next_km=6.2; total_km=8.55]]",
+          "occurrence_id": "A__d03__i03__attraction_14_edo_tokyo_museum",
+          "option": "A",
+          "day": "Day 3"
+        },
+        "A__d03__i04__attraction_16_tokyo_tower": {
+          "item_key": "attraction_16_tokyo_tower",
+          "name": "Tokyo Tower",
+          "time": "16:42",
+          "icon": "activity",
+          "slot": "afternoon",
+          "matches": [
+            "content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo]",
+            "quality_signal[icon=activity; rating=4.1; reviews=146]",
+            "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 9:00 AM – 11:00 PM | Tuesday: 9:00 AM – 11:00 PM | Wednesday:...]"
+          ],
+          "all_matches": [
+            "content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo]",
+            "quality_signal[icon=activity; rating=4.1; reviews=146]",
+            "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 9:00 AM – 11:00 PM | Tuesday: 9:00 AM – 11:00 PM | Wednesday:...]",
+            "route_signal[icon=activity; prev_km=6.2; next_km=3.05; total_km=9.25]"
+          ],
+          "rating": "4.1 / 5 (146 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.1; reviews=146]",
+            "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 9:00 AM – 11:00 PM | Tuesday: 9:00 AM – 11:00 PM | Wednesday:...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 3; time=16:42; icon=activity; slot=afternoon; name=Tokyo Tower; evidence=content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo],quality_signal[icon=activity; rating=4.1; reviews=146],hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 9:00 AM – 11:00 PM | Tuesday: 9:00 AM – 11:00 PM | Wednesday:...],route_signal[icon=activity; prev_km=6.2; next_km=3.05; total_km=9.25]]",
+          "occurrence_id": "A__d03__i04__attraction_16_tokyo_tower",
+          "option": "A",
+          "day": "Day 3"
+        },
+        "A__d03__i05__restaurant_11_t_s_tantan": {
+          "item_key": "restaurant_11_t_s_tantan",
+          "name": "T’s Tantan",
+          "time": "18:39",
+          "icon": "restaurant",
+          "slot": "dinner",
+          "matches": [
+            "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+            "content_profile[icon=restaurant; type=Vegan Restaurant; category=Vegan Restaurant; query=Best street food and local restaurants in Tokyo]",
+            "quality_signal[icon=restaurant; rating=4.6; reviews=2762]"
+          ],
+          "all_matches": [
+            "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+            "content_profile[icon=restaurant; type=Vegan Restaurant; category=Vegan Restaurant; query=Best street food and local restaurants in Tokyo]",
+            "quality_signal[icon=restaurant; rating=4.6; reviews=2762]",
+            "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: 10:00 AM – 9:30 PM | Tuesday: 10:00 AM – 9:30 PM | Wednesday:...]",
+            "route_signal[icon=restaurant; prev_km=3.05]"
+          ],
+          "rating": "4.6 / 5 (2,762 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.6; reviews=2762]",
+            "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: 10:00 AM – 9:30 PM | Tuesday: 10:00 AM – 9:30 PM | Wednesday:...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 3; time=18:39; icon=restaurant; slot=dinner; name=T’s Tantan; evidence=pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner],content_profile[icon=restaurant; type=Vegan Restaurant; category=Vegan Restaurant; query=Best street food and local restaurants in Tokyo],quality_signal[icon=restaurant; rating=4.6; reviews=2762],hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: 10:00 AM – 9:30 PM | Tuesday: 10:00 AM – 9:30 PM | Wednesday:...],route_signal[icon=restaurant; prev_km=3.05]]",
+          "occurrence_id": "A__d03__i05__restaurant_11_t_s_tantan",
+          "option": "A",
+          "day": "Day 3"
+        },
+        "A__d04__i01__attraction_05_koishikawa_korakuen": {
+          "item_key": "attraction_05_koishikawa_korakuen",
+          "name": "Koishikawa Korakuen",
+          "time": "09:41",
+          "icon": "activity",
+          "slot": "morning",
+          "matches": [
+            "pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen]",
+            "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]",
+            "quality_signal[icon=activity; rating=4.4; reviews=6578]"
+          ],
+          "all_matches": [
+            "pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen]",
+            "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]",
+            "quality_signal[icon=activity; rating=4.4; reviews=6578]",
+            "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 4:30 PM | Tuesday: 9:00 AM – 4:30 PM | Wednesday: 9...]",
+            "route_signal[icon=activity; next_km=4.82]"
+          ],
+          "rating": "4.4 / 5 (6,578 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.4; reviews=6578]",
+            "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 4:30 PM | Tuesday: 9:00 AM – 4:30 PM | Wednesday: 9...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 4; time=09:41; icon=activity; slot=morning; name=Koishikawa Korakuen; evidence=pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen],content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo],quality_signal[icon=activity; rating=4.4; reviews=6578],hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 4:30 PM | Tuesday: 9:00 AM – 4:30 PM | Wednesday: 9...],route_signal[icon=activity; next_km=4.82]]",
+          "occurrence_id": "A__d04__i01__attraction_05_koishikawa_korakuen",
+          "option": "A",
+          "day": "Day 4"
+        },
+        "A__d04__i02__restaurant_02_censu_tokyo": {
+          "item_key": "restaurant_02_censu_tokyo",
+          "name": "CENSU TOKYO",
+          "time": "12:05",
+          "icon": "restaurant",
+          "slot": "lunch",
+          "matches": [
+            "pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine]",
+            "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]",
+            "quality_signal[icon=restaurant; rating=4.7; reviews=221]"
+          ],
+          "all_matches": [
+            "pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine]",
+            "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]",
+            "quality_signal[icon=restaurant; rating=4.7; reviews=221]",
+            "hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:30 AM – 2:00 PM, 6:00 – 11:00 PM | Tuesday: 11:30 AM – 2:0...]",
+            "route_signal[icon=restaurant; prev_km=4.82; next_km=1.98; total_km=6.8]"
+          ],
+          "rating": "4.7 / 5 (221 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.7; reviews=221]",
+            "hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:30 AM – 2:00 PM, 6:00 – 11:00 PM | Tuesday: 11:30 AM – 2:0...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 4; time=12:05; icon=restaurant; slot=lunch; name=CENSU TOKYO; evidence=pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine],pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional],quality_signal[icon=restaurant; rating=4.7; reviews=221],hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:30 AM – 2:00 PM, 6:00 – 11:00 PM | Tuesday: 11:30 AM – 2:0...],route_signal[icon=restaurant; prev_km=4.82; next_km=1.98; total_km=6.8]]",
+          "occurrence_id": "A__d04__i02__restaurant_02_censu_tokyo",
+          "option": "A",
+          "day": "Day 4"
+        },
+        "A__d04__i03__attraction_18_shibuya_sky": {
+          "item_key": "attraction_18_shibuya_sky",
+          "name": "Shibuya Sky",
+          "time": "13:58",
+          "icon": "activity",
+          "slot": "afternoon",
+          "matches": [
+            "content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo]",
+            "quality_signal[icon=activity; rating=4.6; reviews=24198]",
+            "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 10:00 AM – 10:30 PM | Tuesday: 10:00 AM – 10:30 PM | Wednesda...]"
+          ],
+          "all_matches": [
+            "content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo]",
+            "quality_signal[icon=activity; rating=4.6; reviews=24198]",
+            "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 10:00 AM – 10:30 PM | Tuesday: 10:00 AM – 10:30 PM | Wednesda...]",
+            "route_signal[icon=activity; prev_km=1.98; next_km=6.19; total_km=8.17]"
+          ],
+          "rating": "4.6 / 5 (24,198 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.6; reviews=24198]",
+            "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 10:00 AM – 10:30 PM | Tuesday: 10:00 AM – 10:30 PM | Wednesda...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 4; time=13:58; icon=activity; slot=afternoon; name=Shibuya Sky; evidence=content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo],quality_signal[icon=activity; rating=4.6; reviews=24198],hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 10:00 AM – 10:30 PM | Tuesday: 10:00 AM – 10:30 PM | Wednesda...],route_signal[icon=activity; prev_km=1.98; next_km=6.19; total_km=8.17]]",
+          "occurrence_id": "A__d04__i03__attraction_18_shibuya_sky",
+          "option": "A",
+          "day": "Day 4"
+        },
+        "A__d04__i04__restaurant_18_grilled_wagyu_beef": {
+          "item_key": "restaurant_18_grilled_wagyu_beef",
+          "name": "Grilled Wagyu Beef",
+          "time": "18:00",
+          "icon": "restaurant",
+          "slot": "dinner",
+          "matches": [
+            "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+            "content_profile[icon=restaurant; type=Restaurant; category=Restaurant; query=Best street food and local restaurants in Tokyo]",
+            "quality_signal[icon=restaurant; rating=4.8; reviews=117]"
+          ],
+          "all_matches": [
+            "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+            "content_profile[icon=restaurant; type=Restaurant; category=Restaurant; query=Best street food and local restaurants in Tokyo]",
+            "quality_signal[icon=restaurant; rating=4.8; reviews=117]",
+            "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: Open 24 hours | Tuesday: Open 24 hours | Wednesday: Open 24 h...]",
+            "route_signal[icon=restaurant; prev_km=6.19]"
+          ],
+          "rating": "4.8 / 5 (117 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.8; reviews=117]",
+            "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: Open 24 hours | Tuesday: Open 24 hours | Wednesday: Open 24 h...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 4; time=18:00; icon=restaurant; slot=dinner; name=Grilled Wagyu Beef; evidence=pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner],content_profile[icon=restaurant; type=Restaurant; category=Restaurant; query=Best street food and local restaurants in Tokyo],quality_signal[icon=restaurant; rating=4.8; reviews=117],hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: Open 24 hours | Tuesday: Open 24 hours | Wednesday: Open 24 h...],route_signal[icon=restaurant; prev_km=6.19]]",
+          "occurrence_id": "A__d04__i04__restaurant_18_grilled_wagyu_beef",
+          "option": "A",
+          "day": "Day 4"
+        },
+        "A__d05__i01__hotel_checkout": {
+          "item_key": "hotel_checkout",
+          "name": "Checkout from OHANA TOKYO HOUSE",
+          "time": "10:30",
+          "icon": "hotel",
+          "slot": "morning",
+          "matches": [
+            "budget_signal[price_per_night_usd=41; budget=SGD 5000]",
+            "quality_signal[icon=hotel; rating=4.33; reviews=18]",
+            "hotel_signal[key=hotel_checkout; time=10:30; name=OHANA TOKYO HOUSE]"
+          ],
+          "all_matches": [
+            "budget_signal[price_per_night_usd=41; budget=SGD 5000]",
+            "quality_signal[icon=hotel; rating=4.33; reviews=18]",
+            "hotel_signal[key=hotel_checkout; time=10:30; name=OHANA TOKYO HOUSE]"
+          ],
+          "rating": "4.3 / 5 (18 reviews)",
+          "review_highlights": [
+            "Exceptional<br>#128578; Very clean and comfortable!",
+            "Exceptional"
+          ],
+          "chain_of_thought": "item_signal[day=Day 5; time=10:30; icon=hotel; slot=morning; name=Checkout from OHANA TOKYO HOUSE; evidence=budget_signal[price_per_night_usd=41; budget=SGD 5000],quality_signal[icon=hotel; rating=4.33; reviews=18],hotel_signal[key=hotel_checkout; time=10:30; name=OHANA TOKYO HOUSE]]",
+          "occurrence_id": "A__d05__i01__hotel_checkout",
+          "option": "A",
+          "day": "Day 5"
+        },
+        "A__d05__i02__attraction_04_rikugien_gardens": {
+          "item_key": "attraction_04_rikugien_gardens",
+          "name": "Rikugien Gardens",
+          "time": "10:50",
+          "icon": "activity",
+          "slot": "morning",
+          "matches": [
+            "pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen]",
+            "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]",
+            "quality_signal[icon=activity; rating=4.4; reviews=10455]"
+          ],
+          "all_matches": [
+            "pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen]",
+            "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]",
+            "quality_signal[icon=activity; rating=4.4; reviews=10455]",
+            "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...]",
+            "route_signal[icon=activity]"
+          ],
+          "rating": "4.4 / 5 (10,455 reviews)",
+          "review_highlights": [
+            "rating_signal[rating=4.4; reviews=10455]",
+            "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...]"
+          ],
+          "chain_of_thought": "item_signal[day=Day 5; time=10:50; icon=activity; slot=morning; name=Rikugien Gardens; evidence=pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen],content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo],quality_signal[icon=activity; rating=4.4; reviews=10455],hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...],route_signal[icon=activity]]",
+          "occurrence_id": "A__d05__i02__attraction_04_rikugien_gardens",
+          "option": "A",
+          "day": "Day 5"
+        },
+        "A__d05__i03__flight_return": {
+          "item_key": "flight_return",
+          "name": "ZIPAIR Tokyo ZG 53 (Nonstop) | Narita International Airport → Singapore Changi Airport | dep 2026-06-05 16:50 → arr 2026-06-05 23:00 | 430 min | Economy | USD 211",
+          "time": "16:50",
+          "icon": "flight",
+          "slot": "afternoon",
+          "matches": [
+            "flight_signal[segment=return; nonstop=1; dep=2026-06-05 16:50; arr=2026-06-05 23:00; duration_min=430]",
+            "time_pref_signal[pref=afternoon; dep=2026-06-05 16:50]"
+          ],
+          "all_matches": [
+            "flight_signal[segment=return; nonstop=1; dep=2026-06-05 16:50; arr=2026-06-05 23:00; duration_min=430]",
+            "time_pref_signal[pref=afternoon; dep=2026-06-05 16:50]"
+          ],
+          "rating": "",
+          "review_highlights": [
+            "ZIPAIR Tokyo ZG 53 (Nonstop) | Narita International Airport → Singapore Changi Airport | dep 2026-06-05 16:50 → arr 2026-06-05 23:00 | 430 min | Economy | USD 211"
+          ],
+          "chain_of_thought": "item_signal[day=Day 5; time=16:50; icon=flight; slot=afternoon; name=ZIPAIR Tokyo ZG 53 (Nonstop) | Narita International Airport → Singapore Chang...; evidence=flight_signal[segment=return; nonstop=1; dep=2026-06-05 16:50; arr=2026-06-05 23:00; duration_min=430],time_pref_signal[pref=afternoon; dep=2026-06-05 16:50]]",
+          "occurrence_id": "A__d05__i03__flight_return",
+          "option": "A",
+          "day": "Day 5"
+        }
+      }
+    },
+    "summary_generation": {
+      "mode": "llm",
+      "language": "English",
+      "error": "",
+      "source": {
+        "selected_option": "A",
+        "option_meta": {
+          "label": "Balanced Highlights",
+          "desc": "A balanced plan that covers the strongest relevant picks for the user's stated interests with a steady full-day pace.",
+          "budget": "SGD 5000 (flight + hotel; meals/transport TBC)",
+          "style": "Balanced / top-relevance route",
+          "badge": "Best for a broad first pass through the destination"
+        },
+        "preference_tags": [
+          "historical",
+          "zen gardens",
+          "fine dining",
+          "traditional cultural"
+        ],
+        "option_evidence": "option_summary[option=A; label=Balanced Highlights; style=Balanced / top-relevance route; prefs=historical,zen gardens,fine dining,traditional cultural]",
+        "option_reason_hints": [
+          "flight fit",
+          "time preference",
+          "preference fit"
+        ],
+        "planner_context": "planner_context[summary=Built 3 deterministic itinerary variants from the saved research inventory by choosing the highest-ranked flights, selecting distinct hotels per option, clustering attractions by lat/lng, pairing nearby lunch and dinn...]",
+        "days": [
+          {
+            "day": "Day 1",
+            "items": [
+              {
+                "item_key": "flight_outbound",
+                "occurrence_id": "A__d01__i01__flight_outbound",
+                "time": "17:30",
+                "icon": "flight",
+                "name": "Singapore Airlines SQ 12 (Nonstop) | Singapore Changi Airport → Narita International Airport | dep 2026-06-01 09:25 → arr 2026-06-01 17:30 | 425 min | Economy | USD 722",
+                "slot": "evening",
+                "top_why": [
+                  "flight_signal[segment=outbound; nonstop=1; dep=2026-06-01 09:25; arr=2026-06-01 17:30; duration_min=425]",
+                  "time_pref_signal[pref=morning; dep=2026-06-01 09:25]"
+                ],
+                "top_why_raw": [
+                  "flight_signal[segment=outbound; nonstop=1; dep=2026-06-01 09:25; arr=2026-06-01 17:30; duration_min=425]",
+                  "time_pref_signal[pref=morning; dep=2026-06-01 09:25]"
+                ],
+                "rating": "",
+                "review_highlights": [
+                  "Singapore Airlines SQ 12 (Nonstop) | Singapore Changi Airport → Narita International Airport | dep 2026-06-01 09:25 → arr 2026-06-01 17:30 | 425 min | Economy | USD 722"
+                ],
+                "reason_hints": [
+                  "it uses a nonstop outbound flight",
+                  "it matches the preferred morning timing"
+                ]
+              },
+              {
+                "item_key": "restaurant_16_rollsloth",
+                "occurrence_id": "A__d01__i02__restaurant_16_rollsloth",
+                "time": "18:30",
+                "icon": "restaurant",
+                "name": "RollSloth🦥",
+                "slot": "dinner",
+                "top_why": [
+                  "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+                  "content_profile[icon=restaurant; type=Restaurant; category=Restaurant; query=Best street food and local restaurants in Tokyo]"
+                ],
+                "top_why_raw": [
+                  "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+                  "content_profile[icon=restaurant; type=Restaurant; category=Restaurant; query=Best street food and local restaurants in Tokyo]",
+                  "quality_signal[icon=restaurant; rating=4.9; reviews=120]",
+                  "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: 8:00 AM – 1:00 AM | Tuesday: 8:00 AM – 1:00 AM | Wednesday: 8...]",
+                  "route_signal[icon=restaurant]"
+                ],
+                "rating": "4.9 / 5 (120 reviews)",
+                "review_highlights": [
+                  "rating_signal[rating=4.9; reviews=120]"
+                ],
+                "reason_hints": [
+                  "it matches your fine dining preference via slot:dinner",
+                  "it contributes a restaurant meal stop"
+                ]
+              },
+              {
+                "item_key": "hotel_stay",
+                "occurrence_id": "A__d01__i03__hotel_stay",
+                "time": "20:09",
+                "icon": "hotel",
+                "name": "OHANA TOKYO HOUSE",
+                "slot": "evening",
+                "top_why": [
+                  "budget_signal[price_per_night_usd=41; budget=SGD 5000]",
+                  "quality_signal[icon=hotel; rating=4.33; reviews=18]"
+                ],
+                "top_why_raw": [
+                  "budget_signal[price_per_night_usd=41; budget=SGD 5000]",
+                  "quality_signal[icon=hotel; rating=4.33; reviews=18]",
+                  "hotel_signal[key=hotel_stay; time=20:09; name=OHANA TOKYO HOUSE]"
+                ],
+                "rating": "4.3 / 5 (18 reviews)",
+                "review_highlights": [
+                  "Exceptional<br>#128578; Very clean and comfortable!"
+                ],
+                "reason_hints": [
+                  "it stays aligned with the stated budget (SGD 5000)",
+                  "it has a strong quality signal (4.33/5 from 18 reviews)"
+                ]
+              }
+            ],
+            "day_evidence": "day_sequence[day=Day 1; item_count=3; sequence=stop[time=17:30; icon=flight; name=Singapore Airlines SQ 12 (Nonstop) | Singapore Changi Airport...; evidence=flight_signal[segment=outbound; nonstop=1; dep=2026-06-01 09:25; arr=2026-06-01 17:30; duration_min=425]],stop[time=18:30; icon=restaurant; name=RollSloth🦥; evidence=pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]],stop[time=20:09; icon=hotel; name=OHANA TOKYO HOUSE; evidence=budget_signal[price_per_night_usd=41; budget=SGD 5000]]]",
+            "transitions": [
+              {
+                "from_name": "the outbound nonstop flight",
+                "to_name": "RollSloth🦥",
+                "link": "arrival_to_meal",
+                "reason_hint": "RollSloth🦥 follows arrival so the evening starts with one manageable ground stop"
+              },
+              {
+                "from_name": "RollSloth🦥",
+                "to_name": "OHANA TOKYO HOUSE",
+                "link": "meal_to_overnight",
+                "reason_hint": "OHANA TOKYO HOUSE comes after RollSloth🦥 so the day closes into the overnight instead of reopening the route"
+              }
+            ],
+            "day_reason_hints": [
+              "flight fit",
+              "time preference",
+              "preference fit"
+            ]
+          },
+          {
+            "day": "Day 2",
+            "items": [
+              {
+                "item_key": "attraction_02_meiji_jingu",
+                "occurrence_id": "A__d02__i01__attraction_02_meiji_jingu",
+                "time": "09:17",
+                "icon": "activity",
+                "name": "Meiji Jingu",
+                "slot": "morning",
+                "top_why": [
+                  "content_profile[icon=activity; type=Shinto Shrine; category=Shinto Shrine]",
+                  "quality_signal[icon=activity; rating=4.6]"
+                ],
+                "top_why_raw": [
+                  "content_profile[icon=activity; type=Shinto Shrine; category=Shinto Shrine]",
+                  "quality_signal[icon=activity; rating=4.6]",
+                  "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 4:30 PM | Tuesday: 9:00 AM – 4:30 PM | Wednesday: 9...]",
+                  "route_signal[icon=activity; next_km=1.7]"
+                ],
+                "rating": "4.6 / 5",
+                "review_highlights": [
+                  "rating_signal[rating=4.6]"
+                ],
+                "reason_hints": [
+                  "it contributes a shinto shrine activity",
+                  "it has a strong quality signal (4.6/5)"
+                ]
+              },
+              {
+                "item_key": "restaurant_09_mo_mo_paradise_shibuya_koendori",
+                "occurrence_id": "A__d02__i02__restaurant_09_mo_mo_paradise_shibuya_koendori",
+                "time": "11:45",
+                "icon": "restaurant",
+                "name": "MO-MO-PARADISE Shibuya Koendori",
+                "slot": "lunch",
+                "top_why": [
+                  "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]",
+                  "content_profile[icon=restaurant; type=Japanese Restaurant; category=Japanese Restaurant; query=Best traditional restaurants in Tokyo]"
+                ],
+                "top_why_raw": [
+                  "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]",
+                  "content_profile[icon=restaurant; type=Japanese Restaurant; category=Japanese Restaurant; query=Best traditional restaurants in Tokyo]",
+                  "quality_signal[icon=restaurant; rating=4.9; reviews=6118]",
+                  "hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:30 AM – 3:00 PM, 5:00 – 10:30 PM | Tuesday: 11:30 AM – 3:0...]",
+                  "route_signal[icon=restaurant; prev_km=1.7; next_km=4.36; total_km=6.06]"
+                ],
+                "rating": "4.9 / 5 (6,118 reviews)",
+                "review_highlights": [
+                  "rating_signal[rating=4.9; reviews=6118]"
+                ],
+                "reason_hints": [
+                  "it matches your traditional cultural preference via search_query:traditional",
+                  "it contributes a japanese restaurant meal stop"
+                ]
+              },
+              {
+                "item_key": "attraction_06_zojo_ji_temple",
+                "occurrence_id": "A__d02__i03__attraction_06_zojo_ji_temple",
+                "time": "13:57",
+                "icon": "activity",
+                "name": "Zojo-ji Temple",
+                "slot": "afternoon",
+                "top_why": [
+                  "pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen]",
+                  "content_profile[icon=activity; type=Buddhist Temple; category=Buddhist Temple; query=best zen gardens and quiet temples in Tokyo]"
+                ],
+                "top_why_raw": [
+                  "pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen]",
+                  "content_profile[icon=activity; type=Buddhist Temple; category=Buddhist Temple; query=best zen gardens and quiet temples in Tokyo]",
+                  "quality_signal[icon=activity; rating=4.5; reviews=12142]",
+                  "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...]",
+                  "route_signal[icon=activity; prev_km=4.36; next_km=2.85; total_km=7.22]"
+                ],
+                "rating": "4.5 / 5 (12,142 reviews)",
+                "review_highlights": [
+                  "rating_signal[rating=4.5; reviews=12142]"
+                ],
+                "reason_hints": [
+                  "it matches your zen gardens preference via search_query:gardens,zen",
+                  "it contributes a buddhist temple activity"
+                ]
+              },
+              {
+                "item_key": "restaurant_03_narisawa",
+                "occurrence_id": "A__d02__i04__restaurant_03_narisawa",
+                "time": "18:15",
+                "icon": "restaurant",
+                "name": "Narisawa",
+                "slot": "dinner",
+                "top_why": [
+                  "pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine]",
+                  "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]"
+                ],
+                "top_why_raw": [
+                  "pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine]",
+                  "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]",
+                  "quality_signal[icon=restaurant; rating=4.6; reviews=705]",
+                  "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: Closed | Tuesday: 12:00 – 2:30 PM, 5:30 – 8:00 PM | Wednesday...]",
+                  "route_signal[icon=restaurant; prev_km=2.85]"
+                ],
+                "rating": "4.6 / 5 (705 reviews)",
+                "review_highlights": [
+                  "rating_signal[rating=4.6; reviews=705]"
+                ],
+                "reason_hints": [
+                  "it matches your fine dining preference via search_query:dining,fine",
+                  "it matches your traditional cultural preference via search_query:traditional"
+                ]
+              }
+            ],
+            "day_evidence": "day_sequence[day=Day 2; item_count=4; sequence=stop[time=09:17; icon=activity; name=Meiji Jingu; evidence=content_profile[icon=activity; type=Shinto Shrine; category=Shinto Shrine]],stop[time=11:45; icon=restaurant; name=MO-MO-PARADISE Shibuya Koendori; evidence=pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]],stop[time=13:57; icon=activity; name=Zojo-ji Temple; evidence=pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen]],stop[time=18:15; icon=restaurant; name=Narisawa; evidence=pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine]]]",
+            "transitions": [
+              {
+                "from_name": "Meiji Jingu",
+                "to_name": "MO-MO-PARADISE Shibuya Koendori",
+                "link": "morning_to_lunch_bridge",
+                "reason_hint": "MO-MO-PARADISE Shibuya Koendori is used as the lunch bridge after Meiji Jingu instead of creating a separate detour over about 1.7 km"
+              },
+              {
+                "from_name": "MO-MO-PARADISE Shibuya Koendori",
+                "to_name": "Zojo-ji Temple",
+                "link": "lunch_to_afternoon_bridge",
+                "reason_hint": "Zojo-ji Temple resumes the afternoon block after lunch so the same-day run stays intact over about 4.4 km"
+              },
+              {
+                "from_name": "Zojo-ji Temple",
+                "to_name": "Narisawa",
+                "link": "activity_to_dinner_close",
+                "reason_hint": "Narisawa closes the day after Zojo-ji Temple rather than adding another activity over about 2.9 km"
+              }
+            ],
+            "day_reason_hints": [
+              "content type",
+              "quality signal",
+              "preference fit"
+            ]
+          },
+          {
+            "day": "Day 3",
+            "items": [
+              {
+                "item_key": "attraction_09_kiyosumi_gardens",
+                "occurrence_id": "A__d03__i01__attraction_09_kiyosumi_gardens",
+                "time": "09:49",
+                "icon": "activity",
+                "name": "Kiyosumi Gardens",
+                "slot": "morning",
+                "top_why": [
+                  "pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen]",
+                  "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]"
+                ],
+                "top_why_raw": [
+                  "pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen]",
+                  "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]",
+                  "quality_signal[icon=activity; rating=4.4; reviews=5356]",
+                  "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...]",
+                  "route_signal[icon=activity; next_km=3.36]"
+                ],
+                "rating": "4.4 / 5 (5,356 reviews)",
+                "review_highlights": [
+                  "rating_signal[rating=4.4; reviews=5356]"
+                ],
+                "reason_hints": [
+                  "it matches your zen gardens preference via name:gardens|search_query:gardens,zen",
+                  "it contributes a garden activity"
+                ]
+              },
+              {
+                "item_key": "restaurant_15_gyukatsu_ichinisan",
+                "occurrence_id": "A__d03__i02__restaurant_15_gyukatsu_ichinisan",
+                "time": "12:01",
+                "icon": "restaurant",
+                "name": "Gyukatsu Ichinisan",
+                "slot": "lunch",
+                "top_why": [
+                  "pref_match[pref=traditional cultural; icon=restaurant; overlap=type:Tonkatsu Restaurant]",
+                  "content_profile[icon=restaurant; type=Tonkatsu Restaurant; category=Tonkatsu Restaurant; query=Best street food and local restaurants in Tokyo]"
+                ],
+                "top_why_raw": [
+                  "pref_match[pref=traditional cultural; icon=restaurant; overlap=type:Tonkatsu Restaurant]",
+                  "content_profile[icon=restaurant; type=Tonkatsu Restaurant; category=Tonkatsu Restaurant; query=Best street food and local restaurants in Tokyo]",
+                  "quality_signal[icon=restaurant; rating=4.8; reviews=13897]",
+                  "hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:00 AM – 10:00 PM | Tuesday: 11:00 AM – 10:00 PM | Wednesda...]",
+                  "route_signal[icon=restaurant; prev_km=3.36; next_km=2.35; total_km=5.71]"
+                ],
+                "rating": "4.8 / 5 (13,897 reviews)",
+                "review_highlights": [
+                  "rating_signal[rating=4.8; reviews=13897]"
+                ],
+                "reason_hints": [
+                  "it matches your traditional cultural preference via type:Tonkatsu Restaurant",
+                  "it contributes a tonkatsu restaurant meal stop"
+                ]
+              },
+              {
+                "item_key": "attraction_14_edo_tokyo_museum",
+                "occurrence_id": "A__d03__i03__attraction_14_edo_tokyo_museum",
+                "time": "13:57",
+                "icon": "activity",
+                "name": "Edo-Tokyo Museum",
+                "slot": "afternoon",
+                "top_why": [
+                  "content_profile[icon=activity; type=History Museum; category=History Museum; query=best museums in Tokyo]",
+                  "quality_signal[icon=activity; rating=4.4; reviews=12832]"
+                ],
+                "top_why_raw": [
+                  "content_profile[icon=activity; type=History Museum; category=History Museum; query=best museums in Tokyo]",
+                  "quality_signal[icon=activity; rating=4.4; reviews=12832]",
+                  "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: Closed | Tuesday: 9:30 AM – 5:30 PM | Wednesday: 9:30 AM – 5:...]",
+                  "route_signal[icon=activity; prev_km=2.35; next_km=6.2; total_km=8.55]"
+                ],
+                "rating": "4.4 / 5 (12,832 reviews)",
+                "review_highlights": [
+                  "rating_signal[rating=4.4; reviews=12832]"
+                ],
+                "reason_hints": [
+                  "it contributes a history museum activity",
+                  "it has a strong quality signal (4.4/5 from 12832 reviews)"
+                ]
+              },
+              {
+                "item_key": "attraction_16_tokyo_tower",
+                "occurrence_id": "A__d03__i04__attraction_16_tokyo_tower",
+                "time": "16:42",
+                "icon": "activity",
+                "name": "Tokyo Tower",
+                "slot": "afternoon",
+                "top_why": [
+                  "content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo]",
+                  "quality_signal[icon=activity; rating=4.1; reviews=146]"
+                ],
+                "top_why_raw": [
+                  "content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo]",
+                  "quality_signal[icon=activity; rating=4.1; reviews=146]",
+                  "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 9:00 AM – 11:00 PM | Tuesday: 9:00 AM – 11:00 PM | Wednesday:...]",
+                  "route_signal[icon=activity; prev_km=6.2; next_km=3.05; total_km=9.25]"
+                ],
+                "rating": "4.1 / 5 (146 reviews)",
+                "review_highlights": [
+                  "rating_signal[rating=4.1; reviews=146]"
+                ],
+                "reason_hints": [
+                  "it contributes a observation deck activity",
+                  "it has a strong quality signal (4.1/5 from 146 reviews)"
+                ]
+              },
+              {
+                "item_key": "restaurant_11_t_s_tantan",
+                "occurrence_id": "A__d03__i05__restaurant_11_t_s_tantan",
+                "time": "18:39",
+                "icon": "restaurant",
+                "name": "T’s Tantan",
+                "slot": "dinner",
+                "top_why": [
+                  "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+                  "content_profile[icon=restaurant; type=Vegan Restaurant; category=Vegan Restaurant; query=Best street food and local restaurants in Tokyo]"
+                ],
+                "top_why_raw": [
+                  "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+                  "content_profile[icon=restaurant; type=Vegan Restaurant; category=Vegan Restaurant; query=Best street food and local restaurants in Tokyo]",
+                  "quality_signal[icon=restaurant; rating=4.6; reviews=2762]",
+                  "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: 10:00 AM – 9:30 PM | Tuesday: 10:00 AM – 9:30 PM | Wednesday:...]",
+                  "route_signal[icon=restaurant; prev_km=3.05]"
+                ],
+                "rating": "4.6 / 5 (2,762 reviews)",
+                "review_highlights": [
+                  "rating_signal[rating=4.6; reviews=2762]"
+                ],
+                "reason_hints": [
+                  "it matches your fine dining preference via slot:dinner",
+                  "it contributes a vegan restaurant meal stop"
+                ]
+              }
+            ],
+            "day_evidence": "day_sequence[day=Day 3; item_count=5; sequence=stop[time=09:49; icon=activity; name=Kiyosumi Gardens; evidence=pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen]],stop[time=12:01; icon=restaurant; name=Gyukatsu Ichinisan; evidence=pref_match[pref=traditional cultural; icon=restaurant; overlap=type:Tonkatsu Restaurant]],stop[time=13:57; icon=activity; name=Edo-Tokyo Museum; evidence=content_profile[icon=activity; type=History Museum; category=History Museum; query=best museums in Tokyo]],stop[time=16:42; icon=activity; name=Tokyo Tower; evidence=content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo]],stop[time=18:39; icon=restaurant; name=T’s Tantan; evidence=pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]]]",
+            "transitions": [
+              {
+                "from_name": "Kiyosumi Gardens",
+                "to_name": "Gyukatsu Ichinisan",
+                "link": "morning_to_lunch_bridge",
+                "reason_hint": "Gyukatsu Ichinisan is used as the lunch bridge after Kiyosumi Gardens instead of creating a separate detour over about 3.4 km"
+              },
+              {
+                "from_name": "Gyukatsu Ichinisan",
+                "to_name": "Edo-Tokyo Museum",
+                "link": "lunch_to_afternoon_bridge",
+                "reason_hint": "Edo-Tokyo Museum resumes the afternoon block after lunch so the same-day run stays intact over about 2.4 km"
+              },
+              {
+                "from_name": "Edo-Tokyo Museum",
+                "to_name": "Tokyo Tower",
+                "link": "same_day_sightseeing_chain",
+                "reason_hint": "Tokyo Tower stays on the same day as Edo-Tokyo Museum to keep the sightseeing chain continuous over about 6.2 km"
+              },
+              {
+                "from_name": "Tokyo Tower",
+                "to_name": "T’s Tantan",
+                "link": "activity_to_dinner_close",
+                "reason_hint": "T’s Tantan closes the day after Tokyo Tower rather than adding another activity over about 3.0 km"
+              }
+            ],
+            "day_reason_hints": [
+              "preference fit",
+              "content type",
+              "quality signal"
+            ]
+          },
+          {
+            "day": "Day 4",
+            "items": [
+              {
+                "item_key": "attraction_05_koishikawa_korakuen",
+                "occurrence_id": "A__d04__i01__attraction_05_koishikawa_korakuen",
+                "time": "09:41",
+                "icon": "activity",
+                "name": "Koishikawa Korakuen",
+                "slot": "morning",
+                "top_why": [
+                  "pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen]",
+                  "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]"
+                ],
+                "top_why_raw": [
+                  "pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen]",
+                  "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]",
+                  "quality_signal[icon=activity; rating=4.4; reviews=6578]",
+                  "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 4:30 PM | Tuesday: 9:00 AM – 4:30 PM | Wednesday: 9...]",
+                  "route_signal[icon=activity; next_km=4.82]"
+                ],
+                "rating": "4.4 / 5 (6,578 reviews)",
+                "review_highlights": [
+                  "rating_signal[rating=4.4; reviews=6578]"
+                ],
+                "reason_hints": [
+                  "it matches your zen gardens preference via search_query:gardens,zen",
+                  "it contributes a garden activity"
+                ]
+              },
+              {
+                "item_key": "restaurant_02_censu_tokyo",
+                "occurrence_id": "A__d04__i02__restaurant_02_censu_tokyo",
+                "time": "12:05",
+                "icon": "restaurant",
+                "name": "CENSU TOKYO",
+                "slot": "lunch",
+                "top_why": [
+                  "pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine]",
+                  "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]"
+                ],
+                "top_why_raw": [
+                  "pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine]",
+                  "pref_match[pref=traditional cultural; icon=restaurant; overlap=search_query:traditional]",
+                  "quality_signal[icon=restaurant; rating=4.7; reviews=221]",
+                  "hours_signal[icon=restaurant; slot=lunch; hours_available=1; hours_text=Monday: 11:30 AM – 2:00 PM, 6:00 – 11:00 PM | Tuesday: 11:30 AM – 2:0...]",
+                  "route_signal[icon=restaurant; prev_km=4.82; next_km=1.98; total_km=6.8]"
+                ],
+                "rating": "4.7 / 5 (221 reviews)",
+                "review_highlights": [
+                  "rating_signal[rating=4.7; reviews=221]"
+                ],
+                "reason_hints": [
+                  "it matches your fine dining preference via search_query:dining,fine",
+                  "it matches your traditional cultural preference via search_query:traditional"
+                ]
+              },
+              {
+                "item_key": "attraction_18_shibuya_sky",
+                "occurrence_id": "A__d04__i03__attraction_18_shibuya_sky",
+                "time": "13:58",
+                "icon": "activity",
+                "name": "Shibuya Sky",
+                "slot": "afternoon",
+                "top_why": [
+                  "content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo]",
+                  "quality_signal[icon=activity; rating=4.6; reviews=24198]"
+                ],
+                "top_why_raw": [
+                  "content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo]",
+                  "quality_signal[icon=activity; rating=4.6; reviews=24198]",
+                  "hours_signal[icon=activity; slot=afternoon; hours_available=1; hours_text=Monday: 10:00 AM – 10:30 PM | Tuesday: 10:00 AM – 10:30 PM | Wednesda...]",
+                  "route_signal[icon=activity; prev_km=1.98; next_km=6.19; total_km=8.17]"
+                ],
+                "rating": "4.6 / 5 (24,198 reviews)",
+                "review_highlights": [
+                  "rating_signal[rating=4.6; reviews=24198]"
+                ],
+                "reason_hints": [
+                  "it contributes a observation deck activity",
+                  "it has a strong quality signal (4.6/5 from 24198 reviews)"
+                ]
+              },
+              {
+                "item_key": "restaurant_18_grilled_wagyu_beef",
+                "occurrence_id": "A__d04__i04__restaurant_18_grilled_wagyu_beef",
+                "time": "18:00",
+                "icon": "restaurant",
+                "name": "Grilled Wagyu Beef",
+                "slot": "dinner",
+                "top_why": [
+                  "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+                  "content_profile[icon=restaurant; type=Restaurant; category=Restaurant; query=Best street food and local restaurants in Tokyo]"
+                ],
+                "top_why_raw": [
+                  "pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]",
+                  "content_profile[icon=restaurant; type=Restaurant; category=Restaurant; query=Best street food and local restaurants in Tokyo]",
+                  "quality_signal[icon=restaurant; rating=4.8; reviews=117]",
+                  "hours_signal[icon=restaurant; slot=dinner; hours_available=1; hours_text=Monday: Open 24 hours | Tuesday: Open 24 hours | Wednesday: Open 24 h...]",
+                  "route_signal[icon=restaurant; prev_km=6.19]"
+                ],
+                "rating": "4.8 / 5 (117 reviews)",
+                "review_highlights": [
+                  "rating_signal[rating=4.8; reviews=117]"
+                ],
+                "reason_hints": [
+                  "it matches your fine dining preference via slot:dinner",
+                  "it contributes a restaurant meal stop"
+                ]
+              }
+            ],
+            "day_evidence": "day_sequence[day=Day 4; item_count=4; sequence=stop[time=09:41; icon=activity; name=Koishikawa Korakuen; evidence=pref_match[pref=zen gardens; icon=activity; overlap=search_query:gardens,zen]],stop[time=12:05; icon=restaurant; name=CENSU TOKYO; evidence=pref_match[pref=fine dining; icon=restaurant; overlap=search_query:dining,fine]],stop[time=13:58; icon=activity; name=Shibuya Sky; evidence=content_profile[icon=activity; type=Observation Deck; category=Observation Deck; query=Best attractions in Tokyo]],stop[time=18:00; icon=restaurant; name=Grilled Wagyu Beef; evidence=pref_match[pref=fine dining; icon=restaurant; overlap=slot:dinner]]]",
+            "transitions": [
+              {
+                "from_name": "Koishikawa Korakuen",
+                "to_name": "CENSU TOKYO",
+                "link": "morning_to_lunch_bridge",
+                "reason_hint": "CENSU TOKYO is used as the lunch bridge after Koishikawa Korakuen instead of creating a separate detour over about 4.8 km"
+              },
+              {
+                "from_name": "CENSU TOKYO",
+                "to_name": "Shibuya Sky",
+                "link": "lunch_to_afternoon_bridge",
+                "reason_hint": "Shibuya Sky resumes the afternoon block after lunch so the same-day run stays intact over about 2.0 km"
+              },
+              {
+                "from_name": "Shibuya Sky",
+                "to_name": "Grilled Wagyu Beef",
+                "link": "activity_to_dinner_close",
+                "reason_hint": "Grilled Wagyu Beef closes the day after Shibuya Sky rather than adding another activity over about 6.2 km"
+              }
+            ],
+            "day_reason_hints": [
+              "preference fit",
+              "content type",
+              "quality signal"
+            ]
+          },
+          {
+            "day": "Day 5",
+            "items": [
+              {
+                "item_key": "hotel_checkout",
+                "occurrence_id": "A__d05__i01__hotel_checkout",
+                "time": "10:30",
+                "icon": "hotel",
+                "name": "Checkout from OHANA TOKYO HOUSE",
+                "slot": "morning",
+                "top_why": [
+                  "budget_signal[price_per_night_usd=41; budget=SGD 5000]",
+                  "quality_signal[icon=hotel; rating=4.33; reviews=18]"
+                ],
+                "top_why_raw": [
+                  "budget_signal[price_per_night_usd=41; budget=SGD 5000]",
+                  "quality_signal[icon=hotel; rating=4.33; reviews=18]",
+                  "hotel_signal[key=hotel_checkout; time=10:30; name=OHANA TOKYO HOUSE]"
+                ],
+                "rating": "4.3 / 5 (18 reviews)",
+                "review_highlights": [
+                  "Exceptional<br>#128578; Very clean and comfortable!"
+                ],
+                "reason_hints": [
+                  "it stays aligned with the stated budget (SGD 5000)",
+                  "it has a strong quality signal (4.33/5 from 18 reviews)"
+                ]
+              },
+              {
+                "item_key": "attraction_04_rikugien_gardens",
+                "occurrence_id": "A__d05__i02__attraction_04_rikugien_gardens",
+                "time": "10:50",
+                "icon": "activity",
+                "name": "Rikugien Gardens",
+                "slot": "morning",
+                "top_why": [
+                  "pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen]",
+                  "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]"
+                ],
+                "top_why_raw": [
+                  "pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen]",
+                  "content_profile[icon=activity; type=Garden; category=Garden; query=best zen gardens and quiet temples in Tokyo]",
+                  "quality_signal[icon=activity; rating=4.4; reviews=10455]",
+                  "hours_signal[icon=activity; slot=morning; hours_available=1; hours_text=Monday: 9:00 AM – 5:00 PM | Tuesday: 9:00 AM – 5:00 PM | Wednesday: 9...]",
+                  "route_signal[icon=activity]"
+                ],
+                "rating": "4.4 / 5 (10,455 reviews)",
+                "review_highlights": [
+                  "rating_signal[rating=4.4; reviews=10455]"
+                ],
+                "reason_hints": [
+                  "it matches your zen gardens preference via name:gardens|search_query:gardens,zen",
+                  "it contributes a garden activity"
+                ]
+              },
+              {
+                "item_key": "flight_return",
+                "occurrence_id": "A__d05__i03__flight_return",
+                "time": "16:50",
+                "icon": "flight",
+                "name": "ZIPAIR Tokyo ZG 53 (Nonstop) | Narita International Airport → Singapore Changi Airport | dep 2026-06-05 16:50 → arr 2026-06-05 23:00 | 430 min | Economy | USD 211",
+                "slot": "afternoon",
+                "top_why": [
+                  "flight_signal[segment=return; nonstop=1; dep=2026-06-05 16:50; arr=2026-06-05 23:00; duration_min=430]",
+                  "time_pref_signal[pref=afternoon; dep=2026-06-05 16:50]"
+                ],
+                "top_why_raw": [
+                  "flight_signal[segment=return; nonstop=1; dep=2026-06-05 16:50; arr=2026-06-05 23:00; duration_min=430]",
+                  "time_pref_signal[pref=afternoon; dep=2026-06-05 16:50]"
+                ],
+                "rating": "",
+                "review_highlights": [
+                  "ZIPAIR Tokyo ZG 53 (Nonstop) | Narita International Airport → Singapore Changi Airport | dep 2026-06-05 16:50 → arr 2026-06-05 23:00 | 430 min | Economy | USD 211"
+                ],
+                "reason_hints": [
+                  "it uses a nonstop return flight",
+                  "it matches the preferred afternoon timing"
+                ]
+              }
+            ],
+            "day_evidence": "day_sequence[day=Day 5; item_count=3; sequence=stop[time=10:30; icon=hotel; name=Checkout from OHANA TOKYO HOUSE; evidence=budget_signal[price_per_night_usd=41; budget=SGD 5000]],stop[time=10:50; icon=activity; name=Rikugien Gardens; evidence=pref_match[pref=zen gardens; icon=activity; overlap=name:gardens|search_query:gardens,zen]],stop[time=16:50; icon=flight; name=ZIPAIR Tokyo ZG 53 (Nonstop) | Narita International Airport →...; evidence=flight_signal[segment=return; nonstop=1; dep=2026-06-05 16:50; arr=2026-06-05 23:00; duration_min=430]]]",
+            "transitions": [
+              {
+                "from_name": "hotel checkout from OHANA TOKYO HOUSE",
+                "to_name": "Rikugien Gardens",
+                "link": "checkout_to_last_visit",
+                "reason_hint": "Rikugien Gardens is kept right after checkout so the last sightseeing piece still connects to the departure day"
+              },
+              {
+                "from_name": "Rikugien Gardens",
+                "to_name": "the return nonstop flight",
+                "link": "last_stop_to_airport",
+                "reason_hint": "the return nonstop flight remains last so the airport leg stays anchored at the end of the day"
+              }
+            ],
+            "day_reason_hints": [
+              "budget fit",
+              "quality signal",
+              "preference fit"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "agent_steps": [
+    {
+      "icon": "research",
+      "name": "Research Agent",
+      "detail": "Reused 25 logged research/planner steps for Tokyo."
+    },
+    {
+      "icon": "plan",
+      "name": "Planner Agent",
+      "detail": "Explaining the final itinerary for option A."
+    },
+    {
+      "icon": "why",
+      "name": "Explainability Agent",
+      "detail": "Generated deterministic reasons for route, timing, and fit."
+    }
+  ]
+}

@@ -4,7 +4,7 @@ from .google_search import google_search
 from .serp_search import serp_flights
 
 
-def search_flights(origin_city: str, destination_city: str, travel_date: str) -> str:
+def search_flights(origin_city: str, destination_city: str, travel_date: str, time_pref: str = "", direction: str = "outbound") -> str:
     """
     Search flight schedules and prices.
 
@@ -20,7 +20,7 @@ def search_flights(origin_city: str, destination_city: str, travel_date: str) ->
         travel_date:      Date in YYYY-MM-DD format
     """
     # --- Primary: SerpAPI Google Flights ---
-    serp_result = serp_flights(origin_city, destination_city, travel_date)
+    serp_result = serp_flights(origin_city, destination_city, travel_date, time_pref, direction)
     if serp_result:
         return serp_result
 

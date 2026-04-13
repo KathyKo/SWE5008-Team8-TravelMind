@@ -49,6 +49,15 @@ st.markdown("""
     transition: all 0.2s;
   }
   .stButton > button:hover { transform: translateY(-1px); }
+  /* Secondary buttons — make border/text visible on light bg */
+  .stButton > button[kind="secondary"] {
+    border: 2px solid #3b9eff !important;
+    color: #3b9eff !important;
+    background: transparent !important;
+  }
+  .stButton > button[kind="secondary"]:hover {
+    background: rgba(59,158,255,0.1) !important;
+  }
 
   /* Tabs */
   .stTabs [data-baseweb="tab-list"] {
@@ -83,11 +92,20 @@ st.markdown("""
     border-radius: 10px !important;
     color: #e8edf5 !important;
   }
+  .stTextInput > div > div > input::placeholder,
+  .stTextArea textarea::placeholder {
+    color: #4a5a72 !important;
+    opacity: 1 !important;
+  }
 
   /* Selectbox */
   .stSelectbox > div > div {
     background: #1a2235;
     border-radius: 10px;
+    color: #e8edf5;
+  }
+  .stSelectbox > div > div > div {
+    color: #e8edf5 !important;
   }
 
   /* Info / success / warning boxes */
@@ -95,13 +113,15 @@ st.markdown("""
 
   /* Custom card */
   .tm-card {
-    background: #111827;
-    border: 1px solid rgba(255,255,255,0.07);
+    background: #1a2235;
+    border: 1px solid rgba(255,255,255,0.12);
     border-radius: 14px;
     padding: 16px 20px;
     margin-bottom: 12px;
+    color: #c8d4e8;
+    font-size: 14px;
   }
-  .tm-card:hover { border-color: rgba(255,255,255,0.12); }
+  .tm-card:hover { border-color: rgba(255,255,255,0.2); }
 
   .tm-badge {
     display: inline-block;
@@ -259,15 +279,28 @@ def main():
     from pages.replan import render as render_replan
     from pages.security import render as render_security
 
-    tab1, tab2, tab3, tab4 = st.tabs(["🗺️ Plan", "📅 My Trip", "🔄 Re-plan", "🛡️ Security"])
+    # Custom nav — supports programmatic switching via st.session_state.active_page
+    NAV = [("plan", "🗺️ Plan"), ("my_trip", "📅 My Trip"), ("replan", "🔄 Re-plan"), ("security", "🛡️ Security")]
+    active = st.session_state.get("active_page", "plan")
 
-    with tab1:
+    nav_cols = st.columns(len(NAV))
+    for i, (page_key, page_label) in enumerate(NAV):
+        with nav_cols[i]:
+            is_active = active == page_key
+            if st.button(page_label, key=f"nav_{page_key}", use_container_width=True,
+                         type="primary" if is_active else "secondary"):
+                st.session_state.active_page = page_key
+                st.rerun()
+
+    st.markdown("---")
+
+    if active == "plan":
         render_plan()
-    with tab2:
+    elif active == "my_trip":
         render_trip()
-    with tab3:
+    elif active == "replan":
         render_replan()
-    with tab4:
+    else:
         render_security()
 
 

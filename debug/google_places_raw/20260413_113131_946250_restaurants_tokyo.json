@@ -1,0 +1,23 @@
+{
+  "saved_at": "20260413_113131_946250",
+  "place_kind": "restaurants",
+  "city": "Tokyo",
+  "preferences": "historical, zen gardens, fine dining, traditional cultural, historical, zen gardens, fine dining, traditional cultural",
+  "queries": [
+    "top fine dining and traditional Japanese restaurants in Tokyo",
+    "Best traditional restaurants in Tokyo",
+    "Best street food and local restaurants in Tokyo",
+    "Best restaurants in Tokyo",
+    "Best local restaurants in Tokyo"
+  ],
+  "max_output": 40,
+  "min_keep_after_filter": 32,
+  "skipped_llm_filter": true,
+  "removed_ids": [],
+  "counts": {
+    "raw_candidates": 0,
+    "llm_filtered_candidates": 0
+  },
+  "raw_candidates": [],
+  "llm_filtered_candidates": []
+}

@@ -1,0 +1,23 @@
+{
+  "saved_at": "20260412_163742_326053",
+  "place_kind": "attractions",
+  "city": "Tokyo",
+  "preferences": "vegetarian, historical, zen gardens, fine dining, traditional cultural, vegetarian, historical, zen gardens, fine dining",
+  "queries": [
+    "best zen gardens and quiet temples in Tokyo",
+    "best museums in Tokyo",
+    "Best attractions in Tokyo",
+    "Best attractions in Tokyo",
+    "Best attractions in Tokyo"
+  ],
+  "max_output": 60,
+  "min_keep_after_filter": 48,
+  "skipped_llm_filter": true,
+  "removed_ids": [],
+  "counts": {
+    "raw_candidates": 0,
+    "llm_filtered_candidates": 0
+  },
+  "raw_candidates": [],
+  "llm_filtered_candidates": []
+}

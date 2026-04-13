@@ -1,0 +1,23 @@
+{
+  "saved_at": "20260412_225838_496738",
+  "place_kind": "restaurants",
+  "city": "Singapore",
+  "preferences": "traditional cultural, local street food, traditional cultural, local street food",
+  "queries": [
+    "best local hawker food and famous local eats in Singapore",
+    "best traditional local snacks and must-try street food in Singapore",
+    "Best restaurants in Singapore",
+    "Best restaurants in Singapore",
+    "Best restaurants in Singapore"
+  ],
+  "max_output": 40,
+  "min_keep_after_filter": 32,
+  "skipped_llm_filter": true,
+  "removed_ids": [],
+  "counts": {
+    "raw_candidates": 0,
+    "llm_filtered_candidates": 0
+  },
+  "raw_candidates": [],
+  "llm_filtered_candidates": []
+}

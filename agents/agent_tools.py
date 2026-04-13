@@ -5,22 +5,35 @@ from tools import (
     search_hotels,
     search_weather,
     web_search,
-    search_attractions,
     google_search,
 )
 
 
 # Explicit per-agent tool permissions.
 TOOLS_BY_AGENT: Dict[str, Dict[str, Callable]] = {
-    "booking_agent": {
-        "web_search": web_search,
-        "search_hotels": search_hotels,
-        "search_flights": search_flights,
-        "google_search": google_search,
+    # Agent3: Planner
+    "planner_agent": {
+        "search_weather":     search_weather,
+        "search_flights":     search_flights,
+        "search_hotels":      search_hotels,
+        "web_search":         web_search,
+        "google_search":      google_search,
     },
-    "local_guide": {
-        "search_weather": search_weather,
-        "search_attractions": search_attractions,
+    # New research-only pipeline
+    "research_agent_1": {
+        "search_weather":     search_weather,
+        "search_flights":     search_flights,
+        "search_hotels":      search_hotels,
+        "web_search":         web_search,
+        "google_search":      google_search,
+    },
+    # New planner-only pipeline (delegates search to research_agent_1)
+    "planner_agent_1": {
+        "search_weather":     search_weather,
+        "search_flights":     search_flights,
+        "search_hotels":      search_hotels,
+        "web_search":         web_search,
+        "google_search":      google_search,
     },
 }
 
