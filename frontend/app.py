@@ -159,6 +159,7 @@ def init_state():
         "visited": {},          # item_key -> bool
         "selected_option": "A",
         "plan_generated": False,
+      "main_section": "🛡️ Security",
         "security_log": [],
         "blocked_count": 0,
         "passed_count": 0,
@@ -259,15 +260,21 @@ def main():
     from pages.replan import render as render_replan
     from pages.security import render as render_security
 
-    tab1, tab2, tab3, tab4 = st.tabs(["🗺️ Plan", "📅 My Trip", "🔄 Re-plan", "🛡️ Security"])
+    nav = st.radio(
+        "Main navigation",
+        ["🗺️ Plan", "📅 My Trip", "🔄 Re-plan", "🛡️ Security"],
+        horizontal=True,
+        label_visibility="collapsed",
+        key="main_section",
+    )
 
-    with tab1:
+    if nav == "🗺️ Plan":
         render_plan()
-    with tab2:
+    elif nav == "📅 My Trip":
         render_trip()
-    with tab3:
+    elif nav == "🔄 Re-plan":
         render_replan()
-    with tab4:
+    else:
         render_security()
 
 

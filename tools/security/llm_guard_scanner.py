@@ -11,13 +11,12 @@ PyPI: pip install llm-guard
 
 Input scanners used:
   - PromptInjection  : ML classifier for injection attempts
-  - PII              : Named entity recognition for personal data
+  - BanTopics        : Block unsafe topics/keywords
   - TokenLimit       : Enforce token budget (complements MAX_INPUT_LENGTH)
 
 Output scanners used:
   - Sensitive        : Detect sensitive data leaking in responses
-  - FactualConsistency: Flag potentially hallucinated claims
-  - BanTopics        : Block unsafe travel recommendations
+  - BanTopics        : Block unsafe travel topic recommendations
 
 Design decision:
   LLM Guard is only invoked when regex (Layer 1) passes.
@@ -27,6 +26,9 @@ Design decision:
 
 from dataclasses import dataclass
 from typing import Optional
+from llm_guard.input_scanners import PromptInjection, TokenLimit, BanTopics as InputBanTopics
+from llm_guard.output_scanners import Sensitive, BanTopics
+from llm_guard import scan_prompt, scan_output
 
 
 @dataclass
@@ -47,31 +49,6 @@ class LLMGuardOutputResult:
     reason: str
 
 
-# ── Lazy imports — LLM Guard is optional ─────────────────────
-# If llm-guard is not installed, both functions degrade gracefully
-# and return is_safe=True (regex layer is still active as fallback).
-def _import_llm_guard():
-    try:
-        from llm_guard.input_scanners import PromptInjection, PII, TokenLimit
-        from llm_guard.output_scanners import Sensitive, BanTopics
-        from llm_guard import scan_prompt, scan_output
-        return {
-            "PromptInjection": PromptInjection,
-            "PII": PII,
-            "TokenLimit": TokenLimit,
-            "Sensitive": Sensitive,
-            "BanTopics": BanTopics,
-            "scan_prompt": scan_prompt,
-            "scan_output": scan_output,
-            "available": True,
-        }
-    except ImportError:
-        return {"available": False}
-
-
-_LLM_GUARD = _import_llm_guard()
-
-
 # ── Input scanning ────────────────────────────────────────────
 
 def scan_input_llm_guard(text: str) -> LLMGuardInputResult:
@@ -80,45 +57,42 @@ def scan_input_llm_guard(text: str) -> LLMGuardInputResult:
 
     Scanners applied (in order):
       1. PromptInjection — ML classifier trained on injection datasets
-      2. PII             — NER-based personal data detection
+      2. BanTopics       — Block unsafe topics/keywords
       3. TokenLimit      — Enforce a hard token budget
 
-    If llm-guard is not installed, returns is_safe=True with a warning
-    so the system degrades gracefully (regex layer still protects).
+    Note: PII detection is handled separately via pii_scanner module
+          (regex-based NER, independent of LLM Guard)
     """
-    if not _LLM_GUARD["available"]:
-        print("[LLM Guard] ⚠️  llm-guard not installed — Layer 2 skipped (regex only)")
-        return LLMGuardInputResult(
-            is_safe=True,
-            threat_type=None,
-            risk_score=0.0,
-            sanitised_text=text,
-            reason="llm-guard not available — regex layer still active",
-        )
-
     try:
-        PromptInjection = _LLM_GUARD["PromptInjection"]
-        PII             = _LLM_GUARD["PII"]
-        TokenLimit      = _LLM_GUARD["TokenLimit"]
-        scan_prompt     = _LLM_GUARD["scan_prompt"]
-
         input_scanners = [
             PromptInjection(threshold=0.75),   # flag if injection confidence > 75%
-            PII(redact=True, allowed_entities=["LOCATION", "DATE_TIME"]),
+            InputBanTopics(
+                topics=["illegal activity", "drug trafficking", "smuggling"],
+                threshold=0.75,
+            ),
             TokenLimit(limit=512),
         ]
 
         sanitised_text, results, is_valid = scan_prompt(input_scanners, text)
 
-        # results is a dict: {scanner_name: (is_valid, risk_score)}
-        for scanner_name, (valid, score) in results.items():
-            if not valid:
+        # results may be numeric scores (0..1) or booleans depending on llm-guard version.
+        # - numeric: score >= 0.75 means threat
+        # - boolean: True means pass / valid, False means threat
+        for scanner_name, score in results.items():
+            if isinstance(score, bool):
+                is_threat = not score
+                risk_score = 1.0 if is_threat else 0.0
+            else:
+                risk_score = float(score)
+                is_threat = risk_score >= 0.75
+
+            if is_threat:
                 return LLMGuardInputResult(
                     is_safe=False,
                     threat_type=scanner_name.lower(),
-                    risk_score=score,
+                    risk_score=risk_score,
                     sanitised_text=sanitised_text,
-                    reason=f"LLM Guard [{scanner_name}] flagged input (score: {score:.2f})",
+                    reason=f"LLM Guard [{scanner_name}] flagged input (score: {risk_score:.2f})",
                 )
 
         return LLMGuardInputResult(
@@ -128,16 +102,15 @@ def scan_input_llm_guard(text: str) -> LLMGuardInputResult:
             sanitised_text=sanitised_text,
             reason="LLM Guard: all input scanners passed",
         )
-
     except Exception as e:
-        # Never let LLM Guard errors block legitimate users
-        print(f"[LLM Guard] ⚠️  Input scan error: {e} — failing open")
+        # Fail-safe behavior: if security scanner is unavailable, block the request
+        # instead of returning 500 from API endpoints.
         return LLMGuardInputResult(
-            is_safe=True,
-            threat_type=None,
-            risk_score=0.0,
+            is_safe=False,
+            threat_type="llm_guard_runtime_error",
+            risk_score=1.0,
             sanitised_text=text,
-            reason=f"LLM Guard scan error (non-fatal): {str(e)}",
+            reason=f"LLM Guard runtime error: {str(e)}",
         )
 
 
@@ -155,19 +128,7 @@ def scan_output_llm_guard(prompt: str, output: str) -> LLMGuardOutputResult:
         prompt: The original user prompt (required by LLM Guard for context)
         output: The agent's response text to validate
     """
-    if not _LLM_GUARD["available"]:
-        print("[LLM Guard] ⚠️  llm-guard not installed — output Layer 2 skipped")
-        return LLMGuardOutputResult(
-            is_safe=True, flags=[], risk_score=0.0,
-            sanitised_text=output,
-            reason="llm-guard not available — regex layer still active",
-        )
-
     try:
-        Sensitive   = _LLM_GUARD["Sensitive"]
-        BanTopics   = _LLM_GUARD["BanTopics"]
-        scan_output = _LLM_GUARD["scan_output"]
-
         output_scanners = [
             Sensitive(redact=True),
             BanTopics(
@@ -183,10 +144,18 @@ def scan_output_llm_guard(prompt: str, output: str) -> LLMGuardOutputResult:
         flags = []
         max_score = 0.0
 
-        for scanner_name, (valid, score) in results.items():
-            if not valid:
+        # results may be numeric scores (0..1) or booleans depending on llm-guard version.
+        for scanner_name, score in results.items():
+            if isinstance(score, bool):
+                is_threat = not score
+                numeric_score = 1.0 if is_threat else 0.0
+            else:
+                numeric_score = float(score)
+                is_threat = numeric_score >= 0.75
+
+            if is_threat:
                 flags.append(scanner_name)
-                max_score = max(max_score, score)
+                max_score = max(max_score, numeric_score)
 
         if flags:
             return LLMGuardOutputResult(
@@ -202,11 +171,12 @@ def scan_output_llm_guard(prompt: str, output: str) -> LLMGuardOutputResult:
             sanitised_text=sanitised_text,
             reason="LLM Guard: all output scanners passed",
         )
-
     except Exception as e:
-        print(f"[LLM Guard] ⚠️  Output scan error: {e} — failing open")
+        # Fail-safe behavior: mark output unsafe when scanner runtime fails.
         return LLMGuardOutputResult(
-            is_safe=True, flags=[], risk_score=0.0,
+            is_safe=False,
+            flags=["llm_guard_runtime_error"],
+            risk_score=1.0,
             sanitised_text=output,
-            reason=f"LLM Guard scan error (non-fatal): {str(e)}",
+            reason=f"LLM Guard runtime error: {str(e)}",
         )

@@ -41,6 +41,9 @@ VALID_AIRLINE_CODES = {
     "TR", "D7", "AK", "FD", "SL", "VZ", "TW", "VJ", "BX", "OD",
 }
 
+# Flight numbers with 5+ digits are not standard IATA patterns and should be flagged.
+INVALID_FLIGHT_NUMBER_LENGTH_PATTERN = r"\b([A-Z]{2})(\d{5,})\b"
+
 # ── Suspicious output patterns ───────────────────────────────
 HALLUCINATION_PATTERNS: list[tuple[str, str, str]] = [
 
@@ -67,12 +70,22 @@ HALLUCINATION_PATTERNS: list[tuple[str, str, str]] = [
 def _check_flight_numbers(text: str) -> list[dict]:
     """
     Extract flight numbers and validate the airline code portion.
-    Flags numbers with unrecognised airline codes as potentially hallucinated.
+    Flags numbers with unrecognised airline codes or invalid digit length as potentially hallucinated.
     """
     flagged = []
+
+    # Non-standard flight numbers with 5+ digits should be flagged as likely hallucinations
+    for match in re.finditer(INVALID_FLIGHT_NUMBER_LENGTH_PATTERN, text, re.IGNORECASE):
+        full = match.group(0)
+        flagged.append({
+            "entity_type": "flight_number",
+            "value": full,
+            "reason": f"Flight number '{full}' has too many digits to be a standard IATA flight number",
+        })
+
     # Match pattern: 2-letter code + 1-4 digits (standard IATA flight number)
-    for match in re.finditer(r"\b([A-Z]{2})(\d{1,4})\b", text):
-        airline_code = match.group(1)
+    for match in re.finditer(r"\b([A-Z]{2})(\d{1,4})\b", text, re.IGNORECASE):
+        airline_code = match.group(1).upper()
         flight_num = match.group(2)
         full = match.group(0)
         if airline_code not in VALID_AIRLINE_CODES:
