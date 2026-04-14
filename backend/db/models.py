@@ -41,6 +41,10 @@ class Plan(Base):
     tool_log     = Column(JSONB, nullable=True)   # list of log strings
     via_debate   = Column(Boolean, default=False) # True if produced by /debate
 
+    # Planner trace — needed by Agent6 (Explainability) when /explain is called lazily
+    planner_decision_trace = Column(JSONB, nullable=True)   # {A: [...], B: [...], C: [...]}
+    chain_of_thought        = Column(Text, nullable=True)   # JSON-stringified trace
+
     # Debate extras
     debate_verdict = Column(JSONB, nullable=True)
     debate_history = Column(JSONB, nullable=True)

@@ -184,6 +184,115 @@ def _compact_explain_result(result: dict) -> dict:
     }
 
 
+def _name_key(value: str) -> str:
+    text = unicodedata.normalize("NFKC", str(value or ""))
+    text = text.replace("\u2019", "'").replace("\u2018", "'").replace("`", "'")
+    text = re.sub(r"[^\w\s]", " ", text, flags=re.UNICODE)
+    text = re.sub(r"_+", " ", text)
+    return re.sub(r"\s+", " ", text.strip()).casefold()
+
+
+def _collect_plan_item_names(itineraries: dict) -> tuple[set[str], set[str], set[str]]:
+    activity_names: set[str] = set()
+    restaurant_names: set[str] = set()
+    hotel_names: set[str] = set()
+
+    for days in (itineraries or {}).values():
+        if not isinstance(days, list):
+            continue
+        for day in days:
+            for item in day.get("items", []) or []:
+                icon = str(item.get("icon") or "")
+                name = str(item.get("name") or "").strip()
+                if not name:
+                    continue
+                if icon == "activity":
+                    activity_names.add(_name_key(name))
+                elif icon == "restaurant":
+                    restaurant_names.add(_name_key(name))
+                elif icon == "hotel":
+                    if name.lower().startswith("checkout from "):
+                        name = name[len("Checkout from "):].strip()
+                    hotel_names.add(_name_key(name))
+
+    return activity_names, restaurant_names, hotel_names
+
+
+def _filter_named_rows(rows: list, allowed_names: set[str]) -> list:
+    filtered: list = []
+    for row in rows or []:
+        if not isinstance(row, dict):
+            continue
+        if _name_key(row.get("name", "")) in allowed_names:
+            filtered.append(row)
+    return filtered
+
+
+def _compact_research_for_plan(result: dict, activity_names: set[str], restaurant_names: set[str]) -> dict:
+    research = result.get("research", {}) or {}
+    if not isinstance(research, dict):
+        return {}
+    compact: dict = {}
+    for key in ("maps_attractions", "ta_attractions"):
+        if key in research:
+            compact[key] = _filter_named_rows(research.get(key, []), activity_names)
+    for key in ("maps_restaurants", "ta_restaurants"):
+        if key in research:
+            compact[key] = _filter_named_rows(research.get(key, []), restaurant_names)
+    return compact
+
+
+def _compact_inventory_for_plan(result: dict, activity_names: set[str], restaurant_names: set[str]) -> dict:
+    inventory = result.get("inventory", {}) or {}
+    if not isinstance(inventory, dict):
+        return {}
+    compact: dict = {}
+    if "attractions" in inventory:
+        compact["attractions"] = _filter_named_rows(inventory.get("attractions", []), activity_names)
+    if "restaurants" in inventory:
+        compact["restaurants"] = _filter_named_rows(inventory.get("restaurants", []), restaurant_names)
+    return compact
+
+
+def _compact_plan_result(result: dict, *, include_explain: bool = False) -> dict:
+    itineraries = result.get("itineraries", {}) or {}
+    activity_names, restaurant_names, hotel_names = _collect_plan_item_names(itineraries)
+
+    compact = {
+        "itineraries": itineraries,
+        "option_meta": result.get("option_meta", {}) or {},
+        "validation_report": result.get("validation_report", {}) or {},
+        "planner_decision_trace": result.get("planner_decision_trace", {}) or {},
+        "planner_chain_of_thought": result.get("planner_chain_of_thought", ""),
+        "research": _compact_research_for_plan(result, activity_names, restaurant_names),
+        "inventory": _compact_inventory_for_plan(result, activity_names, restaurant_names),
+        "state": result.get("state", {}) or {},
+        "tool_log": result.get("tool_log", []) or [],
+        "hotel_options": _filter_named_rows(result.get("hotel_options", []) or [], hotel_names),
+    }
+
+    raw_planner_output = result.get("raw_planner_output", {}) or {}
+    planner_mode = str(raw_planner_output.get("planner_mode") or "").strip()
+    if planner_mode:
+        compact["planner_mode"] = planner_mode
+
+    if include_explain:
+        compact.update(
+            {
+                "selected_option": result.get("selected_option", ""),
+                "explain_option": result.get("explain_option", ""),
+                "summary": result.get("summary", {}) or {},
+                "item_explanations": result.get("item_explanations", {}) or {},
+                "evidence": result.get("evidence", {}) or {},
+                "agent_steps": result.get("agent_steps", []) or [],
+                "explainability_chain_of_thought": result.get("explainability_chain_of_thought", ""),
+                "combined_chain_of_thought": result.get("combined_chain_of_thought", ""),
+            }
+        )
+
+    return compact
+
+
 def _get_tools(agent_name: str) -> dict:
     from agents.agent_tools import get_tools_for_agent
 
@@ -483,6 +592,10 @@ def main() -> None:
         out_path = project_root / f"{prefix}_{ts}.json"
         if mode == "explain-from-plan":
             save_result = _compact_explain_result(result)
+        elif mode == "full":
+            save_result = _compact_plan_result(result, include_explain=True)
+        elif mode in {"pipeline", "plan-from-research"}:
+            save_result = _compact_plan_result(result, include_explain=False)
         else:
             save_result = {k: v for k, v in result.items() if not k.startswith("_")}
         with open(out_path, "w", encoding="utf-8") as f:

@@ -1,9 +1,11 @@
 """
-backend/routers/planner.py — Kathy's planner endpoints
+backend/routers/planner.py — Agent3 (Planner) endpoints
 
-POST /planner/generate   → Agent3 (Planner) only — fast, returns itineraries immediately
-POST /planner/explain    → Agent6 (Explainability) — call lazily from My Trip page
-GET  /planner/health     → health check
+POST /planner/run     → planner_agent_1(state)
+                        Runs Agent2 internally, then generates 3 itinerary options
+POST /planner/revise  → revise_itinerary_1(state, critique, current_result)
+                        Accepts Agent4 critique and returns a revised plan (1 LLM call)
+GET  /planner/health
 """
 
 import uuid
@@ -11,7 +13,8 @@ from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from typing import Optional
 from sqlalchemy.orm import Session
-from backend.agent_client import call_planner, call_planner_revise, call_explainability, run_debate_loop
+
+from backend.agent_client import call_planner, call_planner_revise
 from backend.db.database import engine, get_db
 from backend.db.models import Base
 from backend.db import crud
@@ -22,84 +25,65 @@ router = APIRouter()
 Base.metadata.create_all(bind=engine)
 
 
-# ── Request / Response schemas ────────────────────────────────
+# ── Request / Response schemas ─────────────────────────────────
 
-class GenerateRequest(BaseModel):
-    origin:              str
-    destination:         str
-    dates:               str
-    duration:            str
-    budget:              str
-    preferences:         str
-    outbound_time_pref:  Optional[str] = None
-    return_time_pref:    Optional[str] = None
-    user_profile:        Optional[dict] = None
-    search_queries:      Optional[list[dict]] = None
-    hard_constraints:    Optional[dict] = None
-    soft_preferences:    Optional[dict] = None
+class PlannerRequest(BaseModel):
+    """
+    Input to Agent3 (Planner).
+    Matches the output format from Agent1 (Intent Profile) / Agent2 (Research).
+    """
+    origin:             str
+    destination:        str
+    dates:              str             # e.g. "2026-05-01 to 2026-05-07"
+    duration:           str             # e.g. "7 days"
+    budget:             str
+    preferences:        str
+    outbound_time_pref: Optional[str]        = None
+    return_time_pref:   Optional[str]        = None
+    user_profile:       Optional[dict]       = None
+    search_queries:     Optional[list[dict]] = None  # RAG queries from Agent1
+    hard_constraints:   Optional[dict]       = None
+    soft_preferences:   Optional[dict]       = None
 
 
-class GenerateResponse(BaseModel):
-    plan_id:                  str    # pass back to /explain
-    itineraries:              dict
-    option_meta:              dict
-    agent_steps:              list
-    tool_log:                 list
-    flight_options_outbound:  list
-    flight_options_return:    list
-    hotel_options:            list
+class PlannerResponse(BaseModel):
+    """
+    Output from Agent3 (Planner).
+    Feed plan_id into Agent6 (Explainability) via POST /explainability/run.
+    Feed itineraries into Agent4 (Debate & Critique) directly.
+    """
+    plan_id:                 str    # store this — pass to /explainability/run
+    itineraries:             dict   # {"A": [...], "B": [...], "C": [...]}
+    option_meta:             dict   # label, style, budget per option
+    tool_log:                list
+    flight_options_outbound: list
+    flight_options_return:   list
+    hotel_options:           list
 
 
 class ReviseRequest(BaseModel):
-    plan_id:   str
-    critique:  str     # critique_summary from Agent4
+    """
+    Input to Agent3 revision mode.
+    Agent4 (Debate & Critique) passes its critique here after reviewing the plan.
+    """
+    plan_id:  str   # from PlannerResponse — identifies the plan to revise
+    critique: str   # critique_summary string from Agent4
 
 
-class DebateRequest(BaseModel):
-    origin:              str
-    destination:         str
-    dates:               str
-    duration:            str
-    budget:              str
-    preferences:         str
-    outbound_time_pref:  Optional[str] = None
-    return_time_pref:    Optional[str] = None
-    user_profile:        Optional[dict] = None
-    search_queries:      Optional[list[dict]] = None
-    hard_constraints:    Optional[dict] = None
-    soft_preferences:    Optional[dict] = None
+# ── Endpoints ──────────────────────────────────────────────────
 
+@router.post("/run", response_model=PlannerResponse)
+def run_planner(request: PlannerRequest, db: Session = Depends(get_db)):
+    """
+    Agent3 (planner_agent_1) — generates 3 itinerary options.
 
-class DebateResponse(BaseModel):
-    plan_id:                  str
-    itineraries:              dict
-    option_meta:              dict
-    tool_log:                 list
-    flight_options_outbound:  list
-    flight_options_return:    list
-    hotel_options:            list
-    debate_verdict:           Optional[dict] = None
-    debate_history:           Optional[list] = None
-    # Agent6 explainability
-    explain_data:             Optional[dict] = None
-    chain_of_thought:         Optional[str]  = None
+    Input  : Travel info + user profile + preferences  (from Agent1 / Agent2)
+    Output : 3 itinerary options A/B/C + flights + hotels  (for Agent4 / Agent6)
 
-
-class ExplainRequest(BaseModel):
-    plan_id: str
-
-
-class ExplainResponse(BaseModel):
-    explain_data:     dict
-    chain_of_thought: str
-    agent_steps:      list
-
-
-# ── Endpoints ─────────────────────────────────────────────────
-
-@router.post("/generate", response_model=GenerateResponse)
-def generate_plan(request: GenerateRequest, db: Session = Depends(get_db)):
-    """Agent3 only — returns 3 itinerary options quickly (no Agent6)."""
+    Internally calls Agent2 (research_agent_1) to fetch live data,
+    then schedules the itinerary deterministically with LLM seed selection.
+    The plan is saved to DB under plan_id — pass this to /explainability/run.
+    """
     state = {
         "origin":             request.origin,
         "destination":        request.destination,
@@ -108,102 +92,23 @@ def generate_plan(request: GenerateRequest, db: Session = Depends(get_db)):
         "budget":             request.budget,
         "preferences":        request.preferences,
         "outbound_time_pref": request.outbound_time_pref or "",
-        "return_time_pref":   request.return_time_pref or "",
-        "user_profile":       request.user_profile or {},
-        "search_queries":     request.search_queries or [],
-        "hard_constraints":   request.hard_constraints or {},
-        "soft_preferences":   request.soft_preferences or {},
+        "return_time_pref":   request.return_time_pref   or "",
+        "user_profile":       request.user_profile       or {},
+        "search_queries":     request.search_queries     or [],
+        "hard_constraints":   request.hard_constraints   or {},
+        "soft_preferences":   request.soft_preferences   or {},
     }
 
-    print(f"[Backend] Calling Agent3 (Planner): {request.origin} → {request.destination} | {request.dates}")
-    planner_result = call_planner(state)
-
-    if "error" in planner_result:
-        raise HTTPException(status_code=500, detail=f"Planner error: {planner_result['error']}")
-
-    plan_id = str(uuid.uuid4())[:8]
-    crud.save_plan(db, plan_id, state, planner_result, via_debate=False)
-
-    return GenerateResponse(
-        plan_id                 = plan_id,
-        itineraries             = planner_result.get("itineraries",             {}),
-        option_meta             = planner_result.get("option_meta",             {}),
-        agent_steps             = planner_result.get("tool_log",                [])[:3],
-        tool_log                = planner_result.get("tool_log",                []),
-        flight_options_outbound = planner_result.get("flight_options_outbound", []),
-        flight_options_return   = planner_result.get("flight_options_return",   []),
-        hotel_options           = planner_result.get("hotel_options",           []),
-    )
-
-
-@router.post("/revise", response_model=GenerateResponse)
-def revise_plan(request: ReviseRequest, db: Session = Depends(get_db)):
-    """Agent3 revision mode — receives Agent4 critique, revises using cached inventory (1 LLM call)."""
-    cached = crud.load_plan(db, request.plan_id)
-    if not cached:
-        raise HTTPException(status_code=404, detail=f"Plan {request.plan_id} not found. Generate a plan first.")
-
-    state_keys = ("origin", "destination", "dates", "duration", "budget",
-                  "preferences", "outbound_time_pref", "return_time_pref", "user_profile",
-                  "search_queries", "hard_constraints", "soft_preferences")
-    state        = {k: cached[k] for k in state_keys if k in cached}
-    current_result = {k: cached[k] for k in ("itineraries", "option_meta", "tool_log",
-                      "flight_options_outbound", "flight_options_return", "hotel_options") if k in cached}
-
-    print(f"[Backend] Calling Agent3 revision for plan {request.plan_id} ({len(request.critique)} chars critique)")
-    revised = call_planner_revise(state, request.critique, current_result)
-
-    if "error" in revised:
-        raise HTTPException(status_code=500, detail=f"Revision error: {revised['error']}")
-
-    crud.update_plan_result(db, request.plan_id, revised)
-
-    return GenerateResponse(
-        plan_id                 = request.plan_id,
-        itineraries             = revised.get("itineraries",             {}),
-        option_meta             = revised.get("option_meta",             {}),
-        agent_steps             = revised.get("tool_log",                [])[:3],
-        tool_log                = revised.get("tool_log",                []),
-        flight_options_outbound = revised.get("flight_options_outbound", []),
-        flight_options_return   = revised.get("flight_options_return",   []),
-        hotel_options           = revised.get("hotel_options",           []),
-    )
-
-
-@router.post("/debate", response_model=DebateResponse)
-def debate_plan(request: DebateRequest, db: Session = Depends(get_db)):
-    """Agent3 → Agent4 debate loop (up to 3 rounds) → Agent6 explain final output."""
-    state = {
-        "origin":             request.origin,
-        "destination":        request.destination,
-        "dates":              request.dates,
-        "duration":           request.duration,
-        "budget":             request.budget,
-        "preferences":        request.preferences,
-        "outbound_time_pref": request.outbound_time_pref or "",
-        "return_time_pref":   request.return_time_pref or "",
-        "user_profile":       request.user_profile or {},
-        "search_queries":     request.search_queries or [],
-        "hard_constraints":   request.hard_constraints or {},
-        "soft_preferences":   request.soft_preferences or {},
-    }
-
-    print(f"[Backend] Starting debate: {request.origin} → {request.destination} | {request.dates}")
-    result = run_debate_loop(state)
+    print(f"[Agent3] Planner: {request.origin} → {request.destination} | {request.dates}")
+    result = call_planner(state)
 
     if "error" in result:
-        raise HTTPException(status_code=500, detail=f"Debate error: {result['error']}")
+        raise HTTPException(status_code=500, detail=f"Agent3 error: {result['error']}")
 
     plan_id = str(uuid.uuid4())[:8]
-    crud.save_plan(db, plan_id, state, result, via_debate=True)
+    crud.save_plan(db, plan_id, state, result, via_debate=False)
 
-    # Agent6: explain the final itineraries
-    print(f"[Backend] Calling Agent6 (Explainability) on debate result...")
-    full_cached = crud.load_plan(db, plan_id)
-    explain_result = call_explainability(full_cached)
-    crud.save_explain(db, plan_id, explain_result)
-
-    return DebateResponse(
+    return PlannerResponse(
         plan_id                 = plan_id,
         itineraries             = result.get("itineraries",             {}),
         option_meta             = result.get("option_meta",             {}),
@@ -211,31 +116,59 @@ def debate_plan(request: DebateRequest, db: Session = Depends(get_db)):
         flight_options_outbound = result.get("flight_options_outbound", []),
         flight_options_return   = result.get("flight_options_return",   []),
         hotel_options           = result.get("hotel_options",           []),
-        debate_verdict          = result.get("debate_verdict"),
-        debate_history          = result.get("debate_history"),
-        explain_data            = explain_result.get("explain_data",     {}),
-        chain_of_thought        = explain_result.get("chain_of_thought", ""),
     )
 
 
-@router.post("/explain", response_model=ExplainResponse)
-def explain_plan(request: ExplainRequest, db: Session = Depends(get_db)):
-    """Agent6 — runs explainability on a previously generated plan."""
+@router.post("/revise", response_model=PlannerResponse)
+def revise_planner(request: ReviseRequest, db: Session = Depends(get_db)):
+    """
+    Agent3 revision mode (revise_itinerary_1) — revises itineraries based on Agent4 critique.
+
+    Input  : plan_id (from /planner/run) + critique string from Agent4
+    Output : revised itineraries A/B/C (same format as /planner/run)
+
+    Reuses the cached research inventory — only 1 LLM call.
+    Can be called up to 3 times per plan (Agent4 debate loop).
+    """
     cached = crud.load_plan(db, request.plan_id)
     if not cached:
-        raise HTTPException(status_code=404, detail=f"Plan {request.plan_id} not found. Generate a plan first.")
+        raise HTTPException(
+            status_code=404,
+            detail=f"Plan '{request.plan_id}' not found. Call /planner/run first."
+        )
 
-    print(f"[Backend] Calling Agent6 (Explainability) for plan {request.plan_id}...")
-    explain_result = call_explainability(cached)
-    crud.save_explain(db, request.plan_id, explain_result)
+    state_keys = (
+        "origin", "destination", "dates", "duration", "budget", "preferences",
+        "outbound_time_pref", "return_time_pref", "user_profile",
+        "search_queries", "hard_constraints", "soft_preferences",
+    )
+    state = {k: cached[k] for k in state_keys if k in cached}
+    current_result = {
+        k: cached[k]
+        for k in ("itineraries", "option_meta", "tool_log",
+                  "flight_options_outbound", "flight_options_return", "hotel_options")
+        if k in cached
+    }
 
-    return ExplainResponse(
-        explain_data     = explain_result.get("explain_data",     {}),
-        chain_of_thought = explain_result.get("chain_of_thought", ""),
-        agent_steps      = explain_result.get("agent_steps",      []),
+    print(f"[Agent3] Revise plan {request.plan_id} — critique: {len(request.critique)} chars")
+    revised = call_planner_revise(state, request.critique, current_result)
+
+    if "error" in revised:
+        raise HTTPException(status_code=500, detail=f"Agent3 revision error: {revised['error']}")
+
+    crud.update_plan_result(db, request.plan_id, revised)
+
+    return PlannerResponse(
+        plan_id                 = request.plan_id,
+        itineraries             = revised.get("itineraries",             {}),
+        option_meta             = revised.get("option_meta",             {}),
+        tool_log                = revised.get("tool_log",                []),
+        flight_options_outbound = revised.get("flight_options_outbound", []),
+        flight_options_return   = revised.get("flight_options_return",   []),
+        hotel_options           = revised.get("hotel_options",           []),
     )
 
 
 @router.get("/health")
 def health():
-    return {"status": "ok", "router": "planner"}
+    return {"status": "ok", "agent": "Agent3-Planner"}
