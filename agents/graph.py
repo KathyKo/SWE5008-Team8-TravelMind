@@ -3,6 +3,7 @@ from langgraph.graph import StateGraph, START, END
 
 from .nodes import (
     human_node,
+    intent_profile_node,
     orchestrator_node,
     concierge_node,
     booking_node,
@@ -26,6 +27,7 @@ def build_travel_graph():
 
     # 1. Add all nodes
     builder.add_node("human", human_node)
+    builder.add_node("intent_profile", intent_profile_node)
     builder.add_node("orchestrator", orchestrator_node)
     builder.add_node("concierge", concierge_node)
     builder.add_node("booking_agent", booking_node)
@@ -41,9 +43,12 @@ def build_travel_graph():
         check_exit_condition,
         {
             "summarizer": "summarizer",
-            "orchestrator": "orchestrator",
+            "intent_profile": "intent_profile",
         },
     )
+
+    # After intent profile extraction, route to the orchestrator
+    builder.add_edge("intent_profile", "orchestrator")
 
     # From orchestrator, route to the selected specialized agent
     builder.add_conditional_edges(

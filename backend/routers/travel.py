@@ -52,7 +52,9 @@ class PlanRequest(BaseModel):
     budget: Optional[str] = None
     preferences: Optional[str] = None
     duration: Optional[str] = None
-
+    outbound_time_pref: Optional[str] = None
+    return_time_pref: Optional[str] = None
+    user_id: Optional[str] = None
 
 class PlanResponse(BaseModel):
     reply: str
@@ -62,6 +64,7 @@ class PlanResponse(BaseModel):
     hotel_options: Optional[list] = None
     itinerary: Optional[str] = None
     final_itinerary: Optional[str] = None
+    intent_profile_output: Optional[dict] = None
     stage: Optional[str] = None
     is_complete: bool = False
 
@@ -195,6 +198,7 @@ def plan(request: PlanRequest):
             hotel_options=result.get("hotel_options"),
             itinerary=result.get("itinerary"),
             final_itinerary=result.get("final_itinerary"),
+            intent_profile_output=result.get("intent_profile_output"),
             stage=result.get("stage"),
             is_complete=result.get("is_complete", False),
         )

@@ -29,6 +29,15 @@ class State(TypedDict):
     flight_options: Optional[List]
     hotel_options: Optional[List]
 
+    # Intent/Profile extracted by Agent1
+    user_profile: Optional[str]  # derived from preferences, e.g. "diet=vegetarian; interests=culture"
+    travelers: Optional[int]
+    outbound_time_pref: Optional[str]
+    return_time_pref: Optional[str]
+    session_id: Optional[str]
+    intent_profile_output: Optional[dict]
+    user_profile_structured: Optional[dict]
+
     # Booking agent multi-stage state
     stage: Optional[str]           # itinerary_draft | awaiting_selection | reviewing | confirmed
     itinerary: Optional[str]       # drafted itinerary text (written once, never overwritten)

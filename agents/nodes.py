@@ -6,6 +6,7 @@ from . import (
     booking_agent,
     local_guide,
     travel_summarizer,
+    intent_profile,
 )
 from .agent_tools import get_tools_for_agent
 from .state import State
@@ -13,10 +14,17 @@ from .state import State
 
 def human_node(state: State) -> dict:
     """Gets user input and resets state for the next turn."""
+    # For CLI runs, we collect user input interactively.
+    # For API/graph runs (backend), `state.messages` is already populated;
+    # in that case we must NOT block waiting for stdin.
+    messages = state.get("messages", [])
+    if messages:
+        return {"is_complete": False}
+
     user_input = input("\nYou (Traveler): ").strip()
     return {
         "messages": [{"role": "user", "content": user_input}],
-        "is_complete": False
+        "is_complete": False,
     }
 
 
@@ -24,6 +32,11 @@ def orchestrator_node(state: State) -> dict:
     """Calls the orchestrator to decide which agent should speak."""
     print("\n[SYSTEM] Orchestrator is analyzing your request...")
     return travel_orchestrator(state)
+
+def intent_profile_node(state: State) -> dict:
+    """Node for Agent1 Intent Profile."""
+    print("\n[AGENT 1] Intent Profile is extracting travel info and user preferences...")
+    return intent_profile(state)
 
 
 def concierge_node(state: State) -> dict:
@@ -69,7 +82,7 @@ def orchestrator_routing(state: State) -> Literal["concierge", "booking_agent", 
     return state.get("next_agent", "concierge")
 
 
-def check_exit_condition(state: State) -> Literal["summarizer", "orchestrator"]:
+def check_exit_condition(state: State) -> Literal["summarizer", "intent_profile"]:
     """Checks if the user wants to exit or if the process should continue."""
     messages = state.get("messages", [])
     if messages:
@@ -78,4 +91,4 @@ def check_exit_condition(state: State) -> Literal["summarizer", "orchestrator"]:
         words = last_msg.replace(".", "").replace("!", "").replace("?", "").split()
         if "exit" in words or "quit" in words or "done" in words:
             return "summarizer"
-    return "orchestrator"
+    return "intent_profile"
