@@ -1,3 +1,4 @@
+from re import search
 from typing import TypedDict, Optional, Annotated, List, Dict, Any
 import operator
 
@@ -30,6 +31,29 @@ class State(TypedDict):
     # Options gathered by specialized agents
     flight_options: Optional[List]
     hotel_options: Optional[List]
+
+    # Intent/Profile extracted by Agent1
+    user_profile: Optional[str]  # derived from preferences, e.g. "diet=vegetarian; interests=culture"
+    travelers: Optional[int]
+    outbound_time_pref: Optional[str]
+    return_time_pref: Optional[str]
+    session_id: Optional[str]
+    intent_profile_output: Optional[dict]
+    user_profile_structured: Optional[dict]
+
+    # 8-agent orchestration layer artifacts
+    orchestration_stage: Optional[str]
+    input_guard_output: Optional[dict]
+    search_output: Optional[dict]
+    planner_output: Optional[dict]
+    debate_output: Optional[dict]
+    explain_output: Optional[dict]
+    output_guard_result: Optional[dict]
+    final_plan: Optional[dict]
+    composite_score: Optional[float]
+    replan_attempts: Optional[int]
+    max_replan_attempts: Optional[int]
+    approval_threshold: Optional[float]
 
     # Booking agent multi-stage state
     stage: Optional[str]           # itinerary_draft | awaiting_selection | reviewing | confirmed

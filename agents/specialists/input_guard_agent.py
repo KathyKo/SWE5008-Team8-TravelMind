@@ -30,6 +30,7 @@ Design decision (v2):
 """
 
 import os
+import json
 import importlib
 from pathlib import Path
 from typing import Any
@@ -200,9 +201,14 @@ def input_guard_node(state: State) -> dict:
     Reads the latest user message, executes security checks,
     and returns updated state with decision trace.
     """
+    def _log_and_return(payload: dict[str, Any]) -> dict[str, Any]:
+        print("[input_guard_agent] 📤 return_json=")
+        print(json.dumps(payload, ensure_ascii=False, indent=2, default=str))
+        return payload
+
     messages = state.get("messages", [])
     if not messages:
-        return {
+        return _log_and_return({
             "threat_blocked": False,
             "input_guard_decision": _make_decision(
                 action="allow",
@@ -210,7 +216,7 @@ def input_guard_node(state: State) -> dict:
                 confidence=1.0,
                 evidence={"message_count": 0},
             ),
-        }
+        })
 
     last_msg = messages[-1]
     raw_input = last_msg.get("content", "") if isinstance(last_msg, dict) else str(last_msg)
@@ -236,13 +242,13 @@ def input_guard_node(state: State) -> dict:
             user_id,
         )
         print(f"[input_guard_agent] ⛔ BLOCKED — Input length {len(raw_input)} exceeds {MAX_INPUT_LENGTH} characters")
-        return {
+        return _log_and_return({
             "threat_blocked": True,
             "threat_type": "oversized_input",
             "threat_detail": "Input exceeds maximum length policy",
             "input_guard_decision": decision,
             "messages": [{"role": "assistant", "content": BLOCKED_RESPONSE}],
-        }
+        })
 
     # ── Step 2: Sanitise ──────────────────────────────────────
     clean_text = sanitise(raw_input)
@@ -287,13 +293,13 @@ def input_guard_node(state: State) -> dict:
             user_id,
         )
         print(f"[input_guard_agent] ⛔ BLOCKED (Step 4 — Regex): {regex_result.reason}")
-        return {
+        return _log_and_return({
             "threat_blocked": True,
             "threat_type": regex_result.threat_type,
             "threat_detail": regex_result.reason,
             "input_guard_decision": decision,
             "messages": [{"role": "assistant", "content": BLOCKED_RESPONSE}],
-        }
+        })
 
     # ── Step 5: PII scan/redaction ────
     # Detection of PII probes should happen before ML-based injection detection
@@ -319,13 +325,13 @@ def input_guard_node(state: State) -> dict:
                 user_id,
             )
             print(f"[input_guard_agent] ⛔ BLOCKED (Step 5 — PII Probe): High-risk PII detected in input")
-            return {
+            return _log_and_return({
                 "threat_blocked": True,
                 "threat_type": "pii_probe",
                 "threat_detail": "Attempted PII extraction detected in user input",
                 "input_guard_decision": decision,
                 "messages": [{"role": "assistant", "content": BLOCKED_RESPONSE}],
-            }
+            })
 
         if pii_result.has_pii:
             log_event(
@@ -363,13 +369,13 @@ def input_guard_node(state: State) -> dict:
             user_id,
         )
         print(f"[input_guard_agent] ⛔ BLOCKED (Step 6 — LLM Guard): {llm_guard_result.reason}")
-        return {
+        return _log_and_return({
             "threat_blocked": True,
             "threat_type": llm_guard_result.threat_type,
             "threat_detail": llm_guard_result.reason,
             "input_guard_decision": decision,
             "messages": [{"role": "assistant", "content": BLOCKED_RESPONSE}],
-        }
+        })
 
     # Use LLM Guard's sanitised text
     clean_text = llm_guard_result.sanitised_text
@@ -402,13 +408,13 @@ def input_guard_node(state: State) -> dict:
                 user_id,
             )
             print(f"[input_guard_agent] ⛔ BLOCKED (Step 7 — OpenAI Moderation): {moderation_result.reason}")
-            return {
+            return _log_and_return({
                 "threat_blocked": True,
                 "threat_type": "harmful_content",
                 "threat_detail": f"Content violates policy: {', '.join(moderation_result.blocked_categories)}",
                 "input_guard_decision": decision,
                 "messages": [{"role": "assistant", "content": BLOCKED_RESPONSE}],
-            }
+            })
 
     # ── Step 8: Pass through ──────────────────────────────────
     log_event(
@@ -437,14 +443,14 @@ def input_guard_node(state: State) -> dict:
         },
     )
 
-    return {
+    return _log_and_return({
         "threat_blocked": False,
         "threat_type": None,
         "threat_detail": None,
         "input_guard_decision": final_decision,
         "sanitised_input": clean_text,
         "messages": updated_messages,
-    }
+    })
 
 
 def input_guard_routing(state: State) -> str:

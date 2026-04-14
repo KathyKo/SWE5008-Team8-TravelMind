@@ -10,20 +10,14 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
     && rm -rf /var/lib/apt/lists/*
 
 
-# Copy backend requirements and agents requirements
+# Copy backend requirements
 COPY backend/requirements.txt .
-COPY agents/requirements.txt ../agents_requirements.txt
 
-# Install all dependencies
-RUN pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir -r ../agents_requirements.txt
+# Install backend dependencies only
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy backend code
 COPY backend/ .
-
-# Copy agents and tools from project root (needed at runtime)
-COPY agents /app/agents
-COPY tools /app/tools
 
 EXPOSE 8000
 
