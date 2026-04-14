@@ -12,7 +12,7 @@ import math
 import re
 import traceback
 
-from langchain_core.messages import SystemMessage
+from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_openai import ChatOpenAI
 
 from ..llm_config import OPENAI_MODEL
@@ -2024,6 +2024,196 @@ def _meal_duration_minutes(item: dict) -> int:
     return 75
 
 
+def _prepare_seed_candidates(
+    pool: list[dict],
+    profile: dict,
+    preference_model: dict,
+    cluster_radius: float = 5.0,
+    max_candidates: int = 5,
+    discouraged_names: set[str] | None = None,
+) -> list[dict]:
+    """Build a short-list of seed candidates with their cluster contents
+    so the LLM can make an informed thematic choice."""
+    if not pool:
+        return []
+
+    ranked = sorted(
+        pool,
+        key=lambda item: _activity_score(item, profile, preference_model, discouraged_names),
+        reverse=True,
+    )
+
+    seen_seeds: set[str] = set()
+    candidates: list[dict] = []
+
+    for seed in ranked[: max_candidates * 3]:
+        seed_name = _normalized_name(seed)
+        if seed_name in seen_seeds:
+            continue
+        seen_seeds.add(seed_name)
+
+        cluster_members = [
+            item
+            for item in ranked
+            if (
+                item is seed
+                or (
+                    (_haversine_km(
+                        seed.get("lat"), seed.get("lng"),
+                        item.get("lat"), item.get("lng"),
+                    ) or 999)
+                    <= cluster_radius
+                )
+            )
+        ]
+        if len(cluster_members) < 2:
+            continue
+
+        candidates.append({
+            "seed": seed,
+            "name": seed.get("name", ""),
+            "type": str(seed.get("type") or seed.get("category") or ""),
+            "cluster_members": [
+                {
+                    "name": m.get("name", ""),
+                    "type": str(m.get("type") or m.get("category") or ""),
+                }
+                for m in cluster_members[:6]
+                if m is not seed
+            ],
+            "cluster_size": len(cluster_members),
+        })
+        if len(candidates) >= max_candidates:
+            break
+
+    return candidates
+
+
+def _llm_select_seed(
+    candidates: list[dict],
+    day_index: int,
+    option_key: str,
+    profile: dict,
+    preference_model: dict,
+    prior_themes: list[str],
+) -> tuple[dict | None, str, str]:
+    """Ask the LLM to choose the best cluster seed for one day.
+
+    Returns (seed_item_dict, theme_string, reason_string).
+    Falls back to the first candidate on any error.
+    """
+    if not candidates:
+        return None, "mixed sightseeing", "no seed candidates available"
+
+    pref_tags = [
+        token
+        for token, count in sorted(
+            preference_model.get("token_counts", {}).items(),
+            key=lambda x: -x[1],
+        )
+        if count >= 1 and len(token) >= 3
+    ][:8]
+
+    display_candidates = [
+        {
+            "name": c["name"],
+            "type": c["type"],
+            "nearby_attractions": [
+                {"name": m["name"], "type": m["type"]}
+                for m in c["cluster_members"][:5]
+            ],
+        }
+        for c in candidates
+    ]
+
+    prompt_payload = json.dumps(
+        {
+            "task": "select_day_anchor",
+            "day_number": day_index + 2,
+            "option_style": profile.get("style", ""),
+            "user_preferences": pref_tags,
+            "themes_already_used": prior_themes,
+            "candidates": display_candidates,
+        },
+        ensure_ascii=False,
+    )
+
+    system_prompt = (
+        "You select which attraction should anchor one day of a travel itinerary. "
+        "Pick the candidate whose cluster of nearby attractions forms the most "
+        "coherent thematic day for the stated user preferences. "
+        "Prefer themes not already used on prior days when possible. "
+        "Return ONLY valid JSON with exactly three keys:\n"
+        '  "selected_name": the exact name string of the chosen candidate,\n'
+        '  "theme": a 2-4 word day theme (e.g. "zen gardens & temples"),\n'
+        '  "reason": one sentence explaining why this cluster makes a good day.\n'
+    )
+
+    try:
+        response = _llm().invoke(
+            [
+                SystemMessage(content=system_prompt),
+                HumanMessage(content=prompt_payload),
+            ],
+            response_format={"type": "json_object"},
+        )
+        parsed = json.loads(response.content)
+        selected_name = str(parsed.get("selected_name", "")).strip()
+        theme = str(parsed.get("theme", "")).strip() or "mixed sightseeing"
+        reason = str(parsed.get("reason", "")).strip() or ""
+
+        for c in candidates:
+            if c["name"].strip().lower() == selected_name.lower():
+                return c["seed"], theme, reason
+
+        for c in candidates:
+            if (
+                selected_name.lower() in c["name"].lower()
+                or c["name"].lower() in selected_name.lower()
+            ):
+                return c["seed"], theme, reason
+
+        return (
+            candidates[0]["seed"],
+            theme,
+            f"LLM selected '{selected_name}' which did not match any candidate name; "
+            f"using top-ranked candidate '{candidates[0]['name']}' instead",
+        )
+    except Exception as exc:
+        return (
+            candidates[0]["seed"],
+            "mixed sightseeing",
+            f"LLM seed selection failed ({exc}); deterministic fallback",
+        )
+
+
+def _meal_trace(
+    restaurant: dict | None,
+    meal_kind: str,
+    preference_model: dict,
+) -> dict:
+    """Build a decision-trace entry for one meal pick."""
+    if not restaurant:
+        return {"meal_kind": meal_kind, "picked": None}
+
+    cuisine = str(
+        restaurant.get("type") or restaurant.get("category") or "restaurant"
+    ).strip()
+    blob = _text_blob(restaurant)
+    matched = [
+        token
+        for token, count in preference_model.get("token_counts", {}).items()
+        if count >= 1 and len(token) >= 3 and token in blob
+    ][:4]
+
+    return {
+        "meal_kind": meal_kind,
+        "name": restaurant.get("name", ""),
+        "cuisine": cuisine,
+        "matched_preferences": matched,
+    }
+
+
 def _choose_cluster_activities(
     attractions: list[dict],
     used_names: set[str],
@@ -2033,6 +2223,7 @@ def _choose_cluster_activities(
     light_only: bool = False,
     day_index: int = 0,
     discouraged_names: set[str] | None = None,
+    forced_seed: dict | None = None,
 ) -> list[dict]:
     available = [
         item for item in attractions
@@ -2042,7 +2233,11 @@ def _choose_cluster_activities(
         return []
     broad_available = list(available)
 
-    strong_preference = preference_model["families"].get("culture", 0) + preference_model["families"].get("food", 0) >= 3
+    strong_preference = (
+        preference_model["families"].get("culture", 0)
+        + preference_model["families"].get("food", 0)
+        >= 3
+    )
 
     if light_only:
         def _light_bonus(item: dict) -> float:
@@ -2054,7 +2249,7 @@ def _choose_cluster_activities(
                 bonus -= 4
             return bonus
     else:
-        _light_bonus = lambda item: 0
+        _light_bonus = lambda item: 0  # noqa: E731
 
     scored_available = [
         (
@@ -2069,6 +2264,7 @@ def _choose_cluster_activities(
     filtered = [item for item, _, relevance in scored_available if relevance >= relevance_cutoff]
     if filtered:
         available = filtered
+
     if discouraged_names:
         fresh_quota = max(0, int(profile.get("fresh_activity_quota", 0)))
         novel_available = [item for item in available if _normalized_name(item) not in discouraged_names]
@@ -2096,86 +2292,92 @@ def _choose_cluster_activities(
         key=lambda item: _activity_score(item, profile, preference_model, discouraged_names) + _light_bonus(item),
         reverse=True,
     )
-    selection_mode = str(profile.get("selection_mode") or "coverage")
-    seed_offsets = profile.get("seed_offsets") or [0]
-    seed_index = min(seed_offsets[day_index % len(seed_offsets)], len(ranked) - 1)
-    seed = ranked[seed_index]
-    if selection_mode == "immersion":
-        cluster_radius = float(profile.get("cluster_radius_km", 5.0))
-        if discouraged_names:
-            novel_ranked = [item for item in ranked if _normalized_name(item) not in discouraged_names]
-            seed_candidates = novel_ranked[: min(len(novel_ranked), 12)] + ranked[: min(len(ranked), 12)]
-            deduped_candidates: list[dict] = []
-            seen_candidates: set[str] = set()
-            for item in seed_candidates:
-                normalized = _normalized_name(item)
-                if normalized and normalized not in seen_candidates:
-                    seen_candidates.add(normalized)
-                    deduped_candidates.append(item)
-            seed_candidates = deduped_candidates
-        else:
-            seed_candidates = ranked[: min(len(ranked), 12)]
-        best_cluster: list[dict] | None = None
-        best_seed = seed
-        best_cluster_score = float("-inf")
-        min_cluster_size = max(2, min(count, 3))
-        for seed_candidate in seed_candidates:
-            cluster_items = [
-                item
-                for item in ranked
-                if (
-                    item is seed_candidate
-                    or (_haversine_km(seed_candidate.get("lat"), seed_candidate.get("lng"), item.get("lat"), item.get("lng")) or 999)
-                    <= cluster_radius
-                )
-            ]
-            if len(cluster_items) < min_cluster_size:
-                continue
-            cluster_ranked = sorted(
-                cluster_items,
-                key=lambda item: _activity_score(item, profile, preference_model, discouraged_names) + _light_bonus(item),
-                reverse=True,
-            )
+
+    if forced_seed is not None:
+        seed = forced_seed
+    else:
+        selection_mode = str(profile.get("selection_mode") or "coverage")
+        seed_offsets = profile.get("seed_offsets") or [0]
+        seed_index = min(seed_offsets[day_index % len(seed_offsets)], len(ranked) - 1)
+        seed = ranked[seed_index]
+
+        if selection_mode == "immersion":
+            cluster_radius = float(profile.get("cluster_radius_km", 5.0))
             if discouraged_names:
-                novel_cluster_items = [
-                    item for item in cluster_ranked if _normalized_name(item) not in discouraged_names
-                ]
-                top_cluster_items = novel_cluster_items[: min(count, 2)]
-                for item in cluster_ranked:
-                    if item not in top_cluster_items:
-                        top_cluster_items.append(item)
-                    if len(top_cluster_items) >= max(count, min_cluster_size):
-                        break
+                novel_ranked = [item for item in ranked if _normalized_name(item) not in discouraged_names]
+                seed_candidates = novel_ranked[: min(len(novel_ranked), 12)] + ranked[: min(len(ranked), 12)]
+                deduped_candidates: list[dict] = []
+                seen_candidates: set[str] = set()
+                for item in seed_candidates:
+                    normalized = _normalized_name(item)
+                    if normalized and normalized not in seen_candidates:
+                        seen_candidates.add(normalized)
+                        deduped_candidates.append(item)
+                seed_candidates = deduped_candidates
             else:
-                top_cluster_items = cluster_ranked[: max(count, min_cluster_size)]
-            fresh_count = sum(
-                1 for item in top_cluster_items
-                if not discouraged_names or _normalized_name(item) not in discouraged_names
-            )
-            repeated_count = len(top_cluster_items) - fresh_count
-            avg_seed_distance = (
-                sum(
-                    (_haversine_km(seed_candidate.get("lat"), seed_candidate.get("lng"), item.get("lat"), item.get("lng")) or cluster_radius)
-                    for item in top_cluster_items
-                    if item is not seed_candidate
-                ) / max(1, len(top_cluster_items) - 1)
-            )
-            cluster_score = (
-                sum(
-                    _activity_score(item, profile, preference_model, discouraged_names) + _light_bonus(item)
-                    for item in top_cluster_items[:count]
+                seed_candidates = ranked[: min(len(ranked), 12)]
+
+            best_cluster: list[dict] | None = None
+            best_seed = seed
+            best_cluster_score = float("-inf")
+            min_cluster_size = max(2, min(count, 3))
+            for seed_candidate in seed_candidates:
+                cluster_items = [
+                    item
+                    for item in ranked
+                    if (
+                        item is seed_candidate
+                        or ((_haversine_km(seed_candidate.get("lat"), seed_candidate.get("lng"), item.get("lat"), item.get("lng")) or 999) <= cluster_radius)
+                    )
+                ]
+                if len(cluster_items) < min_cluster_size:
+                    continue
+                cluster_ranked = sorted(
+                    cluster_items,
+                    key=lambda item: _activity_score(item, profile, preference_model, discouraged_names) + _light_bonus(item),
+                    reverse=True,
                 )
-                + fresh_count * 12.0
-                - repeated_count * 28.0
-                - avg_seed_distance * 3.8
-            )
-            if cluster_score > best_cluster_score:
-                best_cluster_score = cluster_score
-                best_cluster = top_cluster_items
-                best_seed = seed_candidate
-        if best_cluster:
-            available = best_cluster
-            seed = best_seed
+                if discouraged_names:
+                    novel_cluster_items = [
+                        item for item in cluster_ranked if _normalized_name(item) not in discouraged_names
+                    ]
+                    top_cluster_items = novel_cluster_items[: min(count, 2)]
+                    for item in cluster_ranked:
+                        if item not in top_cluster_items:
+                            top_cluster_items.append(item)
+                        if len(top_cluster_items) >= max(count, min_cluster_size):
+                            break
+                else:
+                    top_cluster_items = cluster_ranked[: max(count, min_cluster_size)]
+                fresh_count = sum(
+                    1 for item in top_cluster_items
+                    if not discouraged_names or _normalized_name(item) not in discouraged_names
+                )
+                repeated_count = len(top_cluster_items) - fresh_count
+                avg_seed_distance = (
+                    sum(
+                        (_haversine_km(seed_candidate.get("lat"), seed_candidate.get("lng"), item.get("lat"), item.get("lng")) or cluster_radius)
+                        for item in top_cluster_items
+                        if item is not seed_candidate
+                    ) / max(1, len(top_cluster_items) - 1)
+                )
+                cluster_score = (
+                    sum(
+                        _activity_score(item, profile, preference_model, discouraged_names) + _light_bonus(item)
+                        for item in top_cluster_items[:count]
+                    )
+                    + fresh_count * 12.0
+                    - repeated_count * 28.0
+                    - avg_seed_distance * 3.8
+                )
+                if cluster_score > best_cluster_score:
+                    best_cluster_score = cluster_score
+                    best_cluster = top_cluster_items
+                    best_seed = seed_candidate
+            if best_cluster:
+                available = best_cluster
+                seed = best_seed
+
     selected = [seed]
     remaining = [item for item in available if item is not seed]
     while len(selected) < count and remaining:
@@ -2195,6 +2397,7 @@ def _choose_cluster_activities(
         )
         selected.append(candidate)
         remaining.remove(candidate)
+
     if len(selected) < count:
         fallback_pool = [item for item in broad_available if item not in selected]
         while len(selected) < count and fallback_pool:
@@ -2210,6 +2413,7 @@ def _choose_cluster_activities(
             )
             selected.append(candidate)
             fallback_pool.remove(candidate)
+
     if discouraged_names:
         fresh_quota = max(0, int(profile.get("fresh_activity_quota", 0)))
         fresh_selected = [item for item in selected if _normalized_name(item) not in discouraged_names]
@@ -2236,6 +2440,7 @@ def _choose_cluster_activities(
                 )
                 selected[worst_idx] = fresh_candidates.pop(0)
                 fresh_selected = [item for item in selected if _normalized_name(item) not in discouraged_names]
+
     for item in selected:
         used_names.add(item.get("name", "").lower().strip())
     return selected
@@ -2571,10 +2776,11 @@ def _build_immersion_option_schedule(
     discouraged_activities: set[str] | None = None,
     discouraged_restaurants: set[str] | None = None,
     discouraged_activity_centroids: list[tuple[float, float]] | None = None,
-) -> tuple[list, dict, list[tuple[float, float]]]:
+) -> tuple[list, dict, list[tuple[float, float]], list[dict]]:
     used_place_names: set[str] = set()
     used_cluster_seeds: set[str] = set()
     day_activity_centroids: list[tuple[float, float]] = []
+    day_decisions: list[dict] = []
     allow_global_fallback = str(profile.get("meal_role") or "") == "highlight"
     days: list[dict] = []
     stats = {
@@ -2606,8 +2812,20 @@ def _build_immersion_option_schedule(
             ),
         }
     )
+    day_decisions.append({
+        "day": "Day 1",
+        "day_type": "arrival",
+        "theme": "arrival evening",
+        "seed_name": None,
+        "seed_reason": "arrival day uses a fixed light-evening template",
+        "activities": [],
+        "lunch": None,
+        "dinner": None,
+    })
 
     middle_days = max(duration_days - 2, 0)
+    cluster_radius = float(profile.get("cluster_radius_km", 5.0))
+
     for idx in range(middle_days):
         service_date = _service_date(trip_start_date, idx + 1)
         remaining_middle_days = middle_days - idx
@@ -2635,6 +2853,11 @@ def _build_immersion_option_schedule(
         centroid_bias = list(discouraged_activity_centroids or []) + day_activity_centroids
         probe_profile = {**profile, "selection_mode": "coverage", "fresh_activity_quota": 0, "fresh_activity_bonus": 0}
 
+        prior_themes = [d["theme"] for d in day_decisions if d.get("theme")]
+        selected_seed: dict | None = None
+        day_theme = "mixed sightseeing"
+        seed_reason = ""
+
         for source_items, source_discouraged in source_variants:
             if len(source_items) < desired_count:
                 continue
@@ -2651,6 +2874,25 @@ def _build_immersion_option_schedule(
             )
             if not day_pool:
                 continue
+
+            seed_candidates = _prepare_seed_candidates(
+                day_pool,
+                profile,
+                preference_model,
+                cluster_radius=cluster_radius,
+                max_candidates=5,
+                discouraged_names=source_discouraged,
+            )
+            if seed_candidates:
+                selected_seed, day_theme, seed_reason = _llm_select_seed(
+                    seed_candidates,
+                    day_index=idx,
+                    option_key=option_key,
+                    profile=profile,
+                    preference_model=preference_model,
+                    prior_themes=prior_themes,
+                )
+
             probe_used_names = set(used_place_names)
             picked = _choose_cluster_activities(
                 day_pool,
@@ -2660,6 +2902,7 @@ def _build_immersion_option_schedule(
                 count=desired_count,
                 day_index=idx,
                 discouraged_names=source_discouraged,
+                forced_seed=selected_seed,
             )
             if len(picked) >= int(profile.get("min_activity_count", 2)):
                 activities = picked
@@ -2687,6 +2930,7 @@ def _build_immersion_option_schedule(
                 count=desired_count,
                 day_index=idx,
                 discouraged_names=discouraged_activities,
+                forced_seed=selected_seed,
             )
 
         blocked_place_names = {_normalized_name(item) for item in activities if _normalized_name(item)}
@@ -2861,6 +3105,23 @@ def _build_immersion_option_schedule(
                     used_place_names.add(normalized)
         days.append({"day": f"Day {idx + 2}", "items": items})
 
+        day_decisions.append({
+            "day": f"Day {idx + 2}",
+            "day_type": "middle",
+            "theme": day_theme,
+            "seed_name": selected_seed.get("name") if selected_seed else None,
+            "seed_reason": seed_reason,
+            "activities": [
+                {
+                    "name": a.get("name", ""),
+                    "type": str(a.get("type") or a.get("category") or ""),
+                }
+                for a in activities
+            ],
+            "lunch": _meal_trace(lunch, "lunch", preference_model),
+            "dinner": _meal_trace(dinner, "dinner", preference_model),
+        })
+
     days.append(
         {
             "day": f"Day {duration_days}",
@@ -2879,6 +3140,17 @@ def _build_immersion_option_schedule(
             ),
         }
     )
+    day_decisions.append({
+        "day": f"Day {duration_days}",
+        "day_type": "departure",
+        "theme": "departure day",
+        "seed_name": None,
+        "seed_reason": "departure day uses checkout + last visit + airport template",
+        "activities": [],
+        "lunch": None,
+        "dinner": None,
+    })
+
     seen_place_names: set[str] = set()
     for day in days:
         for item in day.get("items", []):
@@ -2890,7 +3162,7 @@ def _build_immersion_option_schedule(
                     stats["duplicate_items"] += 1
                 else:
                     seen_place_names.add(name)
-    return days, stats, day_activity_centroids
+    return days, stats, day_activity_centroids, day_decisions
 
 
 def _pick_restaurant_for_anchor(
@@ -3815,10 +4087,11 @@ def _build_option_schedule(
     discouraged_activities: set[str] | None = None,
     discouraged_restaurants: set[str] | None = None,
     discouraged_activity_centroids: list[tuple[float, float]] | None = None,
-) -> tuple[list, dict, list[tuple[float, float]]]:
+) -> tuple[list, dict, list[tuple[float, float]], list[dict]]:
     used_place_names: set[str] = set()
     used_cluster_seeds: set[str] = set()
     day_activity_centroids: list[tuple[float, float]] = []
+    day_decisions: list[dict] = []
     allow_global_fallback = str(profile.get("meal_role") or "") == "highlight"
     days: list[dict] = []
     stats = {
@@ -3850,8 +4123,20 @@ def _build_option_schedule(
             ),
         }
     )
+    day_decisions.append({
+        "day": "Day 1",
+        "day_type": "arrival",
+        "theme": "arrival evening",
+        "seed_name": None,
+        "seed_reason": "arrival day uses a fixed light-evening template",
+        "activities": [],
+        "lunch": None,
+        "dinner": None,
+    })
 
     middle_days = max(duration_days - 2, 0)
+    cluster_radius = float(profile.get("cluster_radius_km", 5.0))
+
     for idx in range(middle_days):
         minimum_activity_count = int(profile.get("min_activity_count", 2))
         remaining_middle_days = middle_days - idx
@@ -3864,6 +4149,7 @@ def _build_option_schedule(
         )
         if len(compact_attractions) >= minimum_activity_count:
             activity_count = max(minimum_activity_count, activity_count)
+
         day_activity_pool = _build_day_activity_pool(
             compact_attractions,
             used_place_names,
@@ -3875,7 +4161,33 @@ def _build_option_schedule(
             used_cluster_seeds=used_cluster_seeds,
             discouraged_centroids=discouraged_activity_centroids,
         )
-        activity_profile = profile if str(profile.get("selection_mode") or "coverage") != "immersion" else {**profile, "selection_mode": "coverage"}
+
+        prior_themes = [d["theme"] for d in day_decisions if d.get("theme")]
+        seed_candidates = _prepare_seed_candidates(
+            day_activity_pool or compact_attractions,
+            profile,
+            preference_model,
+            cluster_radius=cluster_radius,
+            max_candidates=5,
+            discouraged_names=discouraged_activities,
+        )
+        if seed_candidates:
+            selected_seed, day_theme, seed_reason = _llm_select_seed(
+                seed_candidates,
+                day_index=idx,
+                option_key=option_key,
+                profile=profile,
+                preference_model=preference_model,
+                prior_themes=prior_themes,
+            )
+        else:
+            selected_seed, day_theme, seed_reason = None, "mixed sightseeing", "pool too small for seed selection"
+
+        activity_profile = (
+            profile
+            if str(profile.get("selection_mode") or "coverage") != "immersion"
+            else {**profile, "selection_mode": "coverage"}
+        )
         activities = _choose_cluster_activities(
             day_activity_pool or compact_attractions,
             used_place_names,
@@ -3884,6 +4196,7 @@ def _build_option_schedule(
             count=activity_count,
             day_index=idx,
             discouraged_names=discouraged_activities,
+            forced_seed=selected_seed,
         )
         blocked_place_names = {_normalized_name(item) for item in activities if _normalized_name(item)}
         lunch = _pick_mandatory_meal(
@@ -3959,11 +4272,7 @@ def _build_option_schedule(
             )
             if not has_lunch:
                 _append_missing_meal(
-                    items,
-                    option_restaurants,
-                    used_place_names,
-                    profile,
-                    preference_model,
+                    items, option_restaurants, used_place_names, profile, preference_model,
                     meal_kind="lunch",
                     service_date=_service_date(trip_start_date, idx + 1),
                     discouraged_restaurants=discouraged_restaurants,
@@ -3974,22 +4283,14 @@ def _build_option_schedule(
                     for item in items
                 ) and fallback_restaurants and fallback_restaurants is not option_restaurants:
                     _append_missing_meal(
-                        items,
-                        fallback_restaurants,
-                        used_place_names,
-                        profile,
-                        preference_model,
+                        items, fallback_restaurants, used_place_names, profile, preference_model,
                         meal_kind="lunch",
                         service_date=_service_date(trip_start_date, idx + 1),
                         discouraged_restaurants=discouraged_restaurants,
                     )
             if not has_dinner:
                 _append_missing_meal(
-                    items,
-                    option_restaurants,
-                    used_place_names,
-                    profile,
-                    preference_model,
+                    items, option_restaurants, used_place_names, profile, preference_model,
                     meal_kind="dinner",
                     service_date=_service_date(trip_start_date, idx + 1),
                     discouraged_restaurants=discouraged_restaurants,
@@ -4000,11 +4301,7 @@ def _build_option_schedule(
                     for item in items
                 ) and fallback_restaurants and fallback_restaurants is not option_restaurants:
                     _append_missing_meal(
-                        items,
-                        fallback_restaurants,
-                        used_place_names,
-                        profile,
-                        preference_model,
+                        items, fallback_restaurants, used_place_names, profile, preference_model,
                         meal_kind="dinner",
                         service_date=_service_date(trip_start_date, idx + 1),
                         discouraged_restaurants=discouraged_restaurants,
@@ -4027,6 +4324,23 @@ def _build_option_schedule(
                     used_place_names.add(normalized)
         days.append({"day": f"Day {idx + 2}", "items": items})
 
+        day_decisions.append({
+            "day": f"Day {idx + 2}",
+            "day_type": "middle",
+            "theme": day_theme,
+            "seed_name": selected_seed.get("name") if selected_seed else None,
+            "seed_reason": seed_reason,
+            "activities": [
+                {
+                    "name": a.get("name", ""),
+                    "type": str(a.get("type") or a.get("category") or ""),
+                }
+                for a in activities
+            ],
+            "lunch": _meal_trace(lunch, "lunch", preference_model),
+            "dinner": _meal_trace(dinner, "dinner", preference_model),
+        })
+
     days.append(
         {
             "day": f"Day {duration_days}",
@@ -4045,6 +4359,17 @@ def _build_option_schedule(
             ),
         }
     )
+    day_decisions.append({
+        "day": f"Day {duration_days}",
+        "day_type": "departure",
+        "theme": "departure day",
+        "seed_name": None,
+        "seed_reason": "departure day uses checkout + last visit + airport template",
+        "activities": [],
+        "lunch": None,
+        "dinner": None,
+    })
+
     seen_place_names: set[str] = set()
     for day in days:
         for item in day.get("items", []):
@@ -4057,7 +4382,7 @@ def _build_option_schedule(
                 else:
                     seen_place_names.add(name)
     stats["route_warnings"] = []
-    return days, stats, day_activity_centroids
+    return days, stats, day_activity_centroids, day_decisions
 
 
 # Main route-first scheduler used by planner_from_research_1().
@@ -4070,7 +4395,7 @@ def _build_deterministic_plan(
     duration_days: int,
     preference_model: dict,
     trip_start_date: date | None = None,
-) -> tuple[dict, dict, dict, dict, str]:
+) -> tuple[dict, dict, dict, dict, dict, dict]:
     compact_attractions = [item for item in compact_attractions if _is_normal_activity_candidate(item)]
     compact_restaurants = [item for item in compact_restaurants if _is_normal_restaurant_candidate(item)]
     outbound_flight = _pick_outbound_flight(compact_flights_out)
@@ -4087,6 +4412,7 @@ def _build_deterministic_plan(
     normalized_itineraries: dict = {}
     option_meta: dict = {}
     validation_report: dict = {}
+    planner_decision_trace: dict = {}
     prior_option_activity_names: set[str] = set()
     prior_option_activity_centroids: list[tuple[float, float]] = []
 
@@ -4094,7 +4420,7 @@ def _build_deterministic_plan(
         hotel = hotel_by_option.get(option_key)
         option_restaurants = restaurant_pools.get(option_key) or compact_restaurants
         if str(profile.get("selection_mode") or "") == "immersion":
-            days, stats, day_centroids = _build_immersion_option_schedule(
+            days, stats, day_centroids, day_decisions = _build_immersion_option_schedule(
                 option_key,
                 profile,
                 compact_attractions,
@@ -4111,7 +4437,7 @@ def _build_deterministic_plan(
                 discouraged_activity_centroids=prior_option_activity_centroids,
             )
         else:
-            days, stats, day_centroids = _build_option_schedule(
+            days, stats, day_centroids, day_decisions = _build_option_schedule(
                 option_key,
                 profile,
                 compact_attractions,
@@ -4127,6 +4453,7 @@ def _build_deterministic_plan(
                 discouraged_restaurants=None,
                 discouraged_activity_centroids=prior_option_activity_centroids,
             )
+
         final_itineraries[option_key] = days
         normalized_itineraries[option_key] = deepcopy(days)
         draft_options[option_key] = {
@@ -4145,6 +4472,8 @@ def _build_deterministic_plan(
             "badge": profile["badge"],
         }
         validation_report[option_key] = stats
+        planner_decision_trace[option_key] = day_decisions
+
         for day in days:
             for item in day.get("items", []):
                 name = _normalized_name(item)
@@ -4154,17 +4483,20 @@ def _build_deterministic_plan(
                     prior_option_activity_names.add(name)
         prior_option_activity_centroids.extend(day_centroids)
 
-    chain_of_thought = (
-        "Built 3 deterministic itinerary variants from the saved research inventory by choosing the highest-ranked "
-        "flights, selecting distinct hotels per option, clustering attractions by lat/lng, pairing nearby lunch and "
-        "dinner stops, and scheduling the final day by working backward from the return flight airport buffer."
-    )
+    chain_of_thought = json.dumps(planner_decision_trace, ensure_ascii=False)
     raw_output = {
-        "planner_mode": "deterministic_route_first",
+        "planner_mode": "deterministic_route_first_with_llm_seeds",
         "chain_of_thought": chain_of_thought,
         "options": draft_options,
     }
-    return raw_output, final_itineraries, normalized_itineraries, option_meta, validation_report
+    return (
+        raw_output,
+        final_itineraries,
+        normalized_itineraries,
+        option_meta,
+        validation_report,
+        planner_decision_trace,
+    )
 
 
 def planner_from_research_1(state: dict, research_result: dict) -> dict:
@@ -4220,7 +4552,15 @@ def planner_from_research_1(state: dict, research_result: dict) -> dict:
             compact_flights_ret,
             prompt_inventory,
         )
-        result, itineraries, normalized_itineraries, option_meta, validation_report = _build_deterministic_plan(
+
+        (
+            result,
+            itineraries,
+            normalized_itineraries,
+            option_meta,
+            validation_report,
+            planner_decision_trace,
+        ) = _build_deterministic_plan(
             compact_attractions,
             compact_restaurants,
             compact_hotels,
@@ -4231,7 +4571,7 @@ def planner_from_research_1(state: dict, research_result: dict) -> dict:
             trip_start_date=trip_start_date,
         )
         planner_chain_of_thought = result.get("chain_of_thought", "")
-        tool_log.append("[planner_agent_1] Deterministic route-first scheduler used saved research inventory")
+        tool_log.append("[planner_agent_1] Deterministic route-first scheduler with LLM seed selection used saved research inventory")
         tool_log.append(f"[planner_agent_1] Generated options: {list(itineraries.keys())}")
 
         return {
@@ -4243,6 +4583,7 @@ def planner_from_research_1(state: dict, research_result: dict) -> dict:
             "validation_report": validation_report,
             "option_meta": option_meta,
             "planner_chain_of_thought": planner_chain_of_thought,
+            "planner_decision_trace": planner_decision_trace,
             "chain_of_thought": planner_chain_of_thought,
             "research": research,
             "state": state,
@@ -4252,6 +4593,7 @@ def planner_from_research_1(state: dict, research_result: dict) -> dict:
             "hotel_options": payload["hotel_opts"],
         }
     except Exception as exc:
+        import traceback
         traceback.print_exc()
         print(f"[Planner1] Error: {exc}")
         return {"error": str(exc)}
