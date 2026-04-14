@@ -6,6 +6,37 @@ version: "3.9"
 
 services:
 
+  agents:
+    build:
+      context: .
+      dockerfile: ./agents/Dockerfile
+    container_name: travelmind-agents
+    ports:
+      - "8001:8001"
+    expose:
+      - "8001"
+      - "8100"
+      - "8101"
+      - "8102"
+      - "8103"
+      - "8104"
+      - "8105"
+      - "8106"
+      - "8107"
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - travelmind-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
   frontend:
     build:
       context: .
@@ -40,6 +71,10 @@ services:
       - .env
     environment:
       - PYTHONUNBUFFERED=1
+      - AGENTS_BASE_URL=http://agents:8001
+    depends_on:
+      agents:
+        condition: service_healthy
     networks:
       - travelmind-network
     restart: unless-stopped

@@ -4,16 +4,19 @@ from typing import Dict
 from .state import State
 
 # 假设在 docker-compose 网络中，每个容器可以通过服务名访问
-# 这里通过环境变量获取基础配置，如果没有则使用默认名
+# 所有 Agent 使用同一个 hostname，仅端口不同（8100 起递增）
+AGENT_HOST = os.getenv("AGENT_HOST", "localhost")
+AGENT_SCHEME = os.getenv("AGENT_SCHEME", "http")
+
 AGENT_URLS = {
-    "input_guard": os.getenv("AGENT5_URL", "http://agent5_safety:8000/api/invoke"),
-    "intent_profile": os.getenv("AGENT1_URL", "http://agent1_intent:8000/api/invoke"),
-    "search": os.getenv("AGENT2_URL", "http://agent2_research:8000/api/invoke"),
-    "planner": os.getenv("AGENT3_URL", "http://agent3_planner:8000/api/invoke"),
-    "debate": os.getenv("AGENT4_URL", "http://agent4_debate:8000/api/invoke"),
-    "explain": os.getenv("AGENT6_URL", "http://agent6_explain:8000/api/invoke"),
-    "output_guard": os.getenv("AGENT7_URL", "http://agent7_safety:8000/api/invoke"),
-    "replanner": os.getenv("AGENT8_URL", "http://agent8_replan:8000/api/invoke"),
+    "input_guard": os.getenv("AGENT_INPUT_GUARD_URL", f"{AGENT_SCHEME}://{AGENT_HOST}:8100/api/invoke/input_guard"),
+    "intent_profile": os.getenv("AGENT_INTENT_PROFILE_URL", f"{AGENT_SCHEME}://{AGENT_HOST}:8101/api/invoke/intent_profile"),
+    "search": os.getenv("AGENT_SEARCH_URL", f"{AGENT_SCHEME}://{AGENT_HOST}:8102/api/invoke/search"),
+    "planner": os.getenv("AGENT_PLANNER_URL", f"{AGENT_SCHEME}://{AGENT_HOST}:8103/api/invoke/planner"),
+    "debate": os.getenv("AGENT_DEBATE_URL", f"{AGENT_SCHEME}://{AGENT_HOST}:8104/api/invoke/debate"),
+    "explain": os.getenv("AGENT_EXPLAIN_URL", f"{AGENT_SCHEME}://{AGENT_HOST}:8105/api/invoke/explain"),
+    "output_guard": os.getenv("AGENT_OUTPUT_GUARD_URL", f"{AGENT_SCHEME}://{AGENT_HOST}:8106/api/invoke/output_guard"),
+    "replanner": os.getenv("AGENT_REPLANNER_URL", f"{AGENT_SCHEME}://{AGENT_HOST}:8107/api/invoke/replanner"),
 }
 
 def call_remote_agent(agent_name: str, state: State) -> Dict:
@@ -29,7 +32,7 @@ def call_remote_agent(agent_name: str, state: State) -> Dict:
     try:
         # 将整个 state 作为 JSON 发送给对应的容器
         # 设置 timeout 防止某个 Agent 卡死导致整个 Graph 阻塞
-        response = requests.post(url, json=state, timeout=60.0)
+        response = requests.post(url, json={"state": state}, timeout=60.0)
         
         # 如果返回非 200 状态码，抛出异常
         response.raise_for_status()
