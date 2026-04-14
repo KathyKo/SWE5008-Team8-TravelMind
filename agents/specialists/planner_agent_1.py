@@ -2142,10 +2142,18 @@ def _llm_select_seed(
         "You select which attraction should anchor one day of a travel itinerary. "
         "Pick the candidate whose cluster of nearby attractions forms the most "
         "coherent thematic day for the stated user preferences. "
-        "Prefer themes not already used on prior days when possible. "
+        "Prefer themes not already used on prior days when possible.\n\n"
+        "IMPORTANT: The 'theme' must accurately describe ALL attractions in the "
+        "cluster (the seed AND its nearby_attractions), not just the seed. "
+        "Look at the 'type' field of every item in nearby_attractions. "
+        "If the cluster contains a mix (e.g. a garden, a museum, and a digital "
+        "art venue), the theme should reflect that mix.\n\n"
+        "The 'reason' should explain why this particular combination of "
+        "attractions makes a coherent or interesting day, mentioning the "
+        "specific types involved.\n\n"
         "Return ONLY valid JSON with exactly three keys:\n"
         '  "selected_name": the exact name string of the chosen candidate,\n'
-        '  "theme": a 2-4 word day theme (e.g. "zen gardens & temples"),\n'
+        '  "theme": a 2-5 word day theme that covers ALL cluster members,\n'
         '  "reason": one sentence explaining why this cluster makes a good day.\n'
     )
 
@@ -2212,6 +2220,227 @@ def _meal_trace(
         "cuisine": cuisine,
         "matched_preferences": matched,
     }
+
+
+def _name_lookup(items: list[dict]) -> dict[str, dict]:
+    lookup: dict[str, dict] = {}
+    for item in items or []:
+        if not isinstance(item, dict):
+            continue
+        name = _normalized_name(item)
+        if name and name not in lookup:
+            lookup[name] = item
+    return lookup
+
+
+def _trace_day_type(day_label: str, day_index: int, total_days: int, original_entry: dict) -> str:
+    day_type = str((original_entry or {}).get("day_type") or "").strip()
+    if day_type:
+        return day_type
+    if day_index == 0:
+        return "arrival"
+    if day_index == max(0, total_days - 1):
+        return "departure"
+    return "middle"
+
+
+def _trace_theme_from_items(original_entry: dict, activities: list[dict], day_type: str) -> str:
+    original_theme = str((original_entry or {}).get("theme") or "").strip()
+    if day_type == "arrival":
+        return original_theme or "arrival evening"
+    if day_type == "departure":
+        return original_theme or "departure day"
+    if original_theme:
+        return original_theme
+
+    type_blob = " ".join(str(item.get("type") or "").lower() for item in activities)
+    if "garden" in type_blob and any(token in type_blob for token in ("temple", "shrine", "museum")):
+        return "gardens & culture"
+    if "garden" in type_blob:
+        return "garden day"
+    if any(token in type_blob for token in ("temple", "shrine", "museum")):
+        return "culture day"
+    return "sightseeing day"
+
+
+def _trace_activities_from_items(day_items: list[dict], attraction_lookup: dict[str, dict]) -> list[dict]:
+    activities: list[dict] = []
+    for item in day_items:
+        if item.get("icon") != "activity":
+            continue
+        meta = attraction_lookup.get(_normalized_name(item), {})
+        activities.append(
+            {
+                "name": item.get("name", ""),
+                "type": str(meta.get("type") or meta.get("category") or "").strip(),
+            }
+        )
+    return activities
+
+
+def _trace_meals_from_items(
+    day_items: list[dict],
+    restaurant_lookup: dict[str, dict],
+    preference_model: dict,
+) -> tuple[dict | None, dict | None]:
+    restaurant_items = [item for item in day_items if item.get("icon") == "restaurant"]
+    if not restaurant_items:
+        return None, None
+
+    lunch_candidates = [
+        item for item in restaurant_items
+        if (_minutes_since_midnight(item.get("time", "")) or 0) < 16 * 60
+    ]
+    dinner_candidates = [
+        item for item in restaurant_items
+        if (_minutes_since_midnight(item.get("time", "")) or 0) >= 16 * 60
+    ]
+
+    lunch_item = lunch_candidates[0] if lunch_candidates else None
+    dinner_item = dinner_candidates[-1] if dinner_candidates else None
+
+    def _trace_for_item(item: dict | None, meal_kind: str) -> dict | None:
+        if not item:
+            return None
+        meta = restaurant_lookup.get(_normalized_name(item), {})
+        if meta:
+            return _meal_trace(meta, meal_kind, preference_model)
+        return _meal_trace(
+            {
+                "name": item.get("name", ""),
+                "type": item.get("type") or "restaurant",
+            },
+            meal_kind,
+            preference_model,
+        )
+
+    return _trace_for_item(lunch_item, "lunch"), _trace_for_item(dinner_item, "dinner")
+
+
+def _trace_seed_name(original_entry: dict, activities: list[dict], day_type: str = "") -> str | None:
+    if day_type in ("arrival", "departure"):
+        return None
+    if not activities:
+        return None
+    original_seed = str((original_entry or {}).get("seed_name") or "").strip()
+    activity_names = {str(item.get("name") or "").strip() for item in activities}
+    if original_seed and original_seed in activity_names:
+        return original_seed
+    return str(activities[0].get("name") or "").strip() or None
+
+
+def _trace_seed_reason(
+    day_type: str,
+    theme: str,
+    activities: list[dict],
+    lunch: dict | None,
+    dinner: dict | None,
+    original_reason: str = "",
+) -> str:
+    """Return the seed reason.
+
+    If the LLM already produced a reason during seed selection AND
+    the activities it mentions are still present in the final itinerary,
+    keep the original reason.  Otherwise generate a minimal factual
+    description from the final activity types (no template prose).
+    """
+    if day_type == "arrival":
+        return ""
+    if day_type == "departure":
+        return ""
+
+    if not activities:
+        return ""
+
+    # Check whether the original LLM reason is still valid
+    if original_reason and original_reason not in (
+        "no seed candidates available",
+        "pool too small for seed selection",
+    ):
+        final_names_lower = {
+            str(a.get("name") or "").strip().lower() for a in activities
+        }
+        # Count how many final activities are mentioned in the reason
+        mentioned = sum(
+            1 for name in final_names_lower
+            if name and name in original_reason.lower()
+        )
+        # If at least half of the final activities appear in the reason,
+        # the reason is still relevant enough to keep
+        if mentioned >= max(1, len(activities) * 0.5):
+            return original_reason
+
+    # Fallback: minimal factual line from the final activity types
+    names = [str(a.get("name") or "").strip() for a in activities[:3] if str(a.get("name") or "").strip()]
+    types = list(dict.fromkeys(
+        str(a.get("type") or "").strip().lower()
+        for a in activities
+        if str(a.get("type") or "").strip()
+    ))
+    types_text = ", ".join(types) if types else "sightseeing"
+    names_text = ", ".join(names)
+    return f"{names_text} ({types_text})" if names_text else ""
+
+
+def _synchronize_planner_decision_trace(
+    days: list[dict],
+    draft_trace: list[dict],
+    attraction_lookup: dict[str, dict],
+    restaurant_lookup: dict[str, dict],
+    preference_model: dict,
+) -> list[dict]:
+    """Enrich the draft trace with actual itinerary data.
+
+    Key principle: activities/lunch/dinner are always rebuilt from the
+    final items so the trace never references stops that got dropped.
+    theme and seed_reason from the LLM are kept when they are still
+    consistent with the final items.
+    """
+    trace_by_day = {
+        str(entry.get("day") or "").strip(): entry
+        for entry in draft_trace or []
+        if isinstance(entry, dict)
+    }
+    total_days = len(days)
+    synced: list[dict] = []
+
+    for day_index, day in enumerate(days):
+        day_label = str(day.get("day") or f"Day {day_index + 1}")
+        day_items = day.get("items", []) or []
+        original_entry = trace_by_day.get(day_label, {})
+        day_type = _trace_day_type(day_label, day_index, total_days, original_entry)
+
+        # Always rebuild from final items (most accurate)
+        activities = _trace_activities_from_items(day_items, attraction_lookup)
+        lunch, dinner = _trace_meals_from_items(day_items, restaurant_lookup, preference_model)
+
+        # Theme: keep LLM theme for middle days, infer for arrival/departure
+        theme = _trace_theme_from_items(original_entry, activities, day_type)
+
+        # Seed name: keep LLM choice if still present, None for arrival/departure
+        seed_name = _trace_seed_name(original_entry, activities, day_type)
+
+        # Seed reason: keep LLM reason if it still mentions the final activities
+        original_reason = str(original_entry.get("seed_reason") or "").strip()
+        seed_reason = _trace_seed_reason(
+            day_type, theme, activities, lunch, dinner,
+            original_reason=original_reason,
+        )
+
+        synced.append(
+            {
+                "day": day_label,
+                "day_type": day_type,
+                "theme": theme,
+                "seed_name": seed_name,
+                "seed_reason": seed_reason,
+                "activities": activities,
+                "lunch": lunch,
+                "dinner": dinner,
+            }
+        )
+
+    return synced
 
 
 def _choose_cluster_activities(
@@ -4398,6 +4627,8 @@ def _build_deterministic_plan(
 ) -> tuple[dict, dict, dict, dict, dict, dict]:
     compact_attractions = [item for item in compact_attractions if _is_normal_activity_candidate(item)]
     compact_restaurants = [item for item in compact_restaurants if _is_normal_restaurant_candidate(item)]
+    attraction_lookup = _name_lookup(compact_attractions)
+    restaurant_lookup = _name_lookup(compact_restaurants)
     outbound_flight = _pick_outbound_flight(compact_flights_out)
     return_flight = _pick_return_flight(compact_flights_ret)
     hotel_by_option = _pick_hotels_by_profile(compact_hotels)
@@ -4462,7 +4693,6 @@ def _build_deterministic_plan(
             "budget": profile["budget"],
             "style": profile["style"],
             "badge": profile["badge"],
-            "days": deepcopy(days),
         }
         option_meta[option_key] = {
             "label": profile["label"],
@@ -4472,7 +4702,13 @@ def _build_deterministic_plan(
             "badge": profile["badge"],
         }
         validation_report[option_key] = stats
-        planner_decision_trace[option_key] = day_decisions
+        planner_decision_trace[option_key] = _synchronize_planner_decision_trace(
+            days,
+            day_decisions,
+            attraction_lookup,
+            restaurant_lookup,
+            preference_model,
+        )
 
         for day in days:
             for item in day.get("items", []):
@@ -4577,13 +4813,11 @@ def planner_from_research_1(state: dict, research_result: dict) -> dict:
         return {
             "itineraries": itineraries,
             "final_itineraries": itineraries,
-            "normalized_itineraries": normalized_itineraries,
-            "validated_itineraries": normalized_itineraries,
-            "raw_planner_output": result,
-            "validation_report": validation_report,
+            "validated_itineraries": itineraries,
             "option_meta": option_meta,
-            "planner_chain_of_thought": planner_chain_of_thought,
+            "validation_report": validation_report,
             "planner_decision_trace": planner_decision_trace,
+            "planner_chain_of_thought": planner_chain_of_thought,
             "chain_of_thought": planner_chain_of_thought,
             "research": research,
             "state": state,
