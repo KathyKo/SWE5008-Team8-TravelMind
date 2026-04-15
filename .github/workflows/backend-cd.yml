@@ -1,0 +1,53 @@
+name: backend-cd
+
+on:
+  workflow_run:
+    workflows: ["backend-ci"]
+    types: [completed]
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-placeholder:
+    name: backend-deploy-placeholder
+    runs-on: ubuntu-latest
+    if: ${{ vars.CI_CD_DISABLED != 'true' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')) }}
+    steps:
+      - name: Pull backend image from DockerHub
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          IMAGE_TAG: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || 'latest' }}
+        run: |
+          if [ -z "${DOCKERHUB_USERNAME}" ] || [ -z "${DOCKERHUB_TOKEN}" ]; then
+            echo "DockerHub secrets are not configured yet. Skipping backend image pull placeholder."
+            echo "Expected secrets: DOCKERHUB_USERNAME, DOCKERHUB_TOKEN"
+            exit 0
+          fi
+
+          echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
+          IMAGE_NAME="${DOCKERHUB_USERNAME}/travelmind-backend"
+          docker pull "${IMAGE_NAME}:${IMAGE_TAG}"
+          docker image inspect "${IMAGE_NAME}:${IMAGE_TAG}" >/dev/null
+
+      - name: Placeholder AWS deploy step
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          AWS_ECR_REPOSITORY: ${{ secrets.AWS_ECR_REPOSITORY }}
+          AWS_ECS_CLUSTER: ${{ secrets.AWS_ECS_CLUSTER }}
+          AWS_ECS_SERVICE: ${{ secrets.AWS_ECS_SERVICE }}
+          IMAGE_TAG: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || 'latest' }}
+        run: |
+          echo "AWS deployment is not configured yet."
+          echo "Use the pulled DockerHub backend image as the source artifact later."
+          echo "Image tag: ${IMAGE_TAG}"
+          echo "Configured values (if present):"
+          echo "AWS_REGION=${AWS_REGION:-<unset>}"
+          echo "AWS_ACCOUNT_ID=${AWS_ACCOUNT_ID:-<unset>}"
+          echo "AWS_ECR_REPOSITORY=${AWS_ECR_REPOSITORY:-<unset>}"
+          echo "AWS_ECS_CLUSTER=${AWS_ECS_CLUSTER:-<unset>}"
+          echo "AWS_ECS_SERVICE=${AWS_ECS_SERVICE:-<unset>}"
