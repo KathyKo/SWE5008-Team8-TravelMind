@@ -17,8 +17,7 @@ This guard handles structural and pattern-level checks.
 """
 
 import re
-from dataclasses import dataclass, field
-
+from dataclasses import dataclass
 
 @dataclass
 class HallucinationResult:
@@ -26,7 +25,6 @@ class HallucinationResult:
     flagged_entities: list[dict]   # list of {entity_type, value, reason}
     confidence: float
     reason: str
-
 
 # ── Known fake / test flight patterns ───────────────────────
 # Flight numbers that are commonly hallucinated or used in tests
@@ -86,7 +84,6 @@ def _check_flight_numbers(text: str) -> list[dict]:
     # Match pattern: 2-letter code + 1-4 digits (standard IATA flight number)
     for match in re.finditer(r"\b([A-Z]{2})(\d{1,4})\b", text, re.IGNORECASE):
         airline_code = match.group(1).upper()
-        flight_num = match.group(2)
         full = match.group(0)
         if airline_code not in VALID_AIRLINE_CODES:
             flagged.append({
@@ -95,7 +92,6 @@ def _check_flight_numbers(text: str) -> list[dict]:
                 "reason": f"Airline code '{airline_code}' not in known IATA list — may be hallucinated",
             })
     return flagged
-
 
 def check_hallucination(output_text: str) -> HallucinationResult:
     """
