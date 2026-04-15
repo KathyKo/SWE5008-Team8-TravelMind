@@ -1,9 +1,10 @@
 from types import SimpleNamespace
+from importlib import import_module
 
 import pytest
 
-from agents.specialists import input_guard_agent as ig
-from agents.specialists import output_guard_agent as og
+ig = import_module("agents.specialists.input_guard_agent")
+og = import_module("agents.specialists.output_guard_agent")
 
 
 @pytest.fixture

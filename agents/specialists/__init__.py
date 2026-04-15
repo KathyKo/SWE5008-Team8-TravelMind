@@ -1,5 +1,8 @@
-from .planner_agent import planner_agent, revise_itinerary
-from .research_agent import research_agent
+from .planner_agent import (
+    planner_agent as planner_agent,
+    revise_itinerary as revise_itinerary,
+)
+from .research_agent import research_agent as research_agent
 from .explainability_agent import explainability_agent
 from .intent_profile import intent_profile
 from .input_guard_agent import input_guard_agent
