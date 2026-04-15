@@ -27,4 +27,6 @@ dist/
 *.egg-info/
 
 .coverage
+# Debug output
+debug/
 
