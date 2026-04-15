@@ -4,32 +4,47 @@ import sys
 import types
 
 import pytest
-from fastapi.testclient import TestClient
 from fastapi import APIRouter
+from fastapi.testclient import TestClient
 
 
 @pytest.fixture
 def backend_main_module(monkeypatch):
-    backend_dir = Path(__file__).resolve().parents[1]
-    monkeypatch.syspath_prepend(str(backend_dir))
+    repo_root = Path(__file__).resolve().parents[2]
+    monkeypatch.syspath_prepend(str(repo_root))
 
-    fake_travel = types.ModuleType("routers.travel")
-    fake_travel.router = APIRouter()
+    fake_research = types.ModuleType("backend.routers.research")
+    fake_research.router = APIRouter()
 
-    fake_routers = types.ModuleType("routers")
-    fake_routers.travel = fake_travel
+    fake_planner = types.ModuleType("backend.routers.planner")
+    fake_planner.router = APIRouter()
+
+    fake_explainability = types.ModuleType("backend.routers.explainability")
+    fake_explainability.router = APIRouter()
+
+    fake_security = types.ModuleType("backend.routers.security")
+    fake_security.router = APIRouter()
+
+    fake_routers = types.ModuleType("backend.routers")
+    fake_routers.research = fake_research
+    fake_routers.planner = fake_planner
+    fake_routers.explainability = fake_explainability
+    fake_routers.security = fake_security
     fake_routers.__path__ = []
 
-    monkeypatch.setitem(sys.modules, "routers", fake_routers)
-    monkeypatch.setitem(sys.modules, "routers.travel", fake_travel)
+    monkeypatch.setitem(sys.modules, "backend.routers", fake_routers)
+    monkeypatch.setitem(sys.modules, "backend.routers.research", fake_research)
+    monkeypatch.setitem(sys.modules, "backend.routers.planner", fake_planner)
+    monkeypatch.setitem(sys.modules, "backend.routers.explainability", fake_explainability)
+    monkeypatch.setitem(sys.modules, "backend.routers.security", fake_security)
 
-    sys.modules.pop("main", None)
-    return import_module("main")
+    sys.modules.pop("backend.main", None)
+    return import_module("backend.main")
 
 
 def test_backend_app_metadata(backend_main_module):
     assert backend_main_module.app.title == "TravelMind API"
-    assert backend_main_module.app.version == "0.1.0"
+    assert backend_main_module.app.version == "1.0.0"
 
 
 def test_backend_health_and_root_endpoints(backend_main_module):
@@ -39,7 +54,20 @@ def test_backend_health_and_root_endpoints(backend_main_module):
     root_response = client.get("/")
 
     assert health_response.status_code == 200
-    assert health_response.json() == {"status": "ok", "service": "travelmind-backend"}
+    assert health_response.json() == {
+        "status": "ok",
+        "service": "travelmind-backend",
+        "agents": ["Agent2", "Agent3", "Agent6"],
+    }
 
     assert root_response.status_code == 200
-    assert "TravelMind API is running" in root_response.json()["message"]
+    assert root_response.json() == {
+        "message": "TravelMind API — Kathy scope",
+        "agents": {
+            "Agent2 Research": "POST /research/run",
+            "Agent3 Planner": "POST /planner/run",
+            "Agent3 Revise": "POST /planner/revise",
+            "Agent6 Explainability": "POST /explainability/run",
+        },
+        "docs": "/docs",
+    }

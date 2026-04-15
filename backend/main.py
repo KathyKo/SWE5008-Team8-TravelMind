@@ -18,7 +18,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.routers import research, planner, explainability, security
 
 app = FastAPI(
-    title="TravelMind API — Kathy (Agent2 / Agent3 / Agent6)",
+    title="TravelMind API",
     description=(
         "Agent2 (Research): POST /research/run\n"
         "Agent3 (Planner):  POST /planner/run  |  POST /planner/revise\n"

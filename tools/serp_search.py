@@ -311,7 +311,7 @@ def serp_flights(
 
     # If no nonstop flights found, retry without the stops restriction
     if not flights and params.get("stops") == "0":
-        print(f"[SerpAPI] No nonstop flights found — retrying with connections allowed")
+        print("[SerpAPI] No nonstop flights found — retrying with connections allowed")
         params_with_stops = {k: v for k, v in params.items() if k != "stops"}
         result = _serpapi_request("google_flights", params_with_stops)
         if result:
@@ -525,7 +525,7 @@ def serp_hotel_details(property_token: str, check_in: str = "", check_out: str =
     nearby = result.get("nearby_places", [])
     if nearby:
         lines.append("Nearby: " + ", ".join(p.get("name", "") for p in nearby[:4]))
-    return "\n".join(l for l in lines if l) or None
+    return "\n".join(line for line in lines if line) or None
 
 
 def serp_hotel_reviews(property_token: str, num: int = 5) -> str | None:

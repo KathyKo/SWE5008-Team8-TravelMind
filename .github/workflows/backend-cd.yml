@@ -6,48 +6,63 @@ on:
     types: [completed]
     branches: ["main"]
   workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Image tag to deploy (e.g. feature-cicd_setup, latest, sha-abc1234)'
+        required: false
+        default: 'latest'
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
-  deploy-placeholder:
-    name: backend-deploy-placeholder
+  deploy:
+    name: backend-deploy
     runs-on: ubuntu-latest
     if: ${{ vars.CI_CD_DISABLED != 'true' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')) }}
     steps:
-      - name: Pull backend image from DockerHub
-        env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-          IMAGE_TAG: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || 'latest' }}
+      - name: Set image tag
+        id: image
         run: |
-          if [ -z "${DOCKERHUB_USERNAME}" ] || [ -z "${DOCKERHUB_TOKEN}" ]; then
-            echo "DockerHub secrets are not configured yet. Skipping backend image pull placeholder."
-            echo "Expected secrets: DOCKERHUB_USERNAME, DOCKERHUB_TOKEN"
-            exit 0
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            FULL_SHA="${{ github.event.workflow_run.head_sha }}"
+            SHORT_SHA="${FULL_SHA:0:7}"
+            echo "tag=sha-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+            echo "Deploying backend image tag: sha-${SHORT_SHA}"
+          else
+            TAG="${{ github.event.inputs.image_tag }}"
+            TAG="${TAG:-latest}"
+            echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+            echo "Deploying backend image tag: ${TAG}"
           fi
 
-          echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
-          IMAGE_NAME="${DOCKERHUB_USERNAME}/travelmind-backend"
-          docker pull "${IMAGE_NAME}:${IMAGE_TAG}"
-          docker image inspect "${IMAGE_NAME}:${IMAGE_TAG}" >/dev/null
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Placeholder AWS deploy step
-        env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-          AWS_ECR_REPOSITORY: ${{ secrets.AWS_ECR_REPOSITORY }}
-          AWS_ECS_CLUSTER: ${{ secrets.AWS_ECS_CLUSTER }}
-          AWS_ECS_SERVICE: ${{ secrets.AWS_ECS_SERVICE }}
-          IMAGE_TAG: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || 'latest' }}
+      - name: Download current task definition
         run: |
-          echo "AWS deployment is not configured yet."
-          echo "Use the pulled DockerHub backend image as the source artifact later."
-          echo "Image tag: ${IMAGE_TAG}"
-          echo "Configured values (if present):"
-          echo "AWS_REGION=${AWS_REGION:-<unset>}"
-          echo "AWS_ACCOUNT_ID=${AWS_ACCOUNT_ID:-<unset>}"
-          echo "AWS_ECR_REPOSITORY=${AWS_ECR_REPOSITORY:-<unset>}"
-          echo "AWS_ECS_CLUSTER=${AWS_ECS_CLUSTER:-<unset>}"
-          echo "AWS_ECS_SERVICE=${AWS_ECS_SERVICE:-<unset>}"
+          aws ecs describe-task-definition \
+            --task-definition travelmind-backend \
+            --query taskDefinition \
+            | jq 'del(.taskDefinitionArn,.revision,.status,.requiresAttributes,.compatibilities,.registeredAt,.registeredBy)' \
+            > task-def.json
+
+      - name: Update image in task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-def.json
+          container-name: ${{ secrets.BACKEND_CONTAINER_NAME }}
+          image: ${{ secrets.DOCKERHUB_USERNAME }}/travelmind-backend:${{ steps.image.outputs.tag }}
+
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ secrets.BACKEND_ECS_SERVICE }}
+          cluster: ${{ secrets.BACKEND_ECS_CLUSTER }}
+          wait-for-service-stability: true

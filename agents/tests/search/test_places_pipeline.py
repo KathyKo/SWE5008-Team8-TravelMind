@@ -23,6 +23,7 @@ import time
 import unicodedata
 from datetime import datetime
 from pathlib import Path
+from dotenv import load_dotenv
 
 if sys.stdout.encoding != "utf-8":
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -32,8 +33,6 @@ if sys.stderr.encoding != "utf-8":
 project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "backend"))
-
-from dotenv import load_dotenv
 
 load_dotenv()
 
