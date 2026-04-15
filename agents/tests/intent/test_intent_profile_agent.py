@@ -2,11 +2,11 @@
 Agent1 (Intent Profile) test cases.
 
 Run from repository root:
-  python -m agents.tests.test_intent_profile_agent
-  python agents/tests/test_intent_profile_agent.py
+  python -m agents.tests.intents.test_intent_profile_agent
+  python agents/tests/intent/test_intent_profile_agent.py
 
 Pytest (CI):
-  pytest agents/tests/test_intent_profile_agent.py -v
+  pytest agents/tests/intent/test_intent_profile_agent.py -v
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-# Repository root: agents/tests/<this_file> -> parents[2]
+# Repository root: agents/tests/intent/<this_file> -> parents[2]
 REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
