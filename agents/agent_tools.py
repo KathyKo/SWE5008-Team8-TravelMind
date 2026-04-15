@@ -19,16 +19,8 @@ TOOLS_BY_AGENT: Dict[str, Dict[str, Callable]] = {
         "web_search":         web_search,
         "google_search":      google_search,
     },
-    # New research-only pipeline
-    "research_agent_1": {
-        "search_weather":     search_weather,
-        "search_flights":     search_flights,
-        "search_hotels":      search_hotels,
-        "web_search":         web_search,
-        "google_search":      google_search,
-    },
-    # New planner-only pipeline (delegates search to research_agent_1)
-    "planner_agent_1": {
+    # Research agent
+    "research_agent": {
         "search_weather":     search_weather,
         "search_flights":     search_flights,
         "search_hotels":      search_hotels,

@@ -42,10 +42,10 @@ def call_research(state: dict) -> dict:
         except Exception as e:
             return {"error": f"Research agent HTTP error: {e}"}
     else:
-        from agents.specialists.research_agent_1 import research_agent_1
+        from agents.specialists.research_agent import research_agent
         from agents.agent_tools import get_tools_for_agent
         tools = get_tools_for_agent("research_agent")
-        return research_agent_1(state, tools=tools)
+        return research_agent(state, tools=tools)
 
 
 def call_planner(state: dict) -> dict:
@@ -62,10 +62,10 @@ def call_planner(state: dict) -> dict:
         except Exception as e:
             return {"error": f"Planner agent HTTP error: {e}"}
     else:
-        from agents.specialists.planner_agent_1 import planner_agent_1
+        from agents.specialists.planner_agent import planner_agent
         from agents.agent_tools import get_tools_for_agent
         tools = get_tools_for_agent("planner_agent")
-        return planner_agent_1(state, tools=tools)
+        return planner_agent(state, tools=tools)
 
 
 def call_planner_revise(state: dict, critique: str, current_result: dict) -> dict:
@@ -82,8 +82,8 @@ def call_planner_revise(state: dict, critique: str, current_result: dict) -> dic
         except Exception as e:
             return {"error": f"Planner revise HTTP error: {e}"}
     else:
-        from agents.specialists.planner_agent_1 import revise_itinerary_1
-        return revise_itinerary_1(state, critique, current_result)
+        from agents.specialists.planner_agent import revise_itinerary
+        return revise_itinerary(state, critique, current_result)
 
 
 def run_debate_loop(state: dict) -> dict:
