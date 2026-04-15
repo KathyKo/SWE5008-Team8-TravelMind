@@ -712,7 +712,7 @@ def _build_hotel_display(hotel: dict) -> str:
     return " | ".join(part for part in parts if part)
 
 
-def research_agent_1(state: dict, tools: dict | None = None) -> dict:
+def research_agent(state: dict, tools: dict | None = None) -> dict:
     state = _normalize_trip_state(state)
 
     dest = state.get("destination")

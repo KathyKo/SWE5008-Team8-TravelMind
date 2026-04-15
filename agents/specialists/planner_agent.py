@@ -10,13 +10,12 @@ from datetime import date, datetime, timedelta
 import json
 import math
 import re
-import traceback
 
 from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_openai import ChatOpenAI
 
 from ..llm_config import OPENAI_MODEL
-from .research_agent_1 import _normalize_trip_state, research_agent_1
+from .research_agent import _normalize_trip_state, research_agent
 
 
 def _llm() -> ChatOpenAI:
@@ -1312,7 +1311,7 @@ def _post_process_options(
     return final_itineraries, option_meta, normalized_itineraries, validation_report
 
 
-def revise_itinerary_1(state: dict, critique: str, current_result: dict) -> dict:
+def revise_itinerary(state: dict, critique: str, current_result: dict) -> dict:
     if not _inventory_cache:
         return {"error": "No cached inventory - run planner_agent_1() first"}
 
@@ -3711,10 +3710,7 @@ def _preferred_activity_count(
     )
     if not relevant_scores:
         return 0
-    best_relevance = relevant_scores[0]
-    strong_preference = preference_model["families"].get("culture", 0) + preference_model["families"].get("food", 0) >= 3
-    relevance_cutoff = max(28.0, best_relevance - (38 if strong_preference else 24))
-    relevant_pool_size = sum(1 for score in relevant_scores if score >= relevance_cutoff)
+
     target = int(profile.get("target_activity_count", 3))
     minimum = int(profile.get("min_activity_count", 2))
     total_available = len(available)
@@ -4230,7 +4226,6 @@ def _departure_day_items(
                 latest_finish=(airport_cutoff or brunch_pref) - 20,
             )
             if brunch_start is not None:
-                brunch_end = brunch_start + _meal_duration_minutes(brunch)
                 items.append(
                     {
                         "time": _hhmm(brunch_start),
@@ -4735,7 +4730,7 @@ def _build_deterministic_plan(
     )
 
 
-def planner_from_research_1(state: dict, research_result: dict) -> dict:
+def planner_from_research(state: dict, research_result: dict) -> dict:
     state = _normalize_trip_state(state)
     dest = state.get("destination")
     origin = state.get("origin")
@@ -4834,9 +4829,9 @@ def planner_from_research_1(state: dict, research_result: dict) -> dict:
 
 
 # Thin wrapper kept for call sites that still expect planner to trigger research first.
-def planner_agent_1(state: dict, tools: dict | None = None) -> dict:
+def planner_agent(state: dict, tools: dict | None = None) -> dict:
     state = _normalize_trip_state(state)
-    research_result = research_agent_1(state, tools or {})
+    research_result = research_agent(state, tools or {})
     if "error" in research_result:
         return research_result
-    return planner_from_research_1(state, research_result)
+    return planner_from_research(state, research_result)
