@@ -261,7 +261,7 @@ def output_guard_node(state: State) -> dict:
             {"layer": "regex", "reason": "high_risk_pii_in_output", "findings": pii_result.findings},
             user_id,
         )
-        print(f"[output_guard_agent] ⛔ FLAGGED (Step 2 — Regex PII): High-risk PII in output")
+        print("[output_guard_agent] ⛔ FLAGGED (Step 2 — Regex PII): High-risk PII in output")
         return {
             "output_flagged": True,
             "output_flag_reason": "pii_leakage",
@@ -279,7 +279,7 @@ def output_guard_node(state: State) -> dict:
             {"layer": "regex", "reason": "medium_pii_redacted", "findings": pii_result.findings},
             user_id,
         )
-        print(f"[output_guard_agent] ℹ️  Medium-risk PII redacted (regex layer)")
+        print("[output_guard_agent] ℹ️  Medium-risk PII redacted (regex layer)")
 
     # ── Step 3: Rule-based unsafe content check ───────────────
     is_unsafe, unsafe_reason = _check_unsafe_content(output_text)

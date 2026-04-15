@@ -324,7 +324,7 @@ def input_guard_node(state: State) -> dict:
                 {"reason": "high_risk_pii_in_input", "findings": pii_result.findings},
                 user_id,
             )
-            print(f"[input_guard_agent] ⛔ BLOCKED (Step 5 — PII Probe): High-risk PII detected in input")
+            print("[input_guard_agent] ⛔ BLOCKED (Step 5 — PII Probe): High-risk PII detected in input")
             return _log_and_return({
                 "threat_blocked": True,
                 "threat_type": "pii_probe",
@@ -341,7 +341,7 @@ def input_guard_node(state: State) -> dict:
             )
             clean_text = pii_result.redacted_text
             pii_redacted = True
-            print(f"[input_guard_agent] ℹ️  (Step 5) Medium-risk PII redacted from input")
+            print("[input_guard_agent] ℹ️  (Step 5) Medium-risk PII redacted from input")
 
     # ── Step 6: LLM Guard injection scan ──────────────────────
     # Now runs on PII-cleaned text for more accurate injection detection

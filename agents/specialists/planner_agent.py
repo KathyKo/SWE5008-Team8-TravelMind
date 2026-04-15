@@ -10,7 +10,6 @@ from datetime import date, datetime, timedelta
 import json
 import math
 import re
-import traceback
 
 from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_openai import ChatOpenAI
@@ -3711,10 +3710,7 @@ def _preferred_activity_count(
     )
     if not relevant_scores:
         return 0
-    best_relevance = relevant_scores[0]
-    strong_preference = preference_model["families"].get("culture", 0) + preference_model["families"].get("food", 0) >= 3
-    relevance_cutoff = max(28.0, best_relevance - (38 if strong_preference else 24))
-    relevant_pool_size = sum(1 for score in relevant_scores if score >= relevance_cutoff)
+
     target = int(profile.get("target_activity_count", 3))
     minimum = int(profile.get("min_activity_count", 2))
     total_available = len(available)
@@ -4230,7 +4226,6 @@ def _departure_day_items(
                 latest_finish=(airport_cutoff or brunch_pref) - 20,
             )
             if brunch_start is not None:
-                brunch_end = brunch_start + _meal_duration_minutes(brunch)
                 items.append(
                     {
                         "time": _hhmm(brunch_start),
