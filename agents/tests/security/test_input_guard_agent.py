@@ -1,7 +1,8 @@
 import pytest
 from types import SimpleNamespace
+from importlib import import_module
 
-from agents.specialists import input_guard_agent as ig
+ig = import_module("agents.specialists.input_guard_agent")
 
 
 def _setup_oversized(monkeypatch):
