@@ -51,7 +51,7 @@ def render():
 
                     with col_check:
                         checked = st.checkbox(
-                            "",
+                            "Mark as visited",
                             value=is_checked,
                             key=f"trip_chk_{item_id}",
                             label_visibility="collapsed",
