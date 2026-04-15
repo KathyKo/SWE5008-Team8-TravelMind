@@ -1,0 +1,51 @@
+name: frontend-cd
+
+on:
+  workflow_run:
+    workflows: ["frontend-ci"]
+    types: [completed]
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-placeholder:
+    name: frontend-deploy-placeholder
+    runs-on: ubuntu-latest
+    if: ${{ vars.CI_CD_DISABLED != 'true' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')) }}
+    steps:
+      - name: Pull frontend image from DockerHub
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          IMAGE_TAG: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || 'latest' }}
+        run: |
+          if [ -z "${DOCKERHUB_USERNAME}" ] || [ -z "${DOCKERHUB_TOKEN}" ]; then
+            echo "DockerHub secrets are not configured yet. Skipping frontend image pull placeholder."
+            echo "Expected secrets: DOCKERHUB_USERNAME, DOCKERHUB_TOKEN"
+            exit 0
+          fi
+
+          echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
+          IMAGE_NAME="${DOCKERHUB_USERNAME}/travelmind-frontend"
+          docker pull "${IMAGE_NAME}:${IMAGE_TAG}"
+          docker image inspect "${IMAGE_NAME}:${IMAGE_TAG}" >/dev/null
+
+      - name: Placeholder AWS deploy step
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          AWS_CLOUDFRONT_DIST_ID: ${{ secrets.AWS_CLOUDFRONT_DIST_ID }}
+          IMAGE_TAG: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || 'latest' }}
+        run: |
+          echo "AWS deployment is not configured yet."
+          echo "Use the pulled DockerHub frontend image as the source artifact later."
+          echo "Image tag: ${IMAGE_TAG}"
+          echo "Configured values (if present):"
+          echo "AWS_REGION=${AWS_REGION:-<unset>}"
+          echo "AWS_ACCOUNT_ID=${AWS_ACCOUNT_ID:-<unset>}"
+          echo "AWS_S3_BUCKET=${AWS_S3_BUCKET:-<unset>}"
+          echo "AWS_CLOUDFRONT_DIST_ID=${AWS_CLOUDFRONT_DIST_ID:-<unset>}"

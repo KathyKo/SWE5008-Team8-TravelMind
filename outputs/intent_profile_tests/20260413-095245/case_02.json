@@ -1,0 +1,64 @@
+{
+  "input": {
+    "user_id": "u-bob-002",
+    "message": "Plan a balanced 4-day Tokyo trip for one person. Budget is flexible around USD 3000, prefer modern and food.",
+    "origin": "Singapore",
+    "destination": "Tokyo, Japan",
+    "dates": "2026-06-01 to 2026-06-04",
+    "budget": "USD 3000 flexible",
+    "preferences": "modern, food, balanced",
+    "duration": "4 days",
+    "outbound_time_pref": "early morning",
+    "return_time_pref": "evening"
+  },
+  "output": {
+    "session_id": "tm-2026-04-13-304",
+    "outbound_time_pref": "early morning",
+    "return_time_pref": "evening",
+    "hard_constraints": {
+      "origin": "Singapore",
+      "destination": "Tokyo, Japan",
+      "start_date": "2026-06-01",
+      "end_date": "2026-06-04",
+      "budget": {
+        "amount": 3000,
+        "currency": "USD",
+        "flexibility": "flexible"
+      },
+      "travelers": 1,
+      "requirements": []
+    },
+    "soft_preferences": {
+      "travel_style": "balanced",
+      "interest_tags": [
+        "modern",
+        "fine_dining"
+      ],
+      "pace": 3,
+      "vibe": "modern_urban",
+      "priority": "cost_effective"
+    },
+    "search_queries": [
+      {
+        "type": "api_flight",
+        "query": "flights from Singapore to Tokyo, Japan on 2026-06-01"
+      },
+      {
+        "type": "api_hotel",
+        "query": "balanced traditional ryokans in Tokyo, Japan"
+      },
+      {
+        "type": "rag_attraction",
+        "query": "best modern and fine_dining in Tokyo, Japan for photography"
+      },
+      {
+        "type": "rag_local_info",
+        "query": "Tokyo, Japan transportation guide for balanced pace travel"
+      }
+    ]
+  },
+  "validation": {
+    "is_valid": true,
+    "issues": []
+  }
+}
