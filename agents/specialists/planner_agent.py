@@ -15,7 +15,7 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_openai import ChatOpenAI
 
 from ..llm_config import OPENAI_MODEL
-from .research_agent_1 import _normalize_trip_state, research_agent_1
+from .research_agent import _normalize_trip_state, research_agent
 
 
 def _llm() -> ChatOpenAI:
@@ -1311,7 +1311,7 @@ def _post_process_options(
     return final_itineraries, option_meta, normalized_itineraries, validation_report
 
 
-def revise_itinerary_1(state: dict, critique: str, current_result: dict) -> dict:
+def revise_itinerary(state: dict, critique: str, current_result: dict) -> dict:
     if not _inventory_cache:
         return {"error": "No cached inventory - run planner_agent_1() first"}
 
@@ -4730,7 +4730,7 @@ def _build_deterministic_plan(
     )
 
 
-def planner_from_research_1(state: dict, research_result: dict) -> dict:
+def planner_from_research(state: dict, research_result: dict) -> dict:
     state = _normalize_trip_state(state)
     dest = state.get("destination")
     origin = state.get("origin")
@@ -4829,9 +4829,9 @@ def planner_from_research_1(state: dict, research_result: dict) -> dict:
 
 
 # Thin wrapper kept for call sites that still expect planner to trigger research first.
-def planner_agent_1(state: dict, tools: dict | None = None) -> dict:
+def planner_agent(state: dict, tools: dict | None = None) -> dict:
     state = _normalize_trip_state(state)
-    research_result = research_agent_1(state, tools or {})
+    research_result = research_agent(state, tools or {})
     if "error" in research_result:
         return research_result
-    return planner_from_research_1(state, research_result)
+    return planner_from_research(state, research_result)
