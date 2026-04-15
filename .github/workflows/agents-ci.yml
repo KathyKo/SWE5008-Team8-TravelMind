@@ -2,7 +2,7 @@ name: agents-ci
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "feature/**"]
     paths:
       - "agents/**"
       - "tools/**"
