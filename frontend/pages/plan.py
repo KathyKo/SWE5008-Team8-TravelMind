@@ -45,7 +45,12 @@ def render_itinerary(option: str):
                 is_checked = visited.get(item_id, False)
 
                 with col_check:
-                    if st.checkbox("", value=is_checked, key=f"chk_{item_id}", label_visibility="collapsed"):
+                    if st.checkbox(
+                        "Mark as visited",
+                        value=is_checked,
+                        key=f"chk_{item_id}",
+                        label_visibility="collapsed",
+                    ):
                         if not is_checked:
                             st.session_state.visited[item_id] = True
                             st.toast(f"✓ Marked **{item['name']}** as visited — AI profile updated", icon="✅")
