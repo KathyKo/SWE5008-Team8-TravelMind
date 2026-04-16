@@ -25,11 +25,15 @@ def backend_main_module(monkeypatch):
     fake_security = types.ModuleType("backend.routers.security")
     fake_security.router = APIRouter()
 
+    fake_auth = types.ModuleType("backend.routers.auth")
+    fake_auth.router = APIRouter()
+
     fake_routers = types.ModuleType("backend.routers")
     fake_routers.research = fake_research
     fake_routers.planner = fake_planner
     fake_routers.explainability = fake_explainability
     fake_routers.security = fake_security
+    fake_routers.auth = fake_auth
     fake_routers.__path__ = []
 
     monkeypatch.setitem(sys.modules, "backend.routers", fake_routers)
@@ -37,6 +41,7 @@ def backend_main_module(monkeypatch):
     monkeypatch.setitem(sys.modules, "backend.routers.planner", fake_planner)
     monkeypatch.setitem(sys.modules, "backend.routers.explainability", fake_explainability)
     monkeypatch.setitem(sys.modules, "backend.routers.security", fake_security)
+    monkeypatch.setitem(sys.modules, "backend.routers.auth", fake_auth)
 
     sys.modules.pop("backend.main", None)
     return import_module("backend.main")

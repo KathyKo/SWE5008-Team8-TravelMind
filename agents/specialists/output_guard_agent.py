@@ -19,7 +19,7 @@ Configuration sources:
 
 Routing:
     [specialists] → output_guard → output_flagged
-                               → output_safe
+                                 → output_safe
 """
 
 import json
@@ -39,7 +39,6 @@ from tools.security.pii_scanner import scan_pii, has_high_risk_pii
 from tools.security.llm_guard_scanner import scan_output_llm_guard
 from tools.security.security_logger import log_event, EventType
 
-
 AGENT_NAME = "output_guard_agent"
 ENABLE_LLM_UNSAFE_CHECK = os.getenv("ENABLE_LLM_UNSAFE_CHECK", "1") == "1"
 OUTPUT_GUARD_PROMPT_VERSION = os.getenv("OUTPUT_GUARD_PROMPT_VERSION", "v1")
@@ -51,7 +50,6 @@ FLAGGED_RESPONSE = (
     "I encountered an issue preparing your travel information. "
     "Please try rephrasing your request."
 )
-
 
 logger = logging.getLogger("travelmind.agents.output_guard")
 logger.setLevel(logging.INFO)
