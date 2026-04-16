@@ -32,6 +32,8 @@ Design decision (v2):
 import os
 import json
 import importlib
+import logging
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -56,6 +58,15 @@ BLOCKED_RESPONSE = (
     "I'm sorry, I'm unable to process that request. "
     "Please describe your travel plans and I'll be happy to help."
 )
+
+
+logger = logging.getLogger("travelmind.agents.input_guard")
+logger.setLevel(logging.INFO)
+if not logger.handlers:
+    _handler = logging.StreamHandler(sys.stdout)
+    _handler.setFormatter(logging.Formatter("[%(asctime)s] %(levelname)s %(name)s — %(message)s"))
+    logger.addHandler(_handler)
+logger.propagate = False
 
 
 def _get_prompt(name: str, version: str, fallback: str) -> str:
@@ -202,8 +213,7 @@ def input_guard_node(state: State) -> dict:
     and returns updated state with decision trace.
     """
     def _log_and_return(payload: dict[str, Any]) -> dict[str, Any]:
-        print("[input_guard_agent] 📤 return_json=")
-        print(json.dumps(payload, ensure_ascii=False, indent=2, default=str))
+        logger.info("return_json=%s", json.dumps(payload, ensure_ascii=False, default=str))
         return payload
 
     messages = state.get("messages", [])
@@ -222,7 +232,7 @@ def input_guard_node(state: State) -> dict:
     raw_input = last_msg.get("content", "") if isinstance(last_msg, dict) else str(last_msg)
     user_id = state.get("user_id")
 
-    print(f"\n[input_guard_agent] scanning input ({len(raw_input)} chars)...")
+    logger.info("scanning_input chars=%s", len(raw_input))
 
     # ── Step 1: Length check ──────────────────────────────────
     # Oversized inputs are rejected outright — not truncated.
@@ -241,7 +251,11 @@ def input_guard_node(state: State) -> dict:
             {"reason": "oversized_input", "length": len(raw_input), "limit": MAX_INPUT_LENGTH},
             user_id,
         )
-        print(f"[input_guard_agent] ⛔ BLOCKED — Input length {len(raw_input)} exceeds {MAX_INPUT_LENGTH} characters")
+        logger.warning(
+            "blocked step=length_check reason=oversized_input length=%s limit=%s",
+            len(raw_input),
+            MAX_INPUT_LENGTH,
+        )
         return _log_and_return({
             "threat_blocked": True,
             "threat_type": "oversized_input",
@@ -262,9 +276,11 @@ def input_guard_node(state: State) -> dict:
     if tool_plan["risk_level"] in {"medium", "high"}:
         run_pii_scan = True
         run_moderation = True
-    print(
-        f"[input_guard_agent] 🧠 (Step 3) Planner risk={tool_plan['risk_level']} "
-        f"PII={run_pii_scan} Moderation={run_moderation}"
+    logger.info(
+        "planner_step risk=%s run_pii_scan=%s run_moderation=%s",
+        tool_plan["risk_level"],
+        run_pii_scan,
+        run_moderation,
     )
 
     # ── Step 4: Regex injection detection ──────────────────────
@@ -292,7 +308,7 @@ def input_guard_node(state: State) -> dict:
             },
             user_id,
         )
-        print(f"[input_guard_agent] ⛔ BLOCKED (Step 4 — Regex): {regex_result.reason}")
+        logger.warning("blocked step=regex reason=%s", regex_result.reason)
         return _log_and_return({
             "threat_blocked": True,
             "threat_type": regex_result.threat_type,
@@ -324,7 +340,7 @@ def input_guard_node(state: State) -> dict:
                 {"reason": "high_risk_pii_in_input", "findings": pii_result.findings},
                 user_id,
             )
-            print("[input_guard_agent] ⛔ BLOCKED (Step 5 — PII Probe): High-risk PII detected in input")
+            logger.warning("blocked step=pii reason=high_risk_pii_detected")
             return _log_and_return({
                 "threat_blocked": True,
                 "threat_type": "pii_probe",
@@ -341,7 +357,7 @@ def input_guard_node(state: State) -> dict:
             )
             clean_text = pii_result.redacted_text
             pii_redacted = True
-            print("[input_guard_agent] ℹ️  (Step 5) Medium-risk PII redacted from input")
+            logger.info("pii_redacted step=pii severity=medium")
 
     # ── Step 6: LLM Guard injection scan ──────────────────────
     # Now runs on PII-cleaned text for more accurate injection detection
@@ -368,7 +384,7 @@ def input_guard_node(state: State) -> dict:
             },
             user_id,
         )
-        print(f"[input_guard_agent] ⛔ BLOCKED (Step 6 — LLM Guard): {llm_guard_result.reason}")
+        logger.warning("blocked step=llm_guard reason=%s", llm_guard_result.reason)
         return _log_and_return({
             "threat_blocked": True,
             "threat_type": llm_guard_result.threat_type,
@@ -407,7 +423,7 @@ def input_guard_node(state: State) -> dict:
                 },
                 user_id,
             )
-            print(f"[input_guard_agent] ⛔ BLOCKED (Step 7 — OpenAI Moderation): {moderation_result.reason}")
+            logger.warning("blocked step=moderation reason=%s", moderation_result.reason)
             return _log_and_return({
                 "threat_blocked": True,
                 "threat_type": "harmful_content",
@@ -422,7 +438,7 @@ def input_guard_node(state: State) -> dict:
         {"message_length": len(clean_text)},
         user_id,
     )
-    print("[input_guard_agent] ✅ Input passed all checks — routing to Intent & Profile Agent")
+    logger.info("input_passed all_checks=true route=intent_profile")
 
     updated_messages = messages[:-1] + [
         {**last_msg, "content": clean_text}
