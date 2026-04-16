@@ -1,8 +1,11 @@
 """
 backend/db/crud.py — save / load plans from RDS
 """
+import hashlib
+import hmac
+import secrets
 from sqlalchemy.orm import Session
-from .models import Plan, PlanItinerary, PlanFlight, PlanHotel, PlanExplain
+from .models import Plan, PlanItinerary, PlanFlight, PlanHotel, PlanExplain, User
 
 
 def save_plan(db: Session, plan_id: str, state: dict, result: dict, via_debate: bool = False) -> Plan:
@@ -142,3 +145,67 @@ def save_explain(db: Session, plan_id: str, explain_result: dict) -> None:
             agent_steps      = explain_result.get("agent_steps"),
         ))
     db.commit()
+
+
+def hash_password(password: str, *, iterations: int = 100_000) -> str:
+    """
+    Hash a plain password using PBKDF2-SHA256.
+    Stored format: pbkdf2_sha256$<iterations>$<salt_hex>$<digest_hex>
+    """
+    salt = secrets.token_bytes(16)
+    digest = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, iterations)
+    return f"pbkdf2_sha256${iterations}${salt.hex()}${digest.hex()}"
+
+
+def verify_password(password: str, password_hash: str) -> bool:
+    """
+    Verify password against hash created by hash_password().
+    Returns False when hash format is invalid.
+    """
+    try:
+        algo, iterations_str, salt_hex, digest_hex = password_hash.split("$", 3)
+        if algo != "pbkdf2_sha256":
+            return False
+        iterations = int(iterations_str)
+        salt = bytes.fromhex(salt_hex)
+        expected = bytes.fromhex(digest_hex)
+    except (TypeError, ValueError):
+        return False
+
+    actual = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, iterations)
+    return hmac.compare_digest(actual, expected)
+
+
+def get_user_by_username(db: Session, username: str) -> User | None:
+    return db.query(User).filter(User.username == username).first()
+
+
+def create_user(db: Session, username: str, password: str) -> User:
+    """
+    Create user with hashed password.
+    Raises ValueError if username already exists.
+    """
+    existing = get_user_by_username(db, username)
+    if existing:
+        raise ValueError("Username already exists")
+
+    user = User(
+        username=username,
+        password_hash=hash_password(password),
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def authenticate_user(db: Session, username: str, password: str) -> User | None:
+    """
+    Return user when username/password are valid; otherwise None.
+    """
+    user = get_user_by_username(db, username)
+    if not user:
+        return None
+    if not verify_password(password, user.password_hash):
+        return None
+    return user
