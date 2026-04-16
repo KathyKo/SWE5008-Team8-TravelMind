@@ -1,2 +1,2 @@
-from . import research, planner, explainability, security
+from . import research, planner, explainability, security, auth
 

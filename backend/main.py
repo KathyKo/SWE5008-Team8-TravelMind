@@ -15,7 +15,7 @@ Interactive docs:
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.routers import research, planner, explainability, security
+from backend.routers import research, planner, explainability, security, auth
 
 app = FastAPI(
     title="TravelMind API — Kathy (Agent2 / Agent3 / Agent6)",
@@ -41,6 +41,7 @@ app.include_router(research.router,       prefix="/research",       tags=["Agent
 app.include_router(planner.router,        prefix="/planner",        tags=["Agent3 Planner"])
 app.include_router(explainability.router, prefix="/explainability", tags=["Agent6 Explainability"])
 app.include_router(security.router,       prefix="/travel",         tags=["Travel Compatibility"])
+app.include_router(auth.router,           prefix="/auth",           tags=["Auth"])
 
 
 # ── Health ────────────────────────────────────────────────────

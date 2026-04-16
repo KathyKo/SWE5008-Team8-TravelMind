@@ -9,8 +9,11 @@ Tables:
   plan_explains     — Agent6 explain output (1 row per plan)
 """
 from datetime import datetime, timezone
+import uuid
 from sqlalchemy import Column, String, Text, Integer, DateTime, Boolean, ForeignKey
+from sqlalchemy import text
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -107,3 +110,24 @@ class PlanExplain(Base):
     agent_steps      = Column(JSONB, nullable=True)
 
     plan = relationship("Plan", back_populates="explains")
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    username = Column(String(100), nullable=False, unique=True, index=True)
+    password_hash = Column(Text, nullable=False)
+    created_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc),
+        server_default=text("CURRENT_TIMESTAMP"),
+    )
+    updated_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+        server_default=text("CURRENT_TIMESTAMP"),
+    )
