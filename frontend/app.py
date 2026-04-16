@@ -3,6 +3,8 @@ app.py — TravelMind Streamlit entry point
 Run: streamlit run app.py
 """
 
+import os
+import requests
 import streamlit as st
 from data.store import USERS
 
@@ -12,6 +14,64 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed",
 )
+
+BACKEND_URL = os.getenv("BACKEND_URL", "http://backend:8000").rstrip("/")
+
+
+def _profile_from_username(username: str) -> dict:
+    demo_profile = USERS.get(username)
+    if demo_profile:
+        return {
+            "name": demo_profile.get("name", username.split("@")[0]),
+            "avatar": demo_profile.get("avatar", "User"),
+            "prefs": demo_profile.get("prefs", []),
+        }
+    return {
+        "name": username.split("@")[0] if "@" in username else username,
+        "avatar": "User",
+        "prefs": [],
+    }
+
+
+def _login_with_backend(username: str, password: str) -> tuple[dict | None, str | None]:
+    try:
+        resp = requests.post(
+            f"{BACKEND_URL}/auth/login",
+            json={"username": username, "password": password},
+            timeout=20,
+        )
+        if resp.status_code != 200:
+            detail = resp.json().get("detail", "Login failed")
+            return None, str(detail)
+        return resp.json(), None
+    except requests.exceptions.RequestException:
+        return None, "Backend unavailable"
+
+
+def _register_with_backend(username: str, password: str) -> tuple[dict | None, str | None]:
+    try:
+        resp = requests.post(
+            f"{BACKEND_URL}/auth/register",
+            json={"username": username, "password": password},
+            timeout=20,
+        )
+        if resp.status_code != 200:
+            detail = resp.json().get("detail", "Register failed")
+            return None, str(detail)
+        return resp.json(), None
+    except requests.exceptions.RequestException:
+        return None, "Backend unavailable"
+
+
+def _set_login_state(username: str, user_id: str | None) -> None:
+    profile = _profile_from_username(username)
+    st.session_state.logged_in = True
+    st.session_state.user_id = user_id
+    st.session_state.user = {
+        **profile,
+        "email": username,
+        "username": username,
+    }
 
 # ── Global CSS ───────────────────────────────────────────────
 st.markdown("""
@@ -155,7 +215,13 @@ st.markdown("""
 def init_state():
     defaults = {
         "logged_in": False,
+        "user_id": None,
         "user": None,
+        "auth_mode": "Sign In",
+        "auth_mode_widget": "Sign In",
+        "auth_mode_pending": None,
+        "auth_notice": None,
+        "login_prefill": "alice@example.com",
         "visited": {},          # item_key -> bool
         "selected_option": "A",
         "plan_generated": False,
@@ -180,11 +246,15 @@ init_state()
 def login_screen():
     col_l, col_c, col_r = st.columns([1, 1.2, 1])
     with col_c:
+        if st.session_state.auth_mode_pending:
+            st.session_state.auth_mode_widget = st.session_state.auth_mode_pending
+            st.session_state.auth_mode_pending = None
+
         st.markdown("<br><br>", unsafe_allow_html=True)
         st.markdown("""
         <div style='text-align:center; margin-bottom:8px;'>
           <span style='font-size:32px; font-weight:800; color:#e8edf5; letter-spacing:-1px;'>
-            🗺️ Travel<span style='color:#3b9eff;'>Mind</span>
+            Travel<span style='color:#3b9eff;'>Mind</span>
           </span>
         </div>
         <div style='text-align:center; color:#7a90b0; font-size:14px; margin-bottom:32px;'>
@@ -192,41 +262,82 @@ def login_screen():
         </div>
         """, unsafe_allow_html=True)
 
-        with st.form("login_form"):
-            email = st.text_input("Email", value="alice@example.com", placeholder="you@example.com")
-            password = st.text_input("Password", type="password", value="demo123", placeholder="••••••••")
-            submitted = st.form_submit_button("Sign In →", use_container_width=True, type="primary")
+        auth_mode = st.radio(
+            "Auth mode",
+            ["Sign In", "Register"],
+            key="auth_mode_widget",
+            horizontal=True,
+            label_visibility="collapsed",
+        )
+        st.session_state.auth_mode = auth_mode
 
-            if submitted:
-                user = USERS.get(email)
-                if user and user["password"] == password:
-                    st.session_state.logged_in = True
-                    st.session_state.user = {**user, "email": email}
-                    st.rerun()
-                else:
-                    st.error("Invalid credentials. Try a demo account below.")
+        if auth_mode == "Sign In":
+            if st.session_state.auth_notice:
+                st.success(st.session_state.auth_notice)
+                st.session_state.auth_notice = None
 
-        st.markdown("<div style='text-align:center; color:#4a5a72; font-size:12px; margin:16px 0;'>— or sign in as a demo user —</div>", unsafe_allow_html=True)
+            with st.form("login_form"):
+                username = st.text_input(
+                    "Username",
+                    value=st.session_state.get("login_prefill", "alice@example.com"),
+                    placeholder="username",
+                )
+                password = st.text_input("Password", type="password", placeholder="At least 6 characters")
+                submitted = st.form_submit_button("Sign In", use_container_width=True, type="primary")
+
+                if submitted:
+                    clean_username = username.strip()
+                    data, err = _login_with_backend(clean_username, password)
+                    if data:
+                        _set_login_state(clean_username, data.get("user_id"))
+                        st.rerun()
+                    elif err == "Backend unavailable":
+                        user = USERS.get(clean_username)
+                        if user and user["password"] == password:
+                            st.warning("Backend unavailable. Logged in with local demo mode.")
+                            _set_login_state(clean_username, None)
+                            st.rerun()
+                        else:
+                            st.error("Backend unavailable, and demo credential did not match.")
+                    else:
+                        st.error(err or "Invalid credentials.")
+        else:
+            with st.form("register_form"):
+                username = st.text_input("Username ", value="", placeholder="new_username")
+                password = st.text_input("Password ", type="password", value="", placeholder="At least 6 characters")
+                submitted = st.form_submit_button("Create Account", use_container_width=True, type="primary")
+
+                if submitted:
+                    clean_username = username.strip()
+                    data, err = _register_with_backend(clean_username, password)
+                    if data:
+                        st.session_state.login_prefill = clean_username
+                        st.session_state.auth_notice = "Register success. Please sign in."
+                        st.session_state.auth_mode_pending = "Sign In"
+                        st.rerun()
+                    elif err == "Backend unavailable":
+                        st.error("Backend unavailable. Cannot register in local demo mode.")
+                    else:
+                        st.error(err or "Register failed.")
+
+        st.markdown("<div style='text-align:center; color:#4a5a72; font-size:12px; margin:16px 0;'>or sign in as a demo user</div>", unsafe_allow_html=True)
 
         col1, col2, col3 = st.columns(3)
         with col1:
-            if st.button("👩 Alice\nCulture lover", use_container_width=True):
-                st.session_state.logged_in = True
-                st.session_state.user = {**USERS["alice@example.com"], "email": "alice@example.com"}
+            if st.button("Alice\nCulture lover", use_container_width=True):
+                _set_login_state("alice@example.com", None)
                 st.rerun()
         with col2:
-            if st.button("👨 Bob\nFoodie", use_container_width=True):
-                st.session_state.logged_in = True
-                st.session_state.user = {**USERS["bob@example.com"], "email": "bob@example.com"}
+            if st.button("Bob\nFoodie", use_container_width=True):
+                _set_login_state("bob@example.com", None)
                 st.rerun()
         with col3:
-            if st.button("👩 Carol\nAdventure", use_container_width=True):
-                st.session_state.logged_in = True
-                st.session_state.user = {**USERS["carol@example.com"], "email": "carol@example.com"}
+            if st.button("Carol\nAdventure", use_container_width=True):
+                _set_login_state("carol@example.com", None)
                 st.rerun()
 
 
-# ── Topbar ───────────────────────────────────────────────────
+# -- Topbar ───────────────────────────────────────────────────
 def topbar():
     user = st.session_state.user
     col1, col2, col3, col4 = st.columns([2, 4, 2, 1])
