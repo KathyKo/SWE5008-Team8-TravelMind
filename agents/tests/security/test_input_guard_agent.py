@@ -4,7 +4,6 @@ from importlib import import_module
 
 ig = import_module("agents.specialists.input_guard_agent")
 
-
 def _setup_oversized(monkeypatch):
     monkeypatch.setattr(ig, "log_event", lambda *args, **kwargs: None)
     monkeypatch.setattr(ig, "MAX_INPUT_LENGTH", 10)

@@ -19,7 +19,7 @@ Configuration sources:
 
 Routing:
     [specialists] → output_guard → output_flagged
-                               → output_safe
+                                 → output_safe
 """
 
 import json
