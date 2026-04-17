@@ -1,3 +1,10 @@
+from pathlib import Path
+import sys
+
+frontend_dir = Path(__file__).resolve().parents[1]
+if str(frontend_dir) not in sys.path:
+    sys.path.insert(0, str(frontend_dir))
+
 from data.store import USERS, OPTION_META, ITINERARIES
 
 
