@@ -30,3 +30,4 @@ dist/
 debug/
 
 .coverage
+htmlcov/
