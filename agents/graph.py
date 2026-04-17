@@ -78,46 +78,58 @@ def run_cli():
 
     graph = build_travel_graph()
 
-    # Initial state
-    initial_state = State(
-        messages=[],
-        origin=None,
-        destination=None,
-        dates=None,
-        budget=None,
-        preferences=None,
-        duration=None,
-        outbound_time_pref=None,
-        return_time_pref=None,
-        flight_options=None,
-        hotel_options=None,
-        user_profile=None,
-        travelers=None,
-        session_id=None,
-        intent_profile_output=None,
-        user_profile_structured=None,
-        orchestration_stage="input_guard",
-        input_guard_output=None,
-        search_output=None,
-        planner_output=None,
-        replanner_output=None,
-        debate_output=None,
-        explain_output=None,
-        output_guard_result=None,
-        composite_score=None,
-        replan_attempts=0,
-        max_replan_attempts=2,
-        approval_threshold=75.0,
-        stage=None,
-        itinerary=None,
-        research=None,
-        selections=None,
-        search_results=None,
-        final_itinerary=None,
-        next_agent=None,
-        confirmed=False,
-        is_complete=False,
-    )
+    initial_state = {
+        "messages": [],
+
+        # Intent Profile — 全部由 intent_profile agent 填充
+        "origin": None,
+        "destination": None,
+        "budget": None,
+        "dates": None,
+        "preferences": None,
+        "duration": None,
+        "user_profile": None,
+        "travelers": None,
+        "outbound_time_pref": None,
+        "return_time_pref": None,
+        "session_id": None,
+        "intent_profile_output": None,
+        "is_complete": False,
+
+        # Security
+        "threat_blocked": None,
+
+        # Research / Search
+        "search_results": None,
+        "research": None,
+
+        # Planner
+        "itineraries": None,
+        "final_itineraries": None,
+
+        # Debate ↔ Planner 循环控制
+        "is_valid": None,
+        "debate_count": 0,
+        "critique": None,
+        "approval_threshold": 75.0,
+
+        # Replanner（用户反馈触发）
+        "user_feedback": None,
+        "replan_attempts": 0,
+        "max_replan_attempts": 2,
+
+        # Explainability
+        "explanation": None,
+        "explain_data": None,
+
+        # Output Guard
+        "output_guard_decision": None,
+
+        # Orchestrator
+        "next_node": None,
+        "error_message": None,
+        "final_output": None,
+    }
 
     try:
         # Start the graph interaction with a higher recursion limit for longer conversations
