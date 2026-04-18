@@ -1,9 +1,9 @@
 """
 backend/routers/planner.py — Agent3 (Planner) endpoints
 
-POST /planner/run     → planner_agent_1(state)
+POST /planner/run     → planner_agent(state)
                         Runs Agent2 internally, then generates 3 itinerary options
-POST /planner/revise  → revise_itinerary_1(state, critique, current_result)
+POST /planner/revise  → revise_itinerary(state, critique, current_result)
                         Accepts Agent4 critique and returns a revised plan (1 LLM call)
 GET  /planner/health
 """
