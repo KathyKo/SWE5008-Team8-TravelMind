@@ -1,5 +1,5 @@
 """
-Planner-only pipeline that consumes `research_agent_1`.
+Planner-only pipeline that consumes `research_agent`.
 """
 
 from __future__ import annotations
