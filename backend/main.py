@@ -2,8 +2,8 @@
 backend/main.py — TravelMind Backend (Kathy: Agent2 / Agent3 / Agent6)
 
 Routers:
-  /research       → Agent2 (Research)       research_agent_1
-  /planner        → Agent3 (Planner)        planner_agent_1 + revise_itinerary_1
+  /research       → Agent2 (Research)       research_agent
+  /planner        → Agent3 (Planner)        planner_agent + revise_itinerary
   /explainability → Agent6 (Explainability) explainability_agent
 
 Run (from project root — travelagents/):
@@ -13,11 +13,29 @@ Interactive docs:
   http://localhost:8000/docs
 """
 
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.routers import research, planner, explainability, security, auth
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Create DB tables on startup — skipped if they already exist.
+    # Wrapped in try/except so the server still starts if RDS is temporarily unreachable.
+    try:
+        from backend.db.database import engine
+        from backend.db.models import Base
+        Base.metadata.create_all(bind=engine)
+        print("[startup] DB tables verified / created.")
+    except Exception as exc:
+        print(f"[startup] WARNING: could not connect to DB — {exc}")
+        print("[startup] Server started without DB. Endpoints requiring DB will fail until RDS is reachable.")
+    yield
+
+
 app = FastAPI(
+    lifespan=lifespan,
     title="TravelMind API — Kathy (Agent2 / Agent3 / Agent6)",
     description=(
         "Agent2 (Research): POST /research/run\n"

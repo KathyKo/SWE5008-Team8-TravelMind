@@ -1,76 +1,85 @@
-from re import search
-from typing import TypedDict, Optional, Annotated, List, Dict, Any
+from typing import TypedDict, Optional, Annotated, List
 import operator
 
 
 class State(TypedDict):
     """
     Overall state of the Travel Agency multi-agent system.
+    All specialist agents read/write subsets of this state.
+    The orchestrator inspects key fields to decide routing.
     """
-    # Conversation history
+
+    # ── Conversation ──────────────────────────────────────
     messages: Annotated[list, operator.add]
 
-    # User preferences (filled by concierge)
+    # ── User Input / Intent Profile ───────────────────────
     origin: Optional[str]
     destination: Optional[str]
     budget: Optional[str]
     dates: Optional[str]
-    preferences: Optional[str]   # e.g. "budget", "moderate", "luxury"
-    duration: Optional[str]      # e.g. "3 days"
-    user_id: Optional[str]       # User identifier for logging
-
-    # Security fields
-    threat_blocked: Optional[bool]
-    threat_type: Optional[str]
-    threat_detail: Optional[str]
-    sanitised_input: Optional[str]
-    security_audit_log: Optional[List]
-    input_guard_decision: Optional[Dict[str, Any]]
-    output_guard_decision: Optional[Dict[str, Any]]
-
-    # Options gathered by specialized agents
-    flight_options: Optional[List]
-    hotel_options: Optional[List]
-
-    # Intent/Profile extracted by Agent1
-    user_profile: Optional[str]  # derived from preferences, e.g. "diet=vegetarian; interests=culture"
+    preferences: Optional[str]       # e.g. "budget", "moderate", "luxury"
+    duration: Optional[str]          # e.g. "3 days"
+    user_profile: Optional[str]      # derived tag string
     travelers: Optional[int]
     outbound_time_pref: Optional[str]
     return_time_pref: Optional[str]
     session_id: Optional[str]
     intent_profile_output: Optional[dict]
     user_profile_structured: Optional[dict]
+    search_queries: Optional[dict]
+    hard_constraints: Optional[dict]
+    soft_preferences: Optional[dict]
+    is_complete: Optional[bool]
 
-    # 8-agent orchestration layer artifacts
-    orchestration_stage: Optional[str]
-    input_guard_output: Optional[dict]
-    search_output: Optional[dict]
-    planner_output: Optional[dict]
-    replanner_output: Optional[dict]
+    # ── Input Guard (Security) ────────────────────────────
+    threat_blocked: Optional[bool]   # True → orchestrator terminates flow
+    threat_type: Optional[str]
+    threat_detail: Optional[str]
+    sanitised_input: Optional[str]
+    input_guard_decision: Optional[str]
+    security_audit_log: Optional[List]
+
+    # ── Research / Search ─────────────────────────────────
+    search_results: Optional[dict]
+    research: Optional[dict]
+    inventory: Optional[dict]        # attractions / hotels / flights
+    maps_attractions: Optional[str]
+
+    # ── Planner ──────────────────────────────────────────
+    itineraries: Optional[list]
+    final_itineraries: Optional[list]
+    validated_itineraries: Optional[list]
+    planner_decision_trace: Optional[list]
+    planner_chain_of_thought: Optional[str]
+    chain_of_thought: Optional[str]
+
+    # ── Debate ───────────────────────────────────────────
+    # is_valid: None=尚未评审 / True=通过 / False=未通过
+    is_valid: Optional[bool]
+    debate_count: Optional[int]      # 累计 debate→planner 循环次数
+    critique: Optional[str]          # debate 输出的改进意见，供 planner 重新规划
+    composite_score: Optional[float] # debate 综合评分
+    approval_threshold: Optional[float]  # 通过阈值 (default 75.0)
     debate_output: Optional[dict]
-    is_valid: Optional[bool]       # None=未评审/True=通过/False=未通过
-    debate_count: Optional[int]    # debate轮数
-    explain_output: Optional[dict]
-    output_guard_result: Optional[dict]
-    final_plan: Optional[dict]
-    composite_score: Optional[float]
+
+    # ── Replanner ────────────────────────────────────────
+    # replanner 仅由用户反馈触发，不参与 debate 循环
+    user_feedback: Optional[str]     # 用户修改/反馈内容 → 触发 replanner
     replan_attempts: Optional[int]
     max_replan_attempts: Optional[int]
-    approval_threshold: Optional[float]
-    user_feedback: Optional[dict]
-    replan_mode: Optional[bool]
+    replanner_output: Optional[dict]
 
-    # Booking agent multi-stage state
-    stage: Optional[str]           # itinerary_draft | awaiting_selection | reviewing | confirmed
-    itinerary: Optional[str]       # drafted itinerary text (written once, never overwritten)
-    research: Optional[dict]       # raw destination research snippets
-    selections: Optional[dict]     # {"transport": "...", "accommodation": "..."}
-    search_results: Optional[dict] # {"transport": {...}, "accommodation": {...}}
+    # ── Explainability ───────────────────────────────────
+    explanation: Optional[dict]
+    explain_data: Optional[dict]
+    summary: Optional[dict]
 
-    # Final output
-    final_itinerary: Optional[str]
+    # ── Output Guard (Security) ──────────────────────────
+    output_flagged: Optional[bool]   # True → output was sanitised/replaced
+    output_flag_reason: Optional[str]
+    output_guard_decision: Optional[str]
 
-    # Flow control
-    next_agent: Optional[str]
-    confirmed: Optional[bool]
-    is_complete: bool
+    # ── Orchestrator Routing ─────────────────────────────
+    next_node: Optional[str]         # orchestrator_node 写入，orchestrator_routing 读取
+    error_message: Optional[str]
+    final_output: Optional[str]

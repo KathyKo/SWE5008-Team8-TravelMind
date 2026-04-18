@@ -1,5 +1,5 @@
 """
-Planner-only pipeline that consumes `research_agent_1`.
+Planner-only pipeline that consumes `research_agent`.
 """
 
 from __future__ import annotations
@@ -1313,7 +1313,7 @@ def _post_process_options(
 
 def revise_itinerary(state: dict, critique: str, current_result: dict) -> dict:
     if not _inventory_cache:
-        return {"error": "No cached inventory - run planner_agent_1() first"}
+        return {"error": "No cached inventory - run planner_agent() first"}
 
     inv = _inventory_cache
     dest = state.get("destination", "")
@@ -1375,7 +1375,7 @@ Return ONLY valid JSON:
 }}
 """
 
-    tool_log = [f"[planner_agent_1] Revision mode critique received ({len(critique)} chars)"]
+    tool_log = [f"[planner_agent] Revision mode critique received ({len(critique)} chars)"]
     try:
         llm = _llm()
         response = llm.invoke([SystemMessage(content=prompt)], response_format={"type": "json_object"})
@@ -1390,7 +1390,7 @@ Return ONLY valid JSON:
             inv["compact_flights_ret"],
             tool_log,
         )
-        tool_log.append(f"[planner_agent_1] Revision complete - {list(options.keys())}")
+        tool_log.append(f"[planner_agent] Revision complete - {list(options.keys())}")
         return {
             "itineraries": itineraries,
             "final_itineraries": itineraries,
@@ -4609,7 +4609,7 @@ def _build_option_schedule(
     return days, stats, day_activity_centroids, day_decisions
 
 
-# Main route-first scheduler used by planner_from_research_1().
+# Main route-first scheduler used by planner_from_research().
 def _build_deterministic_plan(
     compact_attractions: list[dict],
     compact_restaurants: list[dict],
@@ -4802,8 +4802,8 @@ def planner_from_research(state: dict, research_result: dict) -> dict:
             trip_start_date=trip_start_date,
         )
         planner_chain_of_thought = result.get("chain_of_thought", "")
-        tool_log.append("[planner_agent_1] Deterministic route-first scheduler with LLM seed selection used saved research inventory")
-        tool_log.append(f"[planner_agent_1] Generated options: {list(itineraries.keys())}")
+        tool_log.append("[planner_agent] Deterministic route-first scheduler with LLM seed selection used saved research inventory")
+        tool_log.append(f"[planner_agent] Generated options: {list(itineraries.keys())}")
 
         return {
             "itineraries": itineraries,

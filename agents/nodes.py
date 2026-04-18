@@ -3,8 +3,8 @@ import requests
 from typing import Dict
 from .state import State
 
-# 假设在 docker-compose 网络中，每个容器可以通过服务名访问
-# 所有 Agent 使用同一个 hostname，仅端口不同（8100 起递增）
+# Assume in the docker-compose network, each container can be accessed by the service name
+# All Agents use the same hostname, only the port is different (starting from 8100)
 AGENT_HOST = os.getenv("AGENT_HOST", "localhost")
 AGENT_SCHEME = os.getenv("AGENT_SCHEME", "http")
 
@@ -19,112 +19,188 @@ AGENT_URLS = {
     "replanner": os.getenv("AGENT_REPLANNER_URL", f"{AGENT_SCHEME}://{AGENT_HOST}:8107/api/invoke/replanner"),
 }
 
+
 def call_remote_agent(agent_name: str, state: State) -> Dict:
     """
-    【通用底层函数】向指定的 Docker 容器发送当前 State，并接收更新后的 State 片段。
+    Send the current State to the specified Docker container and receive the updated State fragment.
     """
     url = AGENT_URLS.get(agent_name)
     if not url:
         raise ValueError(f"Unknown agent: {agent_name}")
 
-    print(f"--- 正在调用远程容器: [{agent_name}] ---")
-    
+    print(f"--- Calling remote container: [{agent_name}] ---")
+
     try:
-        # 将整个 state 作为 JSON 发送给对应的容器
-        # 设置 timeout 防止某个 Agent 卡死导致整个 Graph 阻塞
         response = requests.post(url, json={"state": state}, timeout=60.0)
-        
-        # 如果返回非 200 状态码，抛出异常
         response.raise_for_status()
-        
-        # 容器应该返回一个字典，包含需要更新的 state 字段
         return response.json()
-        
+
     except requests.exceptions.RequestException as e:
-        print(f"!!! 调用容器 [{agent_name}] 失败: {e}")
-        # 如果调用失败，返回一个错误信息，并将控制权交还给 orchestrator
+        print(f"!!! Calling container [{agent_name}] failed: {e}")
         return {
-            "error_message": f"{agent_name} 服务不可用: {str(e)}",
-            "next_node": "orchestrator" # 强制回到中控进行错误处理
+            "error_message": f"{agent_name} service unavailable: {str(e)}",
         }
 
-# ==========================================
-# 极其简洁的节点封装 (Thin Wrappers)
-# ==========================================
+
+# ============================================================
+#  Thin Node Wrappers — Thin wrapper for each agent node
+# ============================================================
 
 def input_guard_node(state: State) -> Dict:
     return call_remote_agent("input_guard", state)
 
+
 def intent_profile_node(state: State) -> Dict:
     return call_remote_agent("intent_profile", state)
+
 
 def search_node(state: State) -> Dict:
     return call_remote_agent("search", state)
 
+
 def planner_node(state: State) -> Dict:
-    return call_remote_agent("planner", state)
+    """
+    Call the remote planner container.
+    Whether it's the first planning or re-planning after debate failure,
+    reset is_valid=None to let orchestrator re-route to debate for review.
+    """
+    result = call_remote_agent("planner", state)
+    result["is_valid"] = None
+    return result
+
 
 def debate_node(state: State) -> Dict:
-    return call_remote_agent("debate", state)
+    """
+    Call the remote debate container (internal debate between debate LLM and planner LLM).
+    Ensure debate_count increases, so orchestrator can determine if the maximum number of loops has been reached.
+    """
+    result = call_remote_agent("debate", state)
+    result.setdefault("debate_count", state.get("debate_count", 0) + 1)
+    return result
+
+
+def replanner_node(state: State) -> Dict:
+    """
+    Call the remote replanner container (only triggered by user feedback).
+    Reset the state of all downstream stages, so the workflow can start from debate to review the new plan.
+    """
+    result = call_remote_agent("replanner", state)
+    result["user_feedback"] = None
+    result["is_valid"] = None
+    result["explanation"] = None
+    result["explain_data"] = None
+    result["output_guard_decision"] = None
+    result.setdefault("replan_attempts", state.get("replan_attempts", 0) + 1)
+    return result
+
 
 def explain_node(state: State) -> Dict:
     return call_remote_agent("explain", state)
 
+
 def output_guard_node(state: State) -> Dict:
     return call_remote_agent("output_guard", state)
 
-def replanner_node(state: State) -> Dict:
-    return call_remote_agent("replanner", state)
-    # 路由判定函数
-def orchestrator_routing(state: State):
-    # 获取 state 中记录的下一个节点，如果没有，安全起见默认结束
-    return state.get("next_node", "END")
 
-# ==========================================
-# Orchestrator 核心调度器 (本地执行，无需调远端)
-# ==========================================
+# ============================================================
+#  Orchestrator — Central routing brain (pure memory judgment, no remote call)
+# ============================================================
+#
+#  Normal workflow:
+#    START → input_guard → orchestrator
+#      → [threat_blocked?] ──True──→ END
+#      → intent_profile → orchestrator
+#      → search → orchestrator
+#      → planner → orchestrator          ←──┐
+#      → debate → orchestrator                │
+#        ├─ is_valid=True ──────→ explain      │
+#        ├─ is_valid=False & count < max ──────┘  (return to planner with critique to regenerate)
+#        └─ is_valid=False & count ≥ max → explain (强制推进)
+#      → explain → orchestrator
+#      → output_guard → END
+#
+#  User feedback path(replanner):
+#    user_feedback Set as: → replanner → orchestrator
+#      → debate → … (re-run debate→explain→output_guard)
+# ============================================================
 
 def orchestrator_node(state: State) -> Dict:
     """
-    这是你的中央大脑，它不请求外部 API，只在内存中根据当前状态进行极速路由判断。
+    Central orchestrator: determine next_node based on the fields written by each agent in the state.
+    Return {"next_node": "<agent_name>"} to write into state,
+    and read by orchestrator_routing to pass to LangGraph conditional routing.
+    Read by orchestrator_routing and passed to LangGraph conditional routing.
     """
-    # 0. 错误捕获：如果某个远程 Agent 挂了
+
+    # ── 0. Global error intercept ──────────────────────────────────
     if state.get("error_message"):
-        print(f"Orchestrator 拦截到错误: {state['error_message']}")
-        return {"next_node": "END"} # 或路由到专门的 error_handler 节点
-
-    # 0.5 仅在显式 replan 模式下才进入 replanner，避免干扰主链路
-    if state.get("replan_mode") and state.get("user_feedback"):
-        return {"next_node": "replanner"}
-
-    # 0.6 显式 replan 模式下，重规划完成后结束本轮
-    if state.get("replan_mode") and state.get("replanner_output") and not state.get("user_feedback"):
+        print(f"[Orchestrator] error intercepted: {state['error_message']}")
         return {"next_node": "END"}
 
-    # 1. 刚开始跑，没有用户画像，去 Agent 1
-    if not state.get("user_profile"):
+    # ── 1. Input Guard (security gate) ──────────────────────────
+    if state.get("threat_blocked") is True:
+        print("[Orchestrator] input blocked by input_guard, workflow terminated.")
+        return {"next_node": "END"}
+
+    # ── 2. User feedback → Replanner (priority higher than normal workflow) ───
+    #    User submitted a modification feedback at H.I.T. Checkpoint
+    if state.get("user_feedback"):
+        print("[Orchestrator] → replanner (user submitted a modification feedback)")
+        return {"next_node": "replanner"}
+
+    # ── 3. Intent Profile (user intent profile) ──────────────────
+    if not state.get("intent_profile_output"):
+        print("[Orchestrator] → intent_profile (extract user intent)")
         return {"next_node": "intent_profile"}
-        
-    # 2. 有了画像，但没检索数据，去 Agent 2
-    if state.get("user_profile") and not state.get("search_results"):
+
+    # ── 4. Research / Search (information retrieval) ───────────────────
+    if not state.get("search_results") and not state.get("research"):
+        print("[Orchestrator] → search (information retrieval)")
         return {"next_node": "search"}
-        
-    # 3. 检索完了，还没做计划，去 Agent 3
-    # planner invoke currently writes `itinerary` (not `itinerary_options`)
-    if state.get("search_results") and not state.get("itinerary"):
+
+    # ── 5. Planner (trip planning) ────────────────────────────
+    #    First planning: itineraries does not exist
+    #    Re-planning after debate failure: planner_node will reset is_valid=None when returning
+    if not state.get("itineraries") and not state.get("final_itineraries"):
+        print("[Orchestrator] → planner (generate itinerary)")
         return {"next_node": "planner"}
-        
-    # 4. 做完计划了，去辩论 Agent 4
-    if state.get("itinerary") and not state.get("is_valid") and state.get("debate_count", 0) < 3:
+
+    # ── 6. Debate ↔ Planner loop ─────────────────────────
+    is_valid = state.get("is_valid")        # None / True / False
+    debate_count = state.get("debate_count", 0)
+    max_debate_rounds = 3
+
+    # 6a. Not reviewed yet or planner/replanner just generated a new plan → debate
+    if is_valid is None:
+        print("[Orchestrator] → debate (trip quality review)")
         return {"next_node": "debate"}
-        
-    # 5. 辩论通过（或满3次），去解释 Agent 6
-    if (state.get("is_valid") or state.get("debate_count", 0) >= 3) and not state.get("explanation"):
+
+    # 6b. debate failed and not reached the maximum number of rounds → return with critique to planner for improvement
+    if is_valid is False and debate_count < max_debate_rounds:
+        print(f"[Orchestrator] → planner (debate failed, round {debate_count}/{max_debate_rounds} improvement)")
+        return {"next_node": "planner"}
+
+    # 6c. debate passed (is_valid=True) or reached the maximum number of rounds → force push
+
+    # ── 7. Explainability (explainability) ─────────────────────
+    if not state.get("explanation") and not state.get("explain_data"):
+        print("[Orchestrator] → explain (generate decision explanation)")
         return {"next_node": "explain"}
-        
-    # 6. 生成了解释，去出口安全门禁 Agent 7
-    if state.get("explanation") and not state.get("final_output"):
+
+    # ── 8. Output Guard (output security check) ───────────────────
+    if not state.get("output_guard_decision"):
+        print("[Orchestrator] → output_guard (output security check)")
         return {"next_node": "output_guard"}
-        
-    # 7. 全流程完毕
+
+    # ── 9. All workflow completed ───────────────────────────────────
+    print("[Orchestrator] workflow completed.")
     return {"next_node": "END"}
+
+
+def orchestrator_routing(state: State) -> str:
+    """
+    LangGraph add_conditional_edges routing function.
+    Must return str (node name), not Dict.
+    Only read the next_node field written by orchestrator_node.
+    """
+    return state.get("next_node", "END")
