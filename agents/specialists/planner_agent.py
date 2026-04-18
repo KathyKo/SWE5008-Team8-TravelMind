@@ -14,17 +14,12 @@ import re
 from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_openai import ChatOpenAI
 
-from ..llm_config import DMX_API_KEY, DMX_BASE_URL, PLANNER_MODEL
+from ..llm_config import OPENAI_MODEL
 from .research_agent import _normalize_trip_state, research_agent
 
 
 def _llm() -> ChatOpenAI:
-    return ChatOpenAI(
-        model=PLANNER_MODEL,
-        temperature=0.5,
-        base_url=DMX_BASE_URL,
-        api_key=DMX_API_KEY,
-    )
+    return ChatOpenAI(model=OPENAI_MODEL, temperature=0.5)
 
 
 def _has_expected_option_schema(options: dict) -> bool:
