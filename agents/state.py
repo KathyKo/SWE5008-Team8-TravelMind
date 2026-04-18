@@ -46,7 +46,10 @@ class State(TypedDict):
     input_guard_output: Optional[dict]
     search_output: Optional[dict]
     planner_output: Optional[dict]
+    replanner_output: Optional[dict]
     debate_output: Optional[dict]
+    is_valid: Optional[bool]       # None=未评审/True=通过/False=未通过
+    debate_count: Optional[int]    # debate轮数
     explain_output: Optional[dict]
     output_guard_result: Optional[dict]
     final_plan: Optional[dict]
@@ -54,6 +57,8 @@ class State(TypedDict):
     replan_attempts: Optional[int]
     max_replan_attempts: Optional[int]
     approval_threshold: Optional[float]
+    user_feedback: Optional[dict]
+    replan_mode: Optional[bool]
 
     # Booking agent multi-stage state
     stage: Optional[str]           # itinerary_draft | awaiting_selection | reviewing | confirmed

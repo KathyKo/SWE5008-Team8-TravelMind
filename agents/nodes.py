@@ -93,6 +93,14 @@ def orchestrator_node(state: State) -> Dict:
         print(f"Orchestrator 拦截到错误: {state['error_message']}")
         return {"next_node": "END"} # 或路由到专门的 error_handler 节点
 
+    # 0.5 仅在显式 replan 模式下才进入 replanner，避免干扰主链路
+    if state.get("replan_mode") and state.get("user_feedback"):
+        return {"next_node": "replanner"}
+
+    # 0.6 显式 replan 模式下，重规划完成后结束本轮
+    if state.get("replan_mode") and state.get("replanner_output") and not state.get("user_feedback"):
+        return {"next_node": "END"}
+
     # 1. 刚开始跑，没有用户画像，去 Agent 1
     if not state.get("user_profile"):
         return {"next_node": "intent_profile"}
@@ -102,11 +110,12 @@ def orchestrator_node(state: State) -> Dict:
         return {"next_node": "search"}
         
     # 3. 检索完了，还没做计划，去 Agent 3
-    if state.get("search_results") and not state.get("itinerary_options"):
+    # planner invoke currently writes `itinerary` (not `itinerary_options`)
+    if state.get("search_results") and not state.get("itinerary"):
         return {"next_node": "planner"}
         
     # 4. 做完计划了，去辩论 Agent 4
-    if state.get("itinerary_options") and not state.get("is_valid") and state.get("debate_count", 0) < 3:
+    if state.get("itinerary") and not state.get("is_valid") and state.get("debate_count", 0) < 3:
         return {"next_node": "debate"}
         
     # 5. 辩论通过（或满3次），去解释 Agent 6

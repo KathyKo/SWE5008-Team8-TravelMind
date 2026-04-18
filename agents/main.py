@@ -14,6 +14,8 @@ from agents.graph import build_travel_graph
 from agents.state import State
 from agents.specialists.input_guard_agent import input_guard_agent
 from agents.specialists.output_guard_agent import output_guard_agent
+from agents.specialists.debate_agent import debate_agent
+from agents.specialists.dynamic_replan_agent import dynamic_replan_agent
 
 app = FastAPI(
     title="TravelMind Agents API",
@@ -96,6 +98,12 @@ class SummarizeRequest(BaseModel):
     itinerary: Optional[str] = None
 
 
+class ReplanRequest(BaseModel):
+    user_feedback: dict[str, Any]
+    plan_id: Optional[str] = None
+    user_id: Optional[str] = None
+
+
 class AgentInvokeRequest(BaseModel):
     state: dict[str, Any]
 
@@ -158,11 +166,17 @@ def invoke_planner(request: Request, payload: AgentInvokeRequest):
 @app.post("/api/invoke/debate")
 def invoke_debate(request: Request, payload: AgentInvokeRequest):
     _enforce_agent_port(request, 8104, "debate")
-    state = payload.state
-    return {
-        "debate_output": state.get("debate_output", {}),
-        "next_node": state.get("next_node", "orchestrator"),
-    }
+    try:
+        result = debate_agent(payload.state)
+        return {
+            "plan_id": result.get("plan_id"),
+            "is_valid": result.get("is_valid"),
+            "debate_count": result.get("debate_count"),
+            "debate_output": result.get("debate_output", {}),
+            "next_node": result.get("next_node", "orchestrator"),
+        }
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"debate failed: {exc}") from exc
 
 
 @app.post("/api/invoke/explain")
@@ -178,11 +192,16 @@ def invoke_explain(request: Request, payload: AgentInvokeRequest):
 @app.post("/api/invoke/replanner")
 def invoke_replanner(request: Request, payload: AgentInvokeRequest):
     _enforce_agent_port(request, 8107, "replanner")
-    state = payload.state
-    return {
-        "replanner_output": state.get("replanner_output", {}),
-        "next_node": state.get("next_node", "orchestrator"),
-    }
+    try:
+        result = dynamic_replan_agent(payload.state)
+        return {
+            "plan_id": result.get("plan_id"),
+            "replanner_output": result.get("replanner_output", {}),
+            "user_feedback": result.get("user_feedback"),
+            "next_node": result.get("next_node", "orchestrator"),
+        }
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"replanner failed: {exc}") from exc
 
 
 @app.post("/security/check", response_model=SecurityCheckResponse)
@@ -361,3 +380,48 @@ def summarize(request: SummarizeRequest):
         )
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@app.post("/replan")
+def replan(request: ReplanRequest):
+    try:
+        graph = build_travel_graph()
+        initial_state = State(
+            messages=[{"role": "user", "content": str(request.user_feedback)}],
+            user_id=request.user_id or "replan_user",
+            origin=None,
+            destination=None,
+            dates=None,
+            budget=None,
+            preferences=None,
+            duration=None,
+            flight_options=None,
+            hotel_options=None,
+            stage=None,
+            itinerary=None,
+            research=None,
+            selections=None,
+            search_results=None,
+            final_itinerary=None,
+            next_agent=None,
+            confirmed=False,
+            is_complete=False,
+            threat_blocked=False,
+            threat_type=None,
+            threat_detail=None,
+            sanitised_input="",
+            security_audit_log=[],
+            user_feedback={**request.user_feedback, "plan_id": request.plan_id} if request.plan_id else request.user_feedback,
+            replanner_output=None,
+            replan_mode=True,
+            is_valid=None,
+            debate_count=0,
+        )
+        result = graph.invoke(initial_state, config={"recursion_limit": 30})
+        return {
+            "plan_id": result.get("plan_id"),
+            "replanner_output": result.get("replanner_output", {}),
+            "next_node": result.get("next_node", "END"),
+        }
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"replan failed: {exc}") from exc
