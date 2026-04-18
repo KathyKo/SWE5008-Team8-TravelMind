@@ -1,7 +1,7 @@
 """
 backend/routers/research.py — Agent2 (Research) endpoints
 
-POST /research/run  → research_agent_1(state)
+POST /research/run  → research_agent(state)
                       Returns raw flights, hotels, attractions, restaurants
 GET  /research/health
 """
@@ -54,7 +54,7 @@ class ResearchResponse(BaseModel):
 @router.post("/run", response_model=ResearchResponse)
 def run_research(request: ResearchRequest):
     """
-    Agent2 (research_agent_1) — collects local info and transportation data.
+    Agent2 (research_agent) — collects local info and transportation data.
 
     Input  : Travel info + user profile + preferences  (from Agent1)
     Output : Flights, hotels, attractions, restaurants (for Agent3)
