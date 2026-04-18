@@ -69,19 +69,13 @@ def build_travel_graph():
     return builder.compile()
 
 
-def run_cli():
-    print("==========================================")
-    print("      TRAVEL PLANNING AGENCY       ")
-    print("==========================================")
-    print("Welcome! Our team of experts is ready to help you plan your dream trip.")
-    print("Type 'exit' or 'done' whenever you are ready to finalize your itinerary.\n")
-
-    graph = build_travel_graph()
-
-    initial_state = {
+def default_graph_initial_state() -> dict:
+    """
+    Baseline state for LangGraph.invoke / .stream (matches run_cli shape).
+    Callers should set messages and any known UI fields (dates, budget, etc.).
+    """
+    return {
         "messages": [],
-
-        # Intent Profile — 全部由 intent_profile agent 填充
         "origin": None,
         "destination": None,
         "budget": None,
@@ -95,41 +89,37 @@ def run_cli():
         "session_id": None,
         "intent_profile_output": None,
         "is_complete": False,
-
-        # Security
         "threat_blocked": None,
-
-        # Research / Search
         "search_results": None,
         "research": None,
-
-        # Planner
         "itineraries": None,
         "final_itineraries": None,
-
-        # Debate ↔ Planner 循环控制
         "is_valid": None,
         "debate_count": 0,
         "critique": None,
         "approval_threshold": 75.0,
-
-        # Replanner（用户反馈触发）
         "user_feedback": None,
         "replan_attempts": 0,
         "max_replan_attempts": 2,
-
-        # Explainability
         "explanation": None,
         "explain_data": None,
-
-        # Output Guard
         "output_guard_decision": None,
-
-        # Orchestrator
         "next_node": None,
         "error_message": None,
         "final_output": None,
     }
+
+
+def run_cli():
+    print("==========================================")
+    print("      TRAVEL PLANNING AGENCY       ")
+    print("==========================================")
+    print("Welcome! Our team of experts is ready to help you plan your dream trip.")
+    print("Type 'exit' or 'done' whenever you are ready to finalize your itinerary.\n")
+
+    graph = build_travel_graph()
+
+    initial_state = default_graph_initial_state()
 
     try:
         # Start the graph interaction with a higher recursion limit for longer conversations
