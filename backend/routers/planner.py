@@ -75,12 +75,12 @@ class ReviseRequest(BaseModel):
 @router.post("/run", response_model=PlannerResponse)
 def run_planner(request: PlannerRequest, db: Session = Depends(get_db)):
     """
-    Agent3 (planner_agent_1) — generates 3 itinerary options.
+    Agent3 (planner_agent) — generates 3 itinerary options.
 
     Input  : Travel info + user profile + preferences  (from Agent1 / Agent2)
     Output : 3 itinerary options A/B/C + flights + hotels  (for Agent4 / Agent6)
 
-    Internally calls Agent2 (research_agent_1) to fetch live data,
+    Internally calls Agent2 (research_agent) to fetch live data,
     then schedules the itinerary deterministically with LLM seed selection.
     The plan is saved to DB under plan_id — pass this to /explainability/run.
     """
@@ -122,7 +122,7 @@ def run_planner(request: PlannerRequest, db: Session = Depends(get_db)):
 @router.post("/revise", response_model=PlannerResponse)
 def revise_planner(request: ReviseRequest, db: Session = Depends(get_db)):
     """
-    Agent3 revision mode (revise_itinerary_1) — revises itineraries based on Agent4 critique.
+    Agent3 revision mode (revise_itinerary) — revises itineraries based on Agent4 critique.
 
     Input  : plan_id (from /planner/run) + critique string from Agent4
     Output : revised itineraries A/B/C (same format as /planner/run)
