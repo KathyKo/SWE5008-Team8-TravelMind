@@ -14,6 +14,7 @@ from agents.graph import build_travel_graph
 from agents.state import State
 from agents.specialists.input_guard_agent import input_guard_agent
 from agents.specialists.output_guard_agent import output_guard_agent
+from agents.routers.security import router as security_router
 
 app = FastAPI(
     title="TravelMind Agents API",
@@ -32,31 +33,6 @@ def _enforce_agent_port(request: Request, expected_port: int, agent_name: str) -
                 f"Please call {agent_name} on port {expected_port}."
             ),
         )
-
-
-class SecurityCheckRequest(BaseModel):
-    text: str
-    user_id: Optional[str] = None
-
-
-class SecurityCheckResponse(BaseModel):
-    threat_blocked: bool
-    threat_type: Optional[str] = None
-    threat_detail: Optional[str] = None
-    sanitised_input: str
-    security_audit_log: Optional[list] = None
-
-
-class OutputCheckRequest(BaseModel):
-    text: str
-    user_id: Optional[str] = None
-
-
-class OutputCheckResponse(BaseModel):
-    threat_blocked: bool
-    threat_type: Optional[str] = None
-    threat_detail: Optional[str] = None
-    security_audit_log: Optional[list] = None
 
 
 class PlanRequest(BaseModel):
@@ -185,87 +161,7 @@ def invoke_replanner(request: Request, payload: AgentInvokeRequest):
     }
 
 
-@app.post("/security/check", response_model=SecurityCheckResponse)
-def security_check(request: SecurityCheckRequest):
-    try:
-        initial_state = State(
-            messages=[{"role": "user", "content": request.text}],
-            user_id=request.user_id or "test_user",
-            origin=None,
-            destination=None,
-            dates=None,
-            budget=None,
-            preferences=None,
-            duration=None,
-            flight_options=None,
-            hotel_options=None,
-            stage=None,
-            itinerary=None,
-            research=None,
-            selections=None,
-            search_results=None,
-            final_itinerary=None,
-            next_agent=None,
-            confirmed=False,
-            is_complete=False,
-            threat_blocked=False,
-            threat_type=None,
-            threat_detail=None,
-            sanitised_input="",
-            security_audit_log=[],
-        )
-
-        result = input_guard_agent(initial_state)
-        return SecurityCheckResponse(
-            threat_blocked=result.get("threat_blocked", False),
-            threat_type=result.get("threat_type"),
-            threat_detail=result.get("threat_detail"),
-            sanitised_input=result.get("sanitised_input", request.text),
-            security_audit_log=result.get("security_audit_log", []),
-        )
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Security check failed: {exc}") from exc
-
-
-@app.post("/security/check-output", response_model=OutputCheckResponse)
-def security_check_output(request: OutputCheckRequest):
-    try:
-        initial_state = State(
-            messages=[{"role": "assistant", "content": request.text}],
-            user_id=request.user_id or "test_user",
-            origin=None,
-            destination=None,
-            dates=None,
-            budget=None,
-            preferences=None,
-            duration=None,
-            flight_options=None,
-            hotel_options=None,
-            stage=None,
-            itinerary=None,
-            research=None,
-            selections=None,
-            search_results=None,
-            final_itinerary=None,
-            next_agent=None,
-            confirmed=False,
-            is_complete=False,
-            threat_blocked=False,
-            threat_type=None,
-            threat_detail=None,
-            sanitised_input="",
-            security_audit_log=[],
-        )
-
-        result = output_guard_agent(initial_state)
-        return OutputCheckResponse(
-            threat_blocked=result.get("output_flagged", False),
-            threat_type=result.get("output_flag_reason"),
-            threat_detail=result.get("output_guard_decision", {}).get("reason", "Output passed validation"),
-            security_audit_log=result.get("security_audit_log", []),
-        )
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Output security check failed: {exc}") from exc
+app.include_router(security_router)
 
 
 @app.post("/plan", response_model=PlanResponse)
