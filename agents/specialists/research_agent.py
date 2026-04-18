@@ -1457,7 +1457,7 @@ def research_agent(state: dict, tools: dict | None = None) -> dict:
     else:
         cutoff_note = "Return departure time unknown; assume a conservative airport cutoff."
 
-    tool_log.append("[research_agent_1] Data collection complete")
+    tool_log.append("[research_agent] Data collection complete")
 
     inventory = {
         "attractions": compact_attractions,

@@ -21,9 +21,6 @@ from backend.db import crud
 
 router = APIRouter()
 
-# Create tables on startup (idempotent — skipped if tables already exist)
-Base.metadata.create_all(bind=engine)
-
 
 # ── Request / Response schemas ─────────────────────────────────
 
