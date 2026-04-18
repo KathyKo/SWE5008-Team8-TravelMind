@@ -4,18 +4,14 @@ WORKDIR /app/agents
 
 ENV PYTHONPATH=/app
 
-RUN sed -i 's|http://deb.debian.org|https://mirrors.aliyun.com|g' /etc/apt/sources.list.d/debian.sources \
-    && apt-get -o Acquire::Retries=5 -o Acquire::http::Timeout=30 update \
-    && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Install dependencies
 COPY agents/requirements.txt ./requirements.txt
-RUN pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/ \
-    && pip config set global.trusted-host mirrors.aliyun.com \
-    && pip install --no-cache-dir --default-timeout=300 --retries=10 -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy source code needed by agents service
 COPY agents /app/agents
