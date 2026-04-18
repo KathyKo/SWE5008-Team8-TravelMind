@@ -47,6 +47,7 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - BACKEND_URL=http://backend:8000
+      - AGENTS_GRAPH_STREAM_URL=http://agents:8001/api/invoke/graph/stream
     depends_on:
       backend:
         condition: service_healthy
