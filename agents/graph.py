@@ -69,6 +69,47 @@ def build_travel_graph():
     return builder.compile()
 
 
+def default_graph_initial_state() -> dict:
+    """
+    Baseline state for LangGraph.invoke / .stream (matches run_cli shape).
+    Callers should set messages and any known UI fields (dates, budget, etc.).
+    """
+    return {
+        "messages": [],
+        "origin": None,
+        "destination": None,
+        "budget": None,
+        "dates": None,
+        "preferences": None,
+        "duration": None,
+        "user_profile": None,
+        "travelers": None,
+        "outbound_time_pref": None,
+        "return_time_pref": None,
+        "session_id": None,
+        "intent_profile_output": None,
+        "is_complete": False,
+        "threat_blocked": None,
+        "search_results": None,
+        "research": None,
+        "itineraries": None,
+        "final_itineraries": None,
+        "is_valid": None,
+        "debate_count": 0,
+        "critique": None,
+        "approval_threshold": 75.0,
+        "user_feedback": None,
+        "replan_attempts": 0,
+        "max_replan_attempts": 2,
+        "explanation": None,
+        "explain_data": None,
+        "output_guard_decision": None,
+        "next_node": None,
+        "error_message": None,
+        "final_output": None,
+    }
+
+
 def run_cli():
     print("==========================================")
     print("      TRAVEL PLANNING AGENCY       ")
@@ -78,46 +119,7 @@ def run_cli():
 
     graph = build_travel_graph()
 
-    # Initial state
-    initial_state = State(
-        messages=[],
-        origin=None,
-        destination=None,
-        dates=None,
-        budget=None,
-        preferences=None,
-        duration=None,
-        outbound_time_pref=None,
-        return_time_pref=None,
-        flight_options=None,
-        hotel_options=None,
-        user_profile=None,
-        travelers=None,
-        session_id=None,
-        intent_profile_output=None,
-        user_profile_structured=None,
-        orchestration_stage="input_guard",
-        input_guard_output=None,
-        search_output=None,
-        planner_output=None,
-        replanner_output=None,
-        debate_output=None,
-        explain_output=None,
-        output_guard_result=None,
-        composite_score=None,
-        replan_attempts=0,
-        max_replan_attempts=2,
-        approval_threshold=75.0,
-        stage=None,
-        itinerary=None,
-        research=None,
-        selections=None,
-        search_results=None,
-        final_itinerary=None,
-        next_agent=None,
-        confirmed=False,
-        is_complete=False,
-    )
+    initial_state = default_graph_initial_state()
 
     try:
         # Start the graph interaction with a higher recursion limit for longer conversations

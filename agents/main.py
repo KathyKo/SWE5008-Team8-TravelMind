@@ -5,15 +5,27 @@ This service hosts the heavy security and planning logic.
 Backend and peer agents call this service over HTTP.
 """
 
-from typing import Any, Optional
+import json
+import logging
+import traceback
+from typing import Any, Iterator
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from agents.graph import build_travel_graph
+from agents.graph import build_travel_graph, default_graph_initial_state
 from agents.state import State
 from agents.specialists.input_guard_agent import input_guard_agent
 from agents.specialists.output_guard_agent import output_guard_agent
+from agents.specialists.intent_profile import intent_profile
+from agents.specialists.planner_agent import planner_agent
+from agents.specialists.research_agent import research_agent
+from agents.specialists.explainability_agent import explainability_agent
+from agents.specialists.replanner_agent import replanner_agent
+from agents.specialists.debate_agent import debate_agent
+
+log = logging.getLogger(__name__)
 
 app = FastAPI(
     title="TravelMind Agents API",
@@ -33,71 +45,112 @@ def _enforce_agent_port(request: Request, expected_port: int, agent_name: str) -
             ),
         )
 
-
-class SecurityCheckRequest(BaseModel):
-    text: str
-    user_id: Optional[str] = None
-
-
-class SecurityCheckResponse(BaseModel):
-    threat_blocked: bool
-    threat_type: Optional[str] = None
-    threat_detail: Optional[str] = None
-    sanitised_input: str
-    security_audit_log: Optional[list] = None
-
-
-class OutputCheckRequest(BaseModel):
-    text: str
-    user_id: Optional[str] = None
-
-
-class OutputCheckResponse(BaseModel):
-    threat_blocked: bool
-    threat_type: Optional[str] = None
-    threat_detail: Optional[str] = None
-    security_audit_log: Optional[list] = None
-
-
-class PlanRequest(BaseModel):
-    message: str
-    origin: Optional[str] = None
-    destination: Optional[str] = None
-    dates: Optional[str] = None
-    budget: Optional[str] = None
-    preferences: Optional[str] = None
-    duration: Optional[str] = None
-    outbound_time_pref: Optional[str] = None
-    return_time_pref: Optional[str] = None
-    user_id: Optional[str] = None
-
-
-class PlanResponse(BaseModel):
-    reply: str
-    next_agent: Optional[str] = None
-    destination: Optional[str] = None
-    flight_options: Optional[list] = None
-    hotel_options: Optional[list] = None
-    itinerary: Optional[str] = None
-    final_itinerary: Optional[str] = None
-    intent_profile_output: Optional[dict] = None
-    stage: Optional[str] = None
-    is_complete: bool = False
-
-
-class SummarizeRequest(BaseModel):
-    origin: Optional[str] = None
-    destination: Optional[str] = None
-    dates: Optional[str] = None
-    budget: Optional[str] = None
-    preferences: Optional[str] = None
-    duration: Optional[str] = None
-    selections: Optional[dict] = None
-    itinerary: Optional[str] = None
-
-
 class AgentInvokeRequest(BaseModel):
     state: dict[str, Any]
+
+
+def _merge_graph_initial(incoming: dict[str, Any]) -> dict[str, Any]:
+    base = default_graph_initial_state()
+    base.update(incoming)
+    return base
+
+
+def _state_for_client(state: dict[str, Any]) -> dict[str, Any]:
+    """Strip large / non-JSON-friendly pieces before sending to the browser."""
+    keys = (
+        "origin",
+        "destination",
+        "dates",
+        "duration",
+        "budget",
+        "preferences",
+        "session_id",
+        "intent_profile_output",
+        "search_results",
+        "research",
+        "itineraries",
+        "final_itineraries",
+        "option_meta",
+        "tool_log",
+        "flight_options_outbound",
+        "flight_options_return",
+        "hotel_options",
+        "is_valid",
+        "debate_count",
+        "critique",
+        "composite_score",
+        "debate_output",
+        "explanation",
+        "explain_data",
+        "output_guard_decision",
+        "output_flagged",
+        "output_flag_reason",
+        "threat_blocked",
+        "threat_detail",
+        "threat_type",
+        "error_message",
+        "input_guard_decision",
+        "sanitised_input",
+    )
+    out: dict[str, Any] = {}
+    for k in keys:
+        if k not in state:
+            continue
+        try:
+            json.dumps(state[k], default=str)
+            out[k] = state[k]
+        except TypeError:
+            out[k] = str(state[k])
+    return out
+
+
+def _ndjson_line(obj: dict[str, Any]) -> bytes:
+    return (json.dumps(obj, ensure_ascii=False, default=str) + "\n").encode("utf-8")
+
+
+@app.post("/api/invoke/graph/stream")
+def invoke_graph_stream(payload: AgentInvokeRequest):
+    """
+    Run the full LangGraph orchestrator with stream_mode='values'.
+    Emits NDJSON: {"type":"progress","step":N} per super-step, then
+    {"type":"done","state":{...}} or {"type":"error","message":"..."}.
+    """
+
+    def event_stream() -> Iterator[bytes]:
+        graph = build_travel_graph()
+        merged = _merge_graph_initial(payload.state)
+        step = 0
+        last_snapshot: dict[str, Any] | None = None
+        try:
+            for item in graph.stream(
+                merged,
+                config={"recursion_limit": 120},
+                stream_mode="values",
+            ):
+                step += 1
+                if isinstance(item, tuple) and len(item) >= 2:
+                    snapshot = item[-1]
+                else:
+                    snapshot = item
+                if isinstance(snapshot, dict):
+                    last_snapshot = snapshot
+                yield _ndjson_line({"type": "progress", "step": step})
+            if not isinstance(last_snapshot, dict):
+                yield _ndjson_line({"type": "error", "message": "graph produced no state"})
+                return
+            yield _ndjson_line({"type": "done", "state": _state_for_client(last_snapshot)})
+        except Exception as exc:
+            log.exception("graph/stream failed")
+            yield _ndjson_line({"type": "error", "message": str(exc)})
+
+    return StreamingResponse(
+        event_stream(),
+        media_type="application/x-ndjson; charset=utf-8",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 @app.get("/health", tags=["system"])
@@ -112,6 +165,7 @@ def invoke_input_guard(request: Request, payload: AgentInvokeRequest):
         result = input_guard_agent(payload.state)
         return result
     except Exception as exc:
+        log.exception("input_guard failed")
         raise HTTPException(status_code=500, detail=f"input_guard failed: {exc}") from exc
 
 
@@ -122,6 +176,7 @@ def invoke_output_guard(request: Request, payload: AgentInvokeRequest):
         result = output_guard_agent(payload.state)
         return result
     except Exception as exc:
+        log.exception("output_guard failed")
         raise HTTPException(status_code=500, detail=f"output_guard failed: {exc}") from exc
 
 
@@ -129,235 +184,73 @@ def invoke_output_guard(request: Request, payload: AgentInvokeRequest):
 def invoke_intent_profile(request: Request, payload: AgentInvokeRequest):
     _enforce_agent_port(request, 8101, "intent_profile")
     state = payload.state
-    return {
-        "intent_profile_output": state.get("intent_profile_output", {}),
-        "next_node": state.get("next_node", "orchestrator"),
-    }
+    try:
+        result = intent_profile(state)
+        return result
+    except Exception as exc:
+        log.exception("intent_profile failed")
+        raise HTTPException(status_code=500, detail=f"intent_profile failed: {exc}") from exc
+
 
 
 @app.post("/api/invoke/search")
 def invoke_search(request: Request, payload: AgentInvokeRequest):
     _enforce_agent_port(request, 8102, "search")
     state = payload.state
-    return {
-        "search_results": state.get("search_results", []),
-        "next_node": state.get("next_node", "orchestrator"),
-    }
+    try:
+        result = research_agent(state)
+        return result
+    except Exception as exc:
+        traceback.print_exc()
+        log.exception("search (research_agent) failed")
+        raise HTTPException(status_code=500, detail=f"search failed: {exc}") from exc
 
 
 @app.post("/api/invoke/planner")
 def invoke_planner(request: Request, payload: AgentInvokeRequest):
     _enforce_agent_port(request, 8103, "planner")
     state = payload.state
-    return {
-        "itinerary": state.get("itinerary"),
-        "next_node": state.get("next_node", "orchestrator"),
-    }
+    try:
+        result = planner_agent(state)
+        return result
+    except Exception as exc:
+        log.exception("planner failed")
+        raise HTTPException(status_code=500, detail=f"planner failed: {exc}") from exc
 
 
 @app.post("/api/invoke/debate")
 def invoke_debate(request: Request, payload: AgentInvokeRequest):
     _enforce_agent_port(request, 8104, "debate")
     state = payload.state
-    return {
-        "debate_output": state.get("debate_output", {}),
-        "next_node": state.get("next_node", "orchestrator"),
-    }
+    try:
+        result = debate_agent(state)
+        return result
+    except Exception as exc:
+        log.exception("debate failed")
+        raise HTTPException(status_code=500, detail=f"debate failed: {exc}") from exc
 
 
 @app.post("/api/invoke/explain")
 def invoke_explain(request: Request, payload: AgentInvokeRequest):
     _enforce_agent_port(request, 8105, "explain")
     state = payload.state
-    return {
-        "explain_output": state.get("explain_output", {}),
-        "next_node": state.get("next_node", "orchestrator"),
-    }
+    try:
+        result = explainability_agent(state)
+        return result
+    except Exception as exc:
+        log.exception("explain failed")
+        raise HTTPException(status_code=500, detail=f"explain failed: {exc}") from exc
 
 
 @app.post("/api/invoke/replanner")
 def invoke_replanner(request: Request, payload: AgentInvokeRequest):
     _enforce_agent_port(request, 8107, "replanner")
     state = payload.state
-    return {
-        "replanner_output": state.get("replanner_output", {}),
-        "next_node": state.get("next_node", "orchestrator"),
-    }
-
-
-@app.post("/security/check", response_model=SecurityCheckResponse)
-def security_check(request: SecurityCheckRequest):
     try:
-        initial_state = State(
-            messages=[{"role": "user", "content": request.text}],
-            user_id=request.user_id or "test_user",
-            origin=None,
-            destination=None,
-            dates=None,
-            budget=None,
-            preferences=None,
-            duration=None,
-            flight_options=None,
-            hotel_options=None,
-            stage=None,
-            itinerary=None,
-            research=None,
-            selections=None,
-            search_results=None,
-            final_itinerary=None,
-            next_agent=None,
-            confirmed=False,
-            is_complete=False,
-            threat_blocked=False,
-            threat_type=None,
-            threat_detail=None,
-            sanitised_input="",
-            security_audit_log=[],
-        )
-
-        result = input_guard_agent(initial_state)
-        return SecurityCheckResponse(
-            threat_blocked=result.get("threat_blocked", False),
-            threat_type=result.get("threat_type"),
-            threat_detail=result.get("threat_detail"),
-            sanitised_input=result.get("sanitised_input", request.text),
-            security_audit_log=result.get("security_audit_log", []),
-        )
+        result = replanner_agent(state)
+        return result
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Security check failed: {exc}") from exc
+        log.exception("replanner failed")
+        raise HTTPException(status_code=500, detail=f"replanner failed: {exc}") from exc
 
 
-@app.post("/security/check-output", response_model=OutputCheckResponse)
-def security_check_output(request: OutputCheckRequest):
-    try:
-        initial_state = State(
-            messages=[{"role": "assistant", "content": request.text}],
-            user_id=request.user_id or "test_user",
-            origin=None,
-            destination=None,
-            dates=None,
-            budget=None,
-            preferences=None,
-            duration=None,
-            flight_options=None,
-            hotel_options=None,
-            stage=None,
-            itinerary=None,
-            research=None,
-            selections=None,
-            search_results=None,
-            final_itinerary=None,
-            next_agent=None,
-            confirmed=False,
-            is_complete=False,
-            threat_blocked=False,
-            threat_type=None,
-            threat_detail=None,
-            sanitised_input="",
-            security_audit_log=[],
-        )
-
-        result = output_guard_agent(initial_state)
-        return OutputCheckResponse(
-            threat_blocked=result.get("output_flagged", False),
-            threat_type=result.get("output_flag_reason"),
-            threat_detail=result.get("output_guard_decision", {}).get("reason", "Output passed validation"),
-            security_audit_log=result.get("security_audit_log", []),
-        )
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Output security check failed: {exc}") from exc
-
-
-@app.post("/plan", response_model=PlanResponse)
-def plan(request: PlanRequest):
-    try:
-        graph = build_travel_graph()
-
-        initial_state = State(
-            messages=[{"role": "user", "content": request.message}],
-            origin=request.origin,
-            destination=request.destination,
-            dates=request.dates,
-            budget=request.budget,
-            preferences=request.preferences,
-            duration=request.duration,
-            flight_options=None,
-            hotel_options=None,
-            stage=None,
-            itinerary=None,
-            research=None,
-            selections=None,
-            search_results=None,
-            final_itinerary=None,
-            next_agent=None,
-            confirmed=False,
-            is_complete=False,
-        )
-
-        result = graph.invoke(initial_state, config={"recursion_limit": 50})
-
-        messages = result.get("messages", [])
-        last_reply = ""
-        for msg in reversed(messages):
-            if msg.get("role") == "assistant":
-                last_reply = msg.get("content", "")
-                break
-
-        return PlanResponse(
-            reply=last_reply,
-            next_agent=result.get("next_agent"),
-            destination=result.get("destination"),
-            flight_options=result.get("flight_options"),
-            hotel_options=result.get("hotel_options"),
-            itinerary=result.get("itinerary"),
-            final_itinerary=result.get("final_itinerary"),
-            intent_profile_output=result.get("intent_profile_output"),
-            stage=result.get("stage"),
-            is_complete=result.get("is_complete", False),
-        )
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc)) from exc
-
-
-@app.post("/summarize", response_model=PlanResponse)
-def summarize(request: SummarizeRequest):
-    try:
-        graph = build_travel_graph()
-
-        state = State(
-            messages=[{"role": "user", "content": "done"}],
-            origin=request.origin,
-            destination=request.destination,
-            dates=request.dates,
-            budget=request.budget,
-            preferences=request.preferences,
-            duration=request.duration,
-            flight_options=None,
-            hotel_options=None,
-            stage=request.itinerary and "confirmed",
-            itinerary=request.itinerary,
-            research=None,
-            selections=request.selections,
-            search_results=None,
-            final_itinerary=None,
-            next_agent=None,
-            confirmed=True,
-            is_complete=False,
-        )
-
-        result = graph.invoke(state, config={"recursion_limit": 20})
-
-        messages = result.get("messages", [])
-        last_reply = ""
-        for msg in reversed(messages):
-            if msg.get("role") == "assistant":
-                last_reply = msg.get("content", "")
-                break
-
-        return PlanResponse(
-            reply=last_reply,
-            final_itinerary=result.get("final_itinerary"),
-            is_complete=True,
-        )
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc)) from exc

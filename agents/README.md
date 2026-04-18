@@ -1,72 +1,140 @@
-# Agents Module Guide
+# Agents Service README
 
-This directory contains the core multi-agent implementation for TravelMind, including LangGraph orchestration, shared state transitions, and specialist agent collaboration.
+`agents/` is the agent-service layer of TravelMind. It is responsible for:
 
-## Directory Structure
+- Multi-agent orchestration (LangGraph)
+- HTTP-based specialist agent invocation and aggregation
+- Input/output security guardrails
+- A unified API surface consumed by `backend`
+
+---
+
+## 1) Current Directory Structure
 
 ```text
 agents/
 ├── __init__.py
-├── __main__.py
 ├── README.md
-├── agent_tools.py
+├── Dockerfile
+├── requirements.txt
+├── main.py
 ├── graph.py
-├── llm_config.py
 ├── nodes.py
 ├── state.py
-├── visualize.py
-└── specialists/
-    ├── __init__.py
-    ├── booking_agent.py
-    ├── concierge.py
-    ├── local_guide.py
-    ├── orchestrator.py
-    └── summarizer.py
+├── llm_config.py
+├── agent_tools.py
+├── prompts/
+│   ├── security_policy.yaml
+│   └── security_prompts.yaml
+├── specialists/
+│   ├── __init__.py
+│   ├── input_guard_agent.py
+│   ├── intent_profile.py
+│   ├── research_agent.py
+│   ├── planner_agent.py
+│   ├── explainability_agent.py
+│   └── output_guard_agent.py
+└── tests/
+    ├── intent/
+    ├── orchestrator/
+    └── security/
 ```
 
-## File Responsibilities (agents root)
+---
 
-| File | Responsibility |
-|---|---|
-| __init__.py | Exposes core agent functions: `travel_orchestrator`, `concierge`, `booking_agent`, `local_guide`, `travel_summarizer` |
-| __main__.py | Package entrypoint. Runs CLI conversation flow when executing `python -m agents` |
-| llm_config.py | Central model config, provides `OPENAI_MODEL` (default: `gpt-5-mini-2025-08-07`) |
-| state.py | Defines shared `State` (user preferences, stage state, search results, confirmation state, etc.) |
-| agent_tools.py | Defines per-agent tool allowlist (`TOOLS_BY_AGENT`) and `get_tools_for_agent()` |
-| nodes.py | Defines LangGraph node and routing functions: `human_node()`, `orchestrator_node()`, `booking_node()`, etc. |
-| graph.py | Builds and compiles the graph: `build_travel_graph()`; CLI runner: `run_cli()` |
-| visualize.py | Generates workflow visualization in ASCII / Mermaid / PNG |
+## 2) Core Files
 
-## File Responsibilities (agents/specialists)
+### `main.py`
 
-| File | Responsibility |
-|---|---|
-| specialists/__init__.py | Exports specialist agent functions |
-| specialists/orchestrator.py | `travel_orchestrator()`: routes to the right specialist based on context and stage |
-| specialists/concierge.py | `concierge()`: collects core trip info (origin/destination/dates/budget/preferences) |
-| specialists/booking_agent.py | `booking_agent()`: stage-based flow for research, itinerary draft, selection parsing, price lookup, and confirmation summary |
-| specialists/local_guide.py | `local_guide()`: weather/attractions/activity guidance (does not handle booking prices) |
-| specialists/summarizer.py | `travel_summarizer()`: compiles final confirmed travel plan output |
+FastAPI service entry point. Exposes:
 
-## How to Run
+- `GET /health`
+- `POST /api/invoke/input_guard`
+- `POST /api/invoke/intent_profile`
+- `POST /api/invoke/search`
+- `POST /api/invoke/planner`
+- `POST /api/invoke/debate`
+- `POST /api/invoke/explain`
+- `POST /api/invoke/output_guard`
+- `POST /api/invoke/replanner`
 
-Run from the repository root:
+All invoke endpoints use a unified request body:
 
-- Start CLI: `python -m agents`
-- Visualize workflow: `python -m agents.visualize`
+```json
+{
+  "state": {}
+}
+```
 
-## State and Flow Highlights
+Each endpoint also runs `_enforce_agent_port()` to prevent requests from reaching the wrong agent port.
 
-- Graph entry: `START -> human -> orchestrator`
-- Routing: `orchestrator_routing()` selects `concierge` / `booking_agent` / `local_guide` / `summarizer`
-- Exit condition: `check_exit_condition()` detects `exit/quit/done`
-- End: `summarizer -> END`
+### `graph.py`
 
-## Tool Permission Model
+Defines and builds the LangGraph workflow:
 
-`agent_tools.py` uses an explicit allowlist:
+- `build_travel_graph()`
+- `run_cli()` (local interactive debugging entrypoint)
 
-- `booking_agent`: `web_search`, `search_hotels`, `search_flights`, `google_search`
-- `local_guide`: `search_weather`, `search_attractions`
+Primary flow:
 
-All other agents have no tool access by default.
+`START -> input_guard -> orchestrator -> (intent/search/planner/debate/explain/output_guard) -> END`
+
+### `nodes.py`
+
+- Wraps remote calls for each node via `call_remote_agent`
+- Implements orchestrator decision logic in `orchestrator_node()`
+- Implements conditional routing output via `orchestrator_routing()`
+
+Agent endpoint mapping is managed by `AGENT_URLS`, defaulting to:
+
+- `http://localhost:8100` to `http://localhost:8107`
+
+Each URL can be overridden via environment variables (for example, `AGENT_PLANNER_URL`).
+
+### `state.py`
+
+Defines the shared `State (TypedDict)`, including:
+
+- User intent fields (`origin`, `destination`, `dates`, `budget`, etc.)
+- Security status (`threat_blocked`, `output_flagged`)
+- Research/planning outputs (`search_results`, `itineraries`)
+- Orchestration control fields (`next_node`, `is_valid`, `debate_count`, `error_message`)
+
+---
+
+## 3) Specialists
+
+The current `specialists/` implementations are:
+
+- `input_guard_agent.py`: input security validation
+- `intent_profile.py`: user intent structuring
+- `research_agent.py`: research and information retrieval aggregation
+- `planner_agent.py`: itinerary generation and revision
+- `explainability_agent.py`: explanation generation
+- `output_guard_agent.py`: output safety validation
+
+`specialists/__init__.py` exports the main specialist interfaces.
+
+---
+
+## 4) Run Locally
+
+From repository root:
+
+```bash
+docker compose up --build agents
+```
+
+Health check:
+
+```bash
+curl http://localhost:8001/health
+```
+
+---
+
+## 5) Development Notes
+
+- `main.py` enforces strict per-agent port checks. If an invoke call returns `409`, verify that the request is sent to the expected port.
+- `orchestrator_node()` in `nodes.py` relies on field presence/emptiness in `state`; update `state.py` and related tests together when changing routing fields.
+- `tests/orchestrator`, `tests/intent`, and `tests/security` cover the key orchestration and guardrail paths. Run these suites after flow-related changes.
