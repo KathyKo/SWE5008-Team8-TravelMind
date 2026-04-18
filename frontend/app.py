@@ -73,6 +73,13 @@ def _set_login_state(username: str, user_id: str | None) -> None:
         "username": username,
     }
 
+
+def _fill_demo_credentials(username: str) -> None:
+    st.session_state.auth_mode_widget = "Sign In"
+    st.session_state.auth_mode = "Sign In"
+    st.session_state.login_username_input = username
+    st.session_state.login_password_input = "123456"
+
 # ── Global CSS ───────────────────────────────────────────────
 st.markdown("""
 <style>
@@ -221,11 +228,16 @@ def init_state():
         "auth_mode_widget": "Sign In",
         "auth_mode_pending": None,
         "auth_notice": None,
-        "login_prefill": "alice@example.com",
+        "login_prefill": "",
+        "login_password_prefill": "",
+        "login_username_input": "",
+        "login_password_input": "",
+        "login_fill_pending_username": None,
+        "login_fill_pending_password": None,
         "visited": {},          # item_key -> bool
         "selected_option": "A",
         "plan_generated": False,
-      "main_section": "🛡️ Security",
+        "main_section_key": "plan",
         "security_log": [],
         "blocked_count": 0,
         "passed_count": 0,
@@ -246,6 +258,13 @@ init_state()
 def login_screen():
     col_l, col_c, col_r = st.columns([1, 1.2, 1])
     with col_c:
+        if st.session_state.login_fill_pending_username is not None:
+            st.session_state.login_username_input = st.session_state.login_fill_pending_username
+            st.session_state.login_fill_pending_username = None
+        if st.session_state.login_fill_pending_password is not None:
+            st.session_state.login_password_input = st.session_state.login_fill_pending_password
+            st.session_state.login_fill_pending_password = None
+
         if st.session_state.auth_mode_pending:
             st.session_state.auth_mode_widget = st.session_state.auth_mode_pending
             st.session_state.auth_mode_pending = None
@@ -276,65 +295,104 @@ def login_screen():
                 st.success(st.session_state.auth_notice)
                 st.session_state.auth_notice = None
 
-            with st.form("login_form"):
-                username = st.text_input(
-                    "Username",
-                    value=st.session_state.get("login_prefill", "alice@example.com"),
-                    placeholder="username",
-                )
-                password = st.text_input("Password", type="password", placeholder="At least 6 characters")
-                submitted = st.form_submit_button("Sign In", use_container_width=True, type="primary")
+            st.text_input(
+                "Username",
+                placeholder="username",
+                key="login_username_input",
+            )
+            st.text_input(
+                "Password",
+                type="password",
+                placeholder="At least 6 characters",
+                key="login_password_input",
+            )
+            submitted = st.button(
+                "Sign In",
+                use_container_width=True,
+                type="primary",
+                key="login_submit_btn",
+            )
 
-                if submitted:
-                    clean_username = username.strip()
-                    data, err = _login_with_backend(clean_username, password)
-                    if data:
-                        _set_login_state(clean_username, data.get("user_id"))
+            if submitted:
+                clean_username = st.session_state.login_username_input.strip()
+                current_password = st.session_state.login_password_input
+                data, err = _login_with_backend(clean_username, current_password)
+                if data:
+                    _set_login_state(clean_username, data.get("user_id"))
+                    st.rerun()
+                elif err == "Backend unavailable":
+                    user = USERS.get(clean_username)
+                    if user and user["password"] == current_password:
+                        st.warning("Backend unavailable. Logged in with local demo mode.")
+                        _set_login_state(clean_username, None)
                         st.rerun()
-                    elif err == "Backend unavailable":
-                        user = USERS.get(clean_username)
-                        if user and user["password"] == password:
-                            st.warning("Backend unavailable. Logged in with local demo mode.")
-                            _set_login_state(clean_username, None)
-                            st.rerun()
-                        else:
-                            st.error("Backend unavailable, and demo credential did not match.")
                     else:
-                        st.error(err or "Invalid credentials.")
+                        st.error("Backend unavailable, and demo credential did not match.")
+                else:
+                    st.error(err or "Invalid credentials.")
         else:
-            with st.form("register_form"):
-                username = st.text_input("Username ", value="", placeholder="new_username")
-                password = st.text_input("Password ", type="password", value="", placeholder="At least 6 characters")
-                submitted = st.form_submit_button("Create Account", use_container_width=True, type="primary")
+            register_username = st.text_input(
+                "Username ",
+                value="",
+                placeholder="new_username",
+                key="register_username_input",
+            )
+            register_password = st.text_input(
+                "Password ",
+                type="password",
+                value="",
+                placeholder="At least 6 characters",
+                key="register_password_input",
+            )
+            submitted = st.button(
+                "Create Account",
+                use_container_width=True,
+                type="primary",
+                key="register_submit_btn",
+            )
 
-                if submitted:
-                    clean_username = username.strip()
-                    data, err = _register_with_backend(clean_username, password)
-                    if data:
-                        st.session_state.login_prefill = clean_username
-                        st.session_state.auth_notice = "Register success. Please sign in."
-                        st.session_state.auth_mode_pending = "Sign In"
-                        st.rerun()
-                    elif err == "Backend unavailable":
-                        st.error("Backend unavailable. Cannot register in local demo mode.")
-                    else:
-                        st.error(err or "Register failed.")
+            if submitted:
+                clean_username = register_username.strip()
+                data, err = _register_with_backend(clean_username, register_password)
+                if data:
+                    st.session_state.login_prefill = clean_username
+                    st.session_state.login_fill_pending_username = clean_username
+                    st.session_state.login_fill_pending_password = ""
+                    st.session_state.auth_notice = "Register success. Please sign in."
+                    st.session_state.auth_mode_pending = "Sign In"
+                    st.rerun()
+                elif err == "Backend unavailable":
+                    st.error("Backend unavailable. Cannot register in local demo mode.")
+                else:
+                    st.error(err or "Register failed.")
 
         st.markdown("<div style='text-align:center; color:#4a5a72; font-size:12px; margin:16px 0;'>or sign in as a demo user</div>", unsafe_allow_html=True)
 
         col1, col2, col3 = st.columns(3)
         with col1:
-            if st.button("Alice\nCulture lover", use_container_width=True):
-                _set_login_state("alice@example.com", None)
-                st.rerun()
+            st.button(
+                "Alice\nCulture lover",
+                use_container_width=True,
+                key="demo_user_alice",
+                on_click=_fill_demo_credentials,
+                args=("alice@example.com",),
+            )
         with col2:
-            if st.button("Bob\nFoodie", use_container_width=True):
-                _set_login_state("bob@example.com", None)
-                st.rerun()
+            st.button(
+                "Bob\nFoodie",
+                use_container_width=True,
+                key="demo_user_bob",
+                on_click=_fill_demo_credentials,
+                args=("bob@example.com",),
+            )
         with col3:
-            if st.button("Carol\nAdventure", use_container_width=True):
-                _set_login_state("carol@example.com", None)
-                st.rerun()
+            st.button(
+                "Carol\nAdventure",
+                use_container_width=True,
+                key="demo_user_carol",
+                on_click=_fill_demo_credentials,
+                args=("carol@example.com",),
+            )
 
 
 # -- Topbar ───────────────────────────────────────────────────
@@ -373,17 +431,23 @@ def main():
 
     nav = st.radio(
         "Main navigation",
-        ["🗺️ Plan", "📅 My Trip", "🔄 Re-plan", "🛡️ Security"],
+        ["plan", "my_trip", "replan", "security"],
         horizontal=True,
         label_visibility="collapsed",
-        key="main_section",
+        key="main_section_key",
+        format_func=lambda key: {
+            "plan": "🗺️ Plan",
+            "my_trip": "📅 My Trip",
+            "replan": "🔄 Re-plan",
+            "security": "🛡️ Security",
+        }[key],
     )
 
-    if nav == "🗺️ Plan":
+    if nav == "plan":
         render_plan()
-    elif nav == "📅 My Trip":
+    elif nav == "my_trip":
         render_trip()
-    elif nav == "🔄 Re-plan":
+    elif nav == "replan":
         render_replan()
     else:
         render_security()
