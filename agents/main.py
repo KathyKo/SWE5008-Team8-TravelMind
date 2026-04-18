@@ -5,13 +5,11 @@ This service hosts the heavy security and planning logic.
 Backend and peer agents call this service over HTTP.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 
-from agents.graph import build_travel_graph
-from agents.state import State
 from agents.specialists.input_guard_agent import input_guard_agent
 from agents.specialists.output_guard_agent import output_guard_agent
 from agents.specialists.intent_profile import intent_profile

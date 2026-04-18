@@ -7,7 +7,6 @@ remote agents. Verifies the full START → ... → END routing chain.
 
 from unittest.mock import patch
 
-import pytest
 
 
 # ── Helper: stateful mock dispatcher ────────────────────────
@@ -147,7 +146,7 @@ def test_graph_debate_retry():
         "output_guard": [{"output_flagged": False, "output_guard_decision": "pass"}],
     })
 
-    result = _build_and_invoke(d)
+    _build_and_invoke(d)
 
     assert d.call_order == [
         "input_guard", "intent_profile", "search",

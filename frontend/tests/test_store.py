@@ -1,11 +1,11 @@
 from pathlib import Path
 import sys
+from data.store import USERS, OPTION_META, ITINERARIES
 
 frontend_dir = Path(__file__).resolve().parents[1]
 if str(frontend_dir) not in sys.path:
     sys.path.insert(0, str(frontend_dir))
 
-from data.store import USERS, OPTION_META, ITINERARIES
 
 
 def test_demo_users_are_seeded():
