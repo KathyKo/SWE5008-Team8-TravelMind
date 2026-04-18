@@ -22,8 +22,8 @@ from agents.specialists.intent_profile import intent_profile
 from agents.specialists.planner_agent import planner_agent
 from agents.specialists.research_agent import research_agent
 from agents.specialists.explainability_agent import explainability_agent
-from agents.specialists.replanner_agent import replanner_agent
 from agents.specialists.debate_agent import debate_agent
+from agents.specialists.dynamic_replan_agent import dynamic_replan_agent
 
 log = logging.getLogger(__name__)
 
@@ -247,7 +247,7 @@ def invoke_replanner(request: Request, payload: AgentInvokeRequest):
     _enforce_agent_port(request, 8107, "replanner")
     state = payload.state
     try:
-        result = replanner_agent(state)
+        result = dynamic_replan_agent(state)
         return result
     except Exception as exc:
         log.exception("replanner failed")
