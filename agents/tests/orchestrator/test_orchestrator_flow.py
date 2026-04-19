@@ -410,26 +410,26 @@ class TestSimpleWrappers:
     def test_intent_profile_node(self, mock_call):
         from agents.nodes import intent_profile_node
         mock_call.return_value = {"intent_profile_output": {}}
-        result = intent_profile_node({})
+        intent_profile_node({})
         mock_call.assert_called_once_with("intent_profile", {})
 
     @patch("agents.nodes.call_remote_agent")
     def test_search_node(self, mock_call):
         from agents.nodes import search_node
         mock_call.return_value = {"search_results": {}}
-        result = search_node({})
+        search_node({})
         mock_call.assert_called_once_with("search", {})
 
     @patch("agents.nodes.call_remote_agent")
     def test_explain_node(self, mock_call):
         from agents.nodes import explain_node
         mock_call.return_value = {"explanation": {}}
-        result = explain_node({})
+        explain_node({})
         mock_call.assert_called_once_with("explain", {})
 
     @patch("agents.nodes.call_remote_agent")
     def test_output_guard_node(self, mock_call):
         from agents.nodes import output_guard_node
         mock_call.return_value = {"output_flagged": False}
-        result = output_guard_node({})
+        output_guard_node({})
         mock_call.assert_called_once_with("output_guard", {})

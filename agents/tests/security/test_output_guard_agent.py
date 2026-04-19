@@ -1,9 +1,7 @@
 import pytest
 from types import SimpleNamespace
 from importlib import import_module
-
 og = import_module("agents.specialists.output_guard_agent")
-
 
 def _setup_high_risk_pii(monkeypatch):
     monkeypatch.setattr(

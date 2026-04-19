@@ -1,16 +1,16 @@
 from pathlib import Path
 import sys
+from data.store import USERS, OPTION_META, ITINERARIES
 
 frontend_dir = Path(__file__).resolve().parents[1]
 if str(frontend_dir) not in sys.path:
     sys.path.insert(0, str(frontend_dir))
 
-from data.store import USERS, OPTION_META, ITINERARIES
 
 
 def test_demo_users_are_seeded():
     assert set(USERS) == {"alice@example.com", "bob@example.com", "carol@example.com"}
-    assert USERS["alice@example.com"]["password"] == "demo123"
+    assert USERS["alice@example.com"]["password"] == "123456"
     assert "culture" in USERS["alice@example.com"]["prefs"]
 
 

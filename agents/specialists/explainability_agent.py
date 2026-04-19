@@ -645,7 +645,6 @@ def explainability_agent(state: dict) -> dict:
     )
     tool_log = state.get("tool_log", []) or []
     destination = _first_present(state, "destination", default="")
-    option_meta = state.get("option_meta", {}) or {}
 
     if not option_key or not days:
         empty_summary = {
@@ -671,7 +670,6 @@ def explainability_agent(state: dict) -> dict:
 
     place_lookup = _build_place_lookup(state)
     hotel_lookup = _build_hotel_lookup(state)
-    pref_tags = _collect_pref_tags(state)
 
     # Build item explanations
     explain_data: dict[str, dict] = {}

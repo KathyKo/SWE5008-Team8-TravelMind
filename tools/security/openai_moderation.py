@@ -17,7 +17,6 @@ API: https://platform.openai.com/docs/guides/moderation
 
 import os
 from dataclasses import dataclass
-from typing import Optional
 from openai import OpenAI
 
 

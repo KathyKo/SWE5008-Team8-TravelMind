@@ -30,6 +30,25 @@ from llm_guard.input_scanners import PromptInjection, TokenLimit, BanTopics as I
 from llm_guard.output_scanners import Sensitive, BanTopics
 from llm_guard import scan_prompt, scan_output
 
+# Module-level singletons — models load once at import time (app startup),
+# not on the first request.
+_INPUT_SCANNERS = [
+    PromptInjection(threshold=0.75),
+    InputBanTopics(
+        topics=["illegal activity", "drug trafficking", "smuggling"],
+        threshold=0.75,
+    ),
+    TokenLimit(limit=512),
+]
+
+_OUTPUT_SCANNERS = [
+    Sensitive(redact=True),
+    BanTopics(
+        topics=["illegal activity", "drug trafficking", "smuggling"],
+        threshold=0.75,
+    ),
+]
+
 
 @dataclass
 class LLMGuardInputResult:
@@ -64,16 +83,7 @@ def scan_input_llm_guard(text: str) -> LLMGuardInputResult:
           (regex-based NER, independent of LLM Guard)
     """
     try:
-        input_scanners = [
-            PromptInjection(threshold=0.75),   # flag if injection confidence > 75%
-            InputBanTopics(
-                topics=["illegal activity", "drug trafficking", "smuggling"],
-                threshold=0.75,
-            ),
-            TokenLimit(limit=512),
-        ]
-
-        sanitised_text, results, is_valid = scan_prompt(input_scanners, text)
+        sanitised_text, results, is_valid = scan_prompt(_INPUT_SCANNERS, text)
 
         # results may be numeric scores (0..1) or booleans depending on llm-guard version.
         # - numeric: score >= 0.75 means threat
@@ -129,16 +139,8 @@ def scan_output_llm_guard(prompt: str, output: str) -> LLMGuardOutputResult:
         output: The agent's response text to validate
     """
     try:
-        output_scanners = [
-            Sensitive(redact=True),
-            BanTopics(
-                topics=["illegal activity", "drug trafficking", "smuggling"],
-                threshold=0.75,
-            ),
-        ]
-
         sanitised_text, results, is_valid = scan_output(
-            output_scanners, prompt, output
+            _OUTPUT_SCANNERS, prompt, output
         )
 
         flags = []
