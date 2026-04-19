@@ -16,7 +16,6 @@ from pydantic import BaseModel
 
 from agents.routers.security import router as security_router
 from agents.graph import build_travel_graph, default_graph_initial_state
-from agents.state import State
 from agents.specialists.input_guard_agent import input_guard_agent
 from agents.specialists.output_guard_agent import output_guard_agent
 from agents.specialists.intent_profile import intent_profile

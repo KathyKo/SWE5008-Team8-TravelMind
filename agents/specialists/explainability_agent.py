@@ -706,8 +706,6 @@ def explainability_agent(state: dict) -> dict:
         option_key=option_key,
         itinerary=days,
         decision_trace=decision_trace,
-        option_meta=state.get("option_meta", {}) or {},
-        pref_tags=_collect_pref_tags(state),
     )
 
     explainability_cot = _summary_text(summary)

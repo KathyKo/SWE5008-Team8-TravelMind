@@ -14,22 +14,6 @@ import sys
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-import pytest
-
-REPO_ROOT = Path(__file__).resolve().parents[4]
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
-
-# Stub optional security deps not installed in all environments
-for _mod in (
-    "llm_guard",
-    "llm_guard.input_scanners",
-    "llm_guard.output_scanners",
-    "tools.security.llm_guard_scanner",
-):
-    if _mod not in sys.modules:
-        sys.modules[_mod] = MagicMock()
-
 from datetime import date
 
 from agents.specialists.research_agent import _normalize_trip_state  # noqa: E402
@@ -121,6 +105,20 @@ from agents.specialists.planner_agent import (  # noqa: E402
     _append_missing_meal,
     _pick_mandatory_meal,
 )
+
+REPO_ROOT = Path(__file__).resolve().parents[4]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+# Stub optional security deps not installed in all environments
+for _mod in (
+    "llm_guard",
+    "llm_guard.input_scanners",
+    "llm_guard.output_scanners",
+    "tools.security.llm_guard_scanner",
+):
+    if _mod not in sys.modules:
+        sys.modules[_mod] = MagicMock()
 
 
 # ── 1. _normalize_trip_state ──────────────────────────────────────────────────
