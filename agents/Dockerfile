@@ -4,7 +4,7 @@ WORKDIR /app/agents
 
 ENV PYTHONPATH=/app
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
     build-essential \
     curl \
     && rm -rf /var/lib/apt/lists/*
@@ -19,7 +19,7 @@ COPY tools /app/tools
 
 EXPOSE 8001 8100 8101 8102 8103 8104 8105 8106 8107
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=20s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=15s --start-period=120s --retries=5 \
   CMD curl -f http://localhost:8001/health || exit 1
 
 CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port 8001 & \

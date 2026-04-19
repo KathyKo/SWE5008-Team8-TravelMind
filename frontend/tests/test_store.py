@@ -10,7 +10,7 @@ if str(frontend_dir) not in sys.path:
 
 def test_demo_users_are_seeded():
     assert set(USERS) == {"alice@example.com", "bob@example.com", "carol@example.com"}
-    assert USERS["alice@example.com"]["password"] == "demo123"
+    assert USERS["alice@example.com"]["password"] == "123456"
     assert "culture" in USERS["alice@example.com"]["prefs"]
 
 

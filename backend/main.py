@@ -35,6 +35,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
+    lifespan=lifespan,
     title="TravelMind API",
     description=(
         "Agent2 (Research): POST /research/run\n"
