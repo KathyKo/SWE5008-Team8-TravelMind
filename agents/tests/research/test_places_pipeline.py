@@ -2,10 +2,10 @@
 Test runner for the new research-first places pipeline.
 
 Supported flows:
-- `research`: run `research_agent_1` only
-- `plan-from-research`: run `planner_from_research_1` on a saved research result
+- `research`: run `research_agent` only
+- `plan-from-research`: run `planner_from_research` on a saved research result
 - `explain-from-plan`: run `explainability_agent` on a saved planner result
-- `full`: run `planner_agent_1` + `explainability_agent`
+- `full`: run `planner_agent` + `explainability_agent`
 
 Compatibility aliases:
 - `generate` -> `pipeline`
@@ -308,13 +308,13 @@ def _run_quiet(fn, *args, quiet: bool = True, **kwargs):
 
 
 def run_research(test_state: dict, *, quiet: bool = True) -> dict:
-    from agents.specialists.research_agent_1 import research_agent_1
+    from agents.specialists.research_agent import research_agent
 
     t0 = time.time()
     result = _run_quiet(
-        research_agent_1,
+        research_agent,
         test_state,
-        tools=_get_tools("research_agent_1"),
+        tools=_get_tools("research_agent"),
         quiet=quiet,
     )
     result["_elapsed_s"] = time.time() - t0
@@ -322,14 +322,14 @@ def run_research(test_state: dict, *, quiet: bool = True) -> dict:
 
 
 def run_pipeline(test_state: dict, *, quiet: bool = True) -> dict:
-    from agents.specialists.planner_agent_1 import planner_from_research_1
+    from agents.specialists.planner_agent import planner_from_research
 
     t0 = time.time()
     research_result = run_research(test_state, quiet=quiet)
     if "error" in research_result:
         return research_result
     result = _run_quiet(
-        planner_from_research_1,
+        planner_from_research,
         test_state,
         research_result,
         quiet=quiet,
@@ -343,12 +343,12 @@ def run_pipeline(test_state: dict, *, quiet: bool = True) -> dict:
 
 
 def run_plan_from_research(research_result: dict, *, quiet: bool = True) -> dict:
-    from agents.specialists.planner_agent_1 import planner_from_research_1
+    from agents.specialists.planner_agent import planner_from_research
 
     t0 = time.time()
     test_state = research_result.get("state", {})
     result = _run_quiet(
-        planner_from_research_1,
+        planner_from_research,
         test_state,
         research_result,
         quiet=quiet,
@@ -528,9 +528,9 @@ def main() -> None:
         choices=["research", "pipeline", "plan-from-research", "explain-from-plan", "full", "generate", "local"],
         default="pipeline",
         help=(
-            "research=research_agent_1 only | "
-            "pipeline=research_agent_1 -> planner_from_research_1 | "
-            "plan-from-research=planner_from_research_1 on a saved research JSON | "
+            "research=research_agent only | "
+            "pipeline=research_agent -> planner_from_research | "
+            "plan-from-research=planner_from_research on a saved research JSON | "
             "explain-from-plan=explainability_agent on a saved planner JSON | "
             "full=pipeline + explainability_agent"
         ),

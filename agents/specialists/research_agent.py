@@ -721,10 +721,12 @@ def research_agent(state: dict, tools: dict | None = None) -> dict:
     budget = state.get("budget")
     preferences = state.get("preferences", "")
     duration = state.get("duration")
-    user_profile = state.get("user_profile", {})
+    user_profile_raw = state.get("user_profile")
     outbound_time_pref = state.get("outbound_time_pref", "")
     return_time_pref = state.get("return_time_pref", "")
     search_queries = state.get("search_queries", []) or []
+    if not isinstance(search_queries, list):
+        search_queries = []
 
     date_parts = [d.strip() for d in dates.split(" to ")] if " to " in str(dates) else [str(dates).strip()]
     outbound_date = date_parts[0]
@@ -736,7 +738,13 @@ def research_agent(state: dict, tools: dict | None = None) -> dict:
     search_hotels = tools.get("search_hotels")
     web_search = tools.get("web_search")
 
-    profile_prefs = ", ".join(user_profile.get("prefs", [])) if user_profile else ""
+    # intent_profile stores user_profile as a human-readable string; UI may send a dict with prefs.
+    if isinstance(user_profile_raw, dict):
+        profile_prefs = ", ".join(user_profile_raw.get("prefs", []) or [])
+    elif isinstance(user_profile_raw, str) and user_profile_raw.strip():
+        profile_prefs = user_profile_raw.strip()
+    else:
+        profile_prefs = ""
     user_prefs = ", ".join(filter(None, [preferences, profile_prefs])) or "general traveller"
 
     research: dict = {}
@@ -1449,7 +1457,7 @@ def research_agent(state: dict, tools: dict | None = None) -> dict:
     else:
         cutoff_note = "Return departure time unknown; assume a conservative airport cutoff."
 
-    tool_log.append("[research_agent_1] Data collection complete")
+    tool_log.append("[research_agent] Data collection complete")
 
     inventory = {
         "attractions": compact_attractions,

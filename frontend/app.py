@@ -15,7 +15,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-BACKEND_URL = os.getenv("BACKEND_URL", "http://backend:8000").rstrip("/")
+BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000").rstrip("/")
 
 
 def _profile_from_username(username: str) -> dict:
@@ -78,7 +78,8 @@ def _fill_demo_credentials(username: str) -> None:
     st.session_state.auth_mode_widget = "Sign In"
     st.session_state.auth_mode = "Sign In"
     st.session_state.login_username_input = username
-    st.session_state.login_password_input = "123456"
+    demo_user = USERS.get(username, {})
+    st.session_state.login_password_input = demo_user.get("password", "demo123")
 
 # ── Global CSS ───────────────────────────────────────────────
 st.markdown("""
@@ -155,6 +156,57 @@ st.markdown("""
   .stSelectbox > div > div {
     background: #1a2235;
     border-radius: 10px;
+    color: #e8edf5 !important;
+  }
+  .stSelectbox div[data-baseweb="select"] > div {
+    background: #1a2235 !important;
+    color: #e8edf5 !important;
+  }
+  .stSelectbox div[data-baseweb="select"] span,
+  .stSelectbox div[data-baseweb="select"] input {
+    color: #e8edf5 !important;
+  }
+  /* Dropdown list items */
+  div[data-baseweb="popover"] li,
+  div[data-baseweb="popover"] [role="option"] {
+    background: #1a2235 !important;
+    color: #e8edf5 !important;
+  }
+  div[data-baseweb="popover"] [role="option"]:hover {
+    background: #233047 !important;
+  }
+
+  /* Number input */
+  .stNumberInput input {
+    background: #1a2235 !important;
+    color: #e8edf5 !important;
+    border: 1px solid rgba(255,255,255,0.07) !important;
+    border-radius: 10px !important;
+  }
+  div[data-testid="stNumberInput"] button {
+    background: #2d3a52 !important;
+    border: 1px solid rgba(255,255,255,0.2) !important;
+    color: #f8fafc !important;
+    border-radius: 8px !important;
+    min-width: 2.25rem !important;
+  }
+  div[data-testid="stNumberInput"] button:hover {
+    background: #3b4d6e !important;
+    border-color: rgba(59,158,255,0.45) !important;
+    color: #ffffff !important;
+  }
+  div[data-testid="stNumberInput"] button svg,
+  div[data-testid="stNumberInput"] button path {
+    fill: #f8fafc !important;
+    stroke: #f8fafc !important;
+  }
+
+  /* Date input */
+  .stDateInput input {
+    background: #1a2235 !important;
+    color: #e8edf5 !important;
+    border: 1px solid rgba(255,255,255,0.07) !important;
+    border-radius: 10px !important;
   }
 
   /* Info / success / warning boxes */
@@ -237,6 +289,14 @@ def init_state():
         "visited": {},          # item_key -> bool
         "selected_option": "A",
         "plan_generated": False,
+        "plan_itineraries": {},
+        "plan_option_meta": {},
+        "plan_id": None,
+        "plan_flight_outbound": [],
+        "plan_flight_return": [],
+        "plan_hotel_options": [],
+        "plan_request_summary": {},
+        "agent_status": {},
         "main_section_key": "plan",
         "security_log": [],
         "blocked_count": 0,
