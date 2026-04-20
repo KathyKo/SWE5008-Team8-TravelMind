@@ -13,3 +13,7 @@ from unittest.mock import MagicMock
 for _mod in ("uuid_utils", "uuid_utils.compat", "uuid_utils._uuid_utils"):
     if _mod not in sys.modules:
         sys.modules[_mod] = MagicMock()
+
+
+def pytest_configure(config):
+    config.addinivalue_line("markers", "red_team_e2e: full e2e red team tests against live service")
