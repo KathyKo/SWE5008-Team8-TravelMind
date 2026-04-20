@@ -108,7 +108,12 @@ def update_plan_result(db: Session, plan_id: str, revised: dict) -> None:
     plan.tool_log               = revised.get("tool_log",               plan.tool_log)
     plan.planner_decision_trace = revised.get("planner_decision_trace", plan.planner_decision_trace)
     plan.chain_of_thought       = revised.get("chain_of_thought") or revised.get("planner_chain_of_thought") or plan.chain_of_thought
-
+    # Persist debate progress so next debate round is derived from DB history,
+    # rather than being reset to round 1 on every invocation.
+    if "debate_history" in revised:
+        plan.debate_history = revised.get("debate_history")
+    if "debate_verdict" in revised:
+        plan.debate_verdict = revised.get("debate_verdict")
     # Delete + re-insert child rows
     for itin in list(plan.itineraries):
         db.delete(itin)

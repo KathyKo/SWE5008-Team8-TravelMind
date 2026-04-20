@@ -16,6 +16,9 @@ from langchain_openai import ChatOpenAI
 
 from ..llm_config import OPENAI_MODEL
 from .research_agent import _normalize_trip_state, research_agent
+from ..logging_config import get_agent_logger
+
+logger = get_agent_logger("travelmind.agents.planner")
 
 
 def _llm() -> ChatOpenAI:
@@ -4620,8 +4623,11 @@ def _build_deterministic_plan(
     preference_model: dict,
     trip_start_date: date | None = None,
 ) -> tuple[dict, dict, dict, dict, dict, dict]:
-    compact_attractions = [item for item in compact_attractions if _is_normal_activity_candidate(item)]
-    compact_restaurants = [item for item in compact_restaurants if _is_normal_restaurant_candidate(item)]
+    #compact_attractions = [item for item in compact_attractions if _is_normal_activity_candidate(item)]  
+    #compact_restaurants = [item for item in compact_restaurants if _is_normal_restaurant_candidate(item)]
+    compact_attractions = [item for item in compact_attractions ]
+    compact_restaurants = [item for item in compact_restaurants ]
+   
     attraction_lookup = _name_lookup(compact_attractions)
     restaurant_lookup = _name_lookup(compact_restaurants)
     outbound_flight = _pick_outbound_flight(compact_flights_out)
@@ -4731,6 +4737,7 @@ def _build_deterministic_plan(
 
 
 def planner_from_research(state: dict, research_result: dict) -> dict:
+    logger.info("[planner_from_research] start")
     state = _normalize_trip_state(state)
     dest = state.get("destination")
     origin = state.get("origin")
@@ -4750,9 +4757,19 @@ def planner_from_research(state: dict, research_result: dict) -> dict:
         if not value
     ]
     if missing:
+        logger.error("[planner_from_research] missing required fields: %s", missing)
         return {"error": f"Missing required fields: {', '.join(missing)}"}
 
+    logger.info(
+        "[planner_from_research] extracted state: dest=%s, origin=%s, dates=%s, duration=%s",
+        dest,
+        origin,
+        dates,
+        duration,
+    )
+
     try:
+        logger.info("[planner_from_research] extracting research payload")
         payload = _extract_research_payload(state, research_result)
         research = payload["research"]
         tool_log = payload["tool_log"]
@@ -4761,6 +4778,17 @@ def planner_from_research(state: dict, research_result: dict) -> dict:
         compact_hotels = payload["compact_hotels"]
         compact_flights_out = payload["compact_flights_out"]
         compact_flights_ret = payload["compact_flights_ret"]
+        
+        logger.info(
+            "[planner_from_research] inventory summary: %d attractions, %d restaurants, %d hotels, %d flights out, %d flights ret",
+            len(compact_attractions),
+            len(compact_restaurants),
+            len(compact_hotels),
+            len(compact_flights_out),
+            len(compact_flights_ret),
+        )
+        
+        logger.info("[planner_from_research] building prompt inventory")
         prompt_inventory = _build_prompt_inventory(
             compact_attractions,
             compact_restaurants,
@@ -4772,6 +4800,8 @@ def planner_from_research(state: dict, research_result: dict) -> dict:
         compact_restaurants = _ensure_inventory_keys(compact_restaurants, "restaurant")
         preference_model = _build_preference_model(state)
         trip_start_date = _trip_start_date(state)
+        logger.info("[planner_from_research] trip_start_date=%s", trip_start_date)
+        
         _cache_inventory_snapshot(
             research,
             research_result,
@@ -4784,6 +4814,7 @@ def planner_from_research(state: dict, research_result: dict) -> dict:
             prompt_inventory,
         )
 
+        logger.info("[planner_from_research] building deterministic plan")
         (
             result,
             itineraries,
@@ -4802,6 +4833,7 @@ def planner_from_research(state: dict, research_result: dict) -> dict:
             trip_start_date=trip_start_date,
         )
         planner_chain_of_thought = result.get("chain_of_thought", "")
+        logger.info("[planner_from_research] plan generated with options: %s", list(itineraries.keys()))
         tool_log.append("[planner_agent] Deterministic route-first scheduler with LLM seed selection used saved research inventory")
         tool_log.append(f"[planner_agent] Generated options: {list(itineraries.keys())}")
 
@@ -4823,6 +4855,7 @@ def planner_from_research(state: dict, research_result: dict) -> dict:
         }
     except Exception as exc:
         import traceback
+        logger.exception("[planner_from_research] planning failed with error: %s", str(exc))
         traceback.print_exc()
         print(f"[Planner1] Error: {exc}")
         return {"error": str(exc)}
@@ -4830,8 +4863,65 @@ def planner_from_research(state: dict, research_result: dict) -> dict:
 
 # Thin wrapper kept for call sites that still expect planner to trigger research first.
 def planner_agent(state: dict, tools: dict | None = None) -> dict:
+    logger.info("[planner_agent] start")
     state = _normalize_trip_state(state)
+    logger.info(
+        "[planner_agent] normalized state: destination=%s, origin=%s, budget=%s",
+        state.get("destination"),
+        state.get("origin"),
+        state.get("budget"),
+    )
+
+    # Check if research payload already exists in state to avoid duplicate external calls
+    inventory = state.get("inventory") or {}
+    has_research_data = any(
+        [
+            bool(state.get("research")),
+            bool(state.get("compact_attractions")),
+            bool(state.get("compact_restaurants")),
+            bool(state.get("compact_hotels")),
+            bool(state.get("compact_flights_out")),
+            bool(state.get("compact_flights_ret")),
+            bool(state.get("flight_options_outbound")),
+            bool(state.get("flight_options_return")),
+            bool(state.get("hotel_options")),
+            bool(inventory.get("attractions")),
+            bool(inventory.get("restaurants")),
+            bool(inventory.get("hotels")),
+            bool(inventory.get("flights_outbound")),
+            bool(inventory.get("flights_return")),
+        ]
+    )
+
+    if has_research_data:
+        logger.info("[planner_agent] reusing upstream search/research payload from state")
+        seeded_research_result = {
+            "research": state.get("research", {}),
+            "inventory": state.get("inventory", {}),
+            "tool_log": list(state.get("tool_log", [])),
+            "user_prefs": state.get("user_prefs") or state.get("preferences", ""),
+            "compact_attractions": state.get("compact_attractions", []),
+            "compact_restaurants": state.get("compact_restaurants", []),
+            "compact_hotels": state.get("compact_hotels") or state.get("hotel_options", []),
+            "compact_flights_out": state.get("compact_flights_out") or state.get("flight_options_outbound", []),
+            "compact_flights_ret": state.get("compact_flights_ret") or state.get("flight_options_return", []),
+            "att_list_text": state.get("att_list_text", ""),
+            "rest_list_text": state.get("rest_list_text", ""),
+            "hotel_list_text": state.get("hotel_list_text", ""),
+            "flight_out_text": state.get("flight_out_text", ""),
+            "flight_ret_text": state.get("flight_ret_text", ""),
+            "ret_cutoff_note": state.get("ret_cutoff_note", ""),
+            "hotel_opts": state.get("hotel_opts") or state.get("hotel_options", []),
+        }
+        seeded_research_result["tool_log"].append(
+            "[planner_agent] Reusing upstream search/research payload from state"
+        )
+        return planner_from_research(state, seeded_research_result)
+
+    logger.info("[planner_agent] no research data in state, calling research_agent")
     research_result = research_agent(state, tools or {})
     if "error" in research_result:
+        logger.error("[planner_agent] research_agent failed: %s", research_result.get("error"))
         return research_result
+    logger.info("[planner_agent] research_agent completed, calling planner_from_research")
     return planner_from_research(state, research_result)

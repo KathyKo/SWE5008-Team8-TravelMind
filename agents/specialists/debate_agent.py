@@ -16,6 +16,9 @@ from agents.db.database import SessionLocal
 from agents.db.models import Plan
 from agents.llm_config import DEBATE_MODEL, DMX_API_KEY, DMX_BASE_URL, JUDGE_MODEL
 from agents.specialists.planner_agent import revise_itinerary
+from agents.logging_config import get_agent_logger
+
+logger = get_agent_logger("travelmind.agents.debate")
 
 MAX_DEBATE_ROUNDS = 3
 DIMENSIONS = ("bias_fairness", "logistics", "preference_alignment", "option_diversity")
@@ -29,17 +32,17 @@ Evaluate itinerary options with exactly these 4 dimensions:
 4) option_diversity
 
 Return strict JSON:
-{
+{{
   "round_decision": "continue" | "decide",
   "winner_option": "A" | "B" | "C" | null,
   "winner_reason": "<short reason>",
   "critique_summary": "<actionable critique to planner>",
-  "dimension_scores": {
-    "A": {"bias_fairness":0-100,"logistics":0-100,"preference_alignment":0-100,"option_diversity":0-100},
-    "B": {"bias_fairness":0-100,"logistics":0-100,"preference_alignment":0-100,"option_diversity":0-100},
-    "C": {"bias_fairness":0-100,"logistics":0-100,"preference_alignment":0-100,"option_diversity":0-100}
-  }
-}
+  "dimension_scores": {{
+    "A": {{"bias_fairness":0-100,"logistics":0-100,"preference_alignment":0-100,"option_diversity":0-100}},
+    "B": {{"bias_fairness":0-100,"logistics":0-100,"preference_alignment":0-100,"option_diversity":0-100}},
+    "C": {{"bias_fairness":0-100,"logistics":0-100,"preference_alignment":0-100,"option_diversity":0-100}}
+  }}
+}}
 If one option clearly wins, set round_decision=decide. Otherwise continue.
 """
 
@@ -73,15 +76,15 @@ Use all context and score A/B/C on 4 dimensions:
 - option_diversity
 
 Return strict JSON:
-{
+{{
   "winner_option": "A" | "B" | "C",
   "winner_reason": "<short reason>",
-  "dimension_scores": {
-    "A": {"bias_fairness":0-100,"logistics":0-100,"preference_alignment":0-100,"option_diversity":0-100},
-    "B": {"bias_fairness":0-100,"logistics":0-100,"preference_alignment":0-100,"option_diversity":0-100},
-    "C": {"bias_fairness":0-100,"logistics":0-100,"preference_alignment":0-100,"option_diversity":0-100}
-  }
-}
+  "dimension_scores": {{
+    "A": {{"bias_fairness":0-100,"logistics":0-100,"preference_alignment":0-100,"option_diversity":0-100}},
+    "B": {{"bias_fairness":0-100,"logistics":0-100,"preference_alignment":0-100,"option_diversity":0-100}},
+    "C": {{"bias_fairness":0-100,"logistics":0-100,"preference_alignment":0-100,"option_diversity":0-100}}
+  }}
+}}
 """
 
 
@@ -299,8 +302,11 @@ def debate_agent(_state: dict) -> dict:
     Debate Agent entrypoint.
     Input source is DB only (to minimize state-coupling and cross-turn mismatch).
     """
+    logger.info("[debate_agent] start")
     plan_id = _resolve_active_plan_id()
+    logger.info("[debate_agent] resolved active plan_id=%s", plan_id)
     if not plan_id:
+        logger.info("[debate_agent] no active plan found in DB")
         return {
             "is_valid": False,
             "debate_count": 0,
@@ -315,6 +321,7 @@ def debate_agent(_state: dict) -> dict:
         db.close()
 
     if not plan_payload:
+        logger.info("[debate_agent] plan_id=%s not found in DB payload", plan_id)
         return {
             "plan_id": plan_id,
             "is_valid": False,
@@ -325,9 +332,19 @@ def debate_agent(_state: dict) -> dict:
 
     debate_history = deepcopy(plan_payload.get("debate_history") or [])
     round_num = _round_from_history(debate_history)
+    logger.info(
+        "[debate_agent] plan_id=%s round=%s history_len=%s",
+        plan_id,
+        round_num,
+        len(debate_history),
+    )
 
     if round_num > MAX_DEBATE_ROUNDS:
         existing_verdict = plan_payload.get("debate_verdict")
+        logger.info(
+            "[debate_agent] plan_id=%s rounds already completed, returning existing verdict",
+            plan_id,
+        )
         return {
             "plan_id": plan_id,
             "is_valid": bool(existing_verdict),
@@ -343,6 +360,11 @@ def debate_agent(_state: dict) -> dict:
     try:
         critique_payload = _build_round_critique_payload(plan_payload, debate_history, round_num)
     except Exception as e:
+        logger.exception(
+            "[debate_agent] plan_id=%s round=%s critique generation failed",
+            plan_id,
+            round_num,
+        )
         critique_payload = {
             "round_decision": "continue",
             "winner_option": None,
@@ -369,9 +391,23 @@ def debate_agent(_state: dict) -> dict:
     winner_option = critique_payload.get("winner_option")
     scores = critique_payload.get("dimension_scores", {})
     immediate_win = round_decision == "decide" and winner_option in plan_payload.get("itineraries", {})
+    logger.info(
+        "[debate_agent] plan_id=%s round=%s round_decision=%s winner_hint=%s immediate_win=%s",
+        plan_id,
+        round_num,
+        round_decision,
+        winner_option,
+        immediate_win,
+    )
 
     if immediate_win:
         final_winner = str(winner_option)
+        logger.info(
+            "[debate_agent] plan_id=%s round=%s immediate winner=%s",
+            plan_id,
+            round_num,
+            final_winner,
+        )
         debate_verdict = {
             "accepted": True,
             "final_round": round_num,
@@ -402,6 +438,11 @@ def debate_agent(_state: dict) -> dict:
 
     # Continue debate if rounds remain: trigger real Planner (Agent3) revision via LLM.
     if round_num < MAX_DEBATE_ROUNDS:
+        logger.info(
+            "[debate_agent] plan_id=%s round=%s continue debate, calling planner revision",
+            plan_id,
+            round_num,
+        )
         planner_state = _planner_state_from_plan_payload(plan_payload)
         revised = revise_itinerary(planner_state, critique_summary, plan_payload)
         planner_reply = {
@@ -423,6 +464,17 @@ def debate_agent(_state: dict) -> dict:
         )
         if isinstance(revised, dict) and "error" not in revised:
             plan_payload = _merge_revised_plan(plan_payload, revised)
+            logger.info(
+                "[debate_agent] plan_id=%s round=%s planner revision merged",
+                plan_id,
+                round_num,
+            )
+        else:
+            logger.info(
+                "[debate_agent] plan_id=%s round=%s planner revision returned error path",
+                plan_id,
+                round_num,
+            )
         _persist_plan_debate(
             plan_id=plan_id,
             plan_payload=plan_payload,
@@ -444,8 +496,18 @@ def debate_agent(_state: dict) -> dict:
     # Max rounds reached: judge decides.
     judge_payload: Optional[dict] = None
     try:
+        logger.info(
+            "[debate_agent] plan_id=%s round=%s max rounds reached, invoking judge",
+            plan_id,
+            round_num,
+        )
         judge_payload = _build_judge_payload(plan_payload, debate_history)
     except Exception:
+        logger.exception(
+            "[debate_agent] plan_id=%s round=%s judge failed, using fallback",
+            plan_id,
+            round_num,
+        )
         fallback_winner = _winner_by_scores(scores) or "A"
         judge_payload = {
             "winner_option": fallback_winner,
@@ -454,6 +516,12 @@ def debate_agent(_state: dict) -> dict:
         }
 
     final_winner = str(judge_payload.get("winner_option", "A"))
+    logger.info(
+        "[debate_agent] plan_id=%s round=%s judge winner=%s",
+        plan_id,
+        round_num,
+        final_winner,
+    )
     debate_verdict = {
         "accepted": True,
         "final_round": round_num,

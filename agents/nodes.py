@@ -2,6 +2,9 @@ import os
 import requests
 from typing import Dict
 from .state import State
+from .logging_config import get_agent_logger
+
+logger = get_agent_logger("travelmind.agents.orchestrator")
 
 # Assume in the docker-compose network, each container can be accessed by the service name
 # All Agents use the same hostname, only the port is different (starting from 8100)
@@ -28,15 +31,38 @@ def call_remote_agent(agent_name: str, state: State) -> Dict:
     if not url:
         raise ValueError(f"Unknown agent: {agent_name}")
 
-    print(f"--- Calling remote container: [{agent_name}] ---")
+    request_payload = {"state": state}
+    logger.info(
+        "[call_remote_agent] request agent=%s url=%s payload=%s",
+        agent_name,
+        url,
+        request_payload,
+    )
 
     try:
-        response = requests.post(url, json={"state": state}, timeout=60.0)
+        response = requests.post(url, json=request_payload, timeout=60.0)
         response.raise_for_status()
-        return response.json()
+        response_json = response.json()
+        logger.info(
+            "[call_remote_agent] response agent=%s url=%s status=%s body=%s",
+            agent_name,
+            url,
+            response.status_code,
+            response_json,
+        )
+        return response_json
 
     except requests.exceptions.RequestException as e:
-        print(f"!!! Calling container [{agent_name}] failed: {e}")
+        response_text = ""
+        if getattr(e, "response", None) is not None:
+            response_text = (e.response.text or "")[:1000]
+        logger.exception(
+            "[call_remote_agent] failed agent=%s url=%s error=%s response_text=%s",
+            agent_name,
+            url,
+            str(e),
+            response_text,
+        )
         return {
             "error_message": f"{agent_name} service unavailable: {str(e)}",
         }
@@ -134,35 +160,35 @@ def orchestrator_node(state: State) -> Dict:
 
     # ── 0. Global error intercept ──────────────────────────────────
     if state.get("error_message"):
-        print(f"[Orchestrator] error intercepted: {state['error_message']}")
+        logger.error("[Orchestrator] error intercepted: %s", state["error_message"])
         return {"next_node": "END"}
 
     # ── 1. Input Guard (security gate) ──────────────────────────
     if state.get("threat_blocked") is True:
-        print("[Orchestrator] input blocked by input_guard, workflow terminated.")
+        logger.info("[Orchestrator] input blocked by input_guard, workflow terminated.")
         return {"next_node": "END"}
 
     # ── 2. User feedback → Replanner (priority higher than normal workflow) ───
     #    User submitted a modification feedback at H.I.T. Checkpoint
     if state.get("user_feedback"):
-        print("[Orchestrator] → replanner (user submitted a modification feedback)")
+        logger.info("[Orchestrator] → replanner (user submitted a modification feedback)")
         return {"next_node": "replanner"}
 
     # ── 3. Intent Profile (user intent profile) ──────────────────
     if not state.get("intent_profile_output"):
-        print("[Orchestrator] → intent_profile (extract user intent)")
+        logger.info("[Orchestrator] → intent_profile (extract user intent)")
         return {"next_node": "intent_profile"}
 
     # ── 4. Research / Search (information retrieval) ───────────────────
     if not state.get("search_results") and not state.get("research"):
-        print("[Orchestrator] → search (information retrieval)")
+        logger.info("[Orchestrator] → search (information retrieval)")
         return {"next_node": "search"}
 
     # ── 5. Planner (trip planning) ────────────────────────────
     #    First planning: itineraries does not exist
     #    Re-planning after debate failure: planner_node will reset is_valid=None when returning
     if not state.get("itineraries") and not state.get("final_itineraries"):
-        print("[Orchestrator] → planner (generate itinerary)")
+        logger.info("[Orchestrator] → planner (generate itinerary)")
         return {"next_node": "planner"}
 
     # ── 6. Debate ↔ Planner loop ─────────────────────────
@@ -172,28 +198,32 @@ def orchestrator_node(state: State) -> Dict:
 
     # 6a. Not reviewed yet or planner/replanner just generated a new plan → debate
     if is_valid is None:
-        print("[Orchestrator] → debate (trip quality review)")
+        logger.info("[Orchestrator] → debate (trip quality review)")
         return {"next_node": "debate"}
 
     # 6b. debate failed and not reached the maximum number of rounds → return with critique to planner for improvement
     if is_valid is False and debate_count < max_debate_rounds:
-        print(f"[Orchestrator] → planner (debate failed, round {debate_count}/{max_debate_rounds} improvement)")
+        logger.info(
+            "[Orchestrator] → planner (debate failed, round %s/%s improvement)",
+            debate_count,
+            max_debate_rounds,
+        )
         return {"next_node": "planner"}
 
     # 6c. debate passed (is_valid=True) or reached the maximum number of rounds → force push
 
     # ── 7. Explainability (explainability) ─────────────────────
     if not state.get("explanation") and not state.get("explain_data"):
-        print("[Orchestrator] → explain (generate decision explanation)")
+        logger.info("[Orchestrator] → explain (generate decision explanation)")
         return {"next_node": "explain"}
 
     # ── 8. Output Guard (output security check) ───────────────────
     if not state.get("output_guard_decision"):
-        print("[Orchestrator] → output_guard (output security check)")
+        logger.info("[Orchestrator] → output_guard (output security check)")
         return {"next_node": "output_guard"}
 
     # ── 9. All workflow completed ───────────────────────────────────
-    print("[Orchestrator] workflow completed.")
+    logger.info("[Orchestrator] workflow completed.")
     return {"next_node": "END"}
 
 
