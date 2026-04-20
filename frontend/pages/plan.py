@@ -300,7 +300,18 @@ def _agent_status_from_graph_state(s: dict) -> dict:
     else:
         status["debate"] = {"state": "skipped", "detail": "no debate verdict in state"}
 
-    og = (s.get("output_guard_decision") or "").lower()
+    og_raw = s.get("output_guard_decision")
+    if isinstance(og_raw, dict):
+        # Newer backend returns structured decision payload
+        action = str(og_raw.get("action") or "").strip().lower()
+        if action in {"allow", "warn_then_allow", "redact_then_allow"}:
+            og = "pass"
+        elif action == "block":
+            og = "block"
+        else:
+            og = ""
+    else:
+        og = str(og_raw or "").strip().lower()
     flagged = s.get("output_flagged") is True
     if og == "pass" and not flagged:
         status["safety"] = {"state": "success", "detail": "output guard: pass"}

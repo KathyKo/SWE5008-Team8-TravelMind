@@ -22,13 +22,4 @@ EXPOSE 8001 8100 8101 8102 8103 8104 8105 8106 8107
 HEALTHCHECK --interval=30s --timeout=15s --start-period=120s --retries=5 \
   CMD curl -f http://localhost:8001/health || exit 1
 
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port 8001 & \
-uvicorn main:app --host 0.0.0.0 --port 8100 & \
-uvicorn main:app --host 0.0.0.0 --port 8101 & \
-uvicorn main:app --host 0.0.0.0 --port 8102 & \
-uvicorn main:app --host 0.0.0.0 --port 8103 & \
-uvicorn main:app --host 0.0.0.0 --port 8104 & \
-uvicorn main:app --host 0.0.0.0 --port 8105 & \
-uvicorn main:app --host 0.0.0.0 --port 8106 & \
-uvicorn main:app --host 0.0.0.0 --port 8107 & \
-wait"]
+CMD ["python", "server.py"]
