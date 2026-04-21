@@ -19,12 +19,14 @@ Configuration sources:
 
 Routing:
     [specialists] → output_guard → output_flagged
-                               → output_safe
+                                 → output_safe
 """
 
 import json
 import os
 import re
+import logging
+import sys
 import yaml
 from pathlib import Path
 from typing import Any
@@ -37,7 +39,6 @@ from tools.security.pii_scanner import scan_pii, has_high_risk_pii
 from tools.security.llm_guard_scanner import scan_output_llm_guard
 from tools.security.security_logger import log_event, EventType
 
-
 AGENT_NAME = "output_guard_agent"
 ENABLE_LLM_UNSAFE_CHECK = os.getenv("ENABLE_LLM_UNSAFE_CHECK", "1") == "1"
 OUTPUT_GUARD_PROMPT_VERSION = os.getenv("OUTPUT_GUARD_PROMPT_VERSION", "v1")
@@ -49,6 +50,14 @@ FLAGGED_RESPONSE = (
     "I encountered an issue preparing your travel information. "
     "Please try rephrasing your request."
 )
+
+logger = logging.getLogger("travelmind.agents.output_guard")
+logger.setLevel(logging.INFO)
+if not logger.handlers:
+    _handler = logging.StreamHandler(sys.stdout)
+    _handler.setFormatter(logging.Formatter("[%(asctime)s] %(levelname)s %(name)s — %(message)s"))
+    logger.addHandler(_handler)
+logger.propagate = False
 
 
 def _get_prompt(name: str, version: str, fallback: str) -> str:
@@ -217,9 +226,9 @@ def output_guard_node(state: State) -> dict:
         if isinstance(msg, dict) and msg.get("role") == "user":
             user_prompt = msg.get("content", "")
 
-    print(f"\n[output_guard_agent] validating response ({len(output_text)} chars)...")
+    logger.info("validating_response chars=%s", len(output_text))
 
-    print("[output_guard_agent] 🧠 Planner disabled: running all safety tools")
+    logger.info("planner_disabled running_all_safety_tools=true")
 
     # ── Step 1: Hallucination check (advisory) ────────────────
     hallucination_warning = False
@@ -241,7 +250,7 @@ def output_guard_node(state: State) -> dict:
             user_id,
         )
         # Advisory warning — log but don't block (Research Agent is primary owner)
-        print(f"[output_guard_agent] ⚠️  Hallucination warning: {halluc_result.reason}")
+        logger.warning("hallucination_warning reason=%s", halluc_result.reason)
 
     # ── Step 2: Regex PII scan ────────────────────────────────
     pii_redacted = False
@@ -261,7 +270,7 @@ def output_guard_node(state: State) -> dict:
             {"layer": "regex", "reason": "high_risk_pii_in_output", "findings": pii_result.findings},
             user_id,
         )
-        print(f"[output_guard_agent] ⛔ FLAGGED (Step 2 — Regex PII): High-risk PII in output")
+        logger.warning("flagged step=regex_pii reason=high_risk_pii_output")
         return {
             "output_flagged": True,
             "output_flag_reason": "pii_leakage",
@@ -279,7 +288,7 @@ def output_guard_node(state: State) -> dict:
             {"layer": "regex", "reason": "medium_pii_redacted", "findings": pii_result.findings},
             user_id,
         )
-        print(f"[output_guard_agent] ℹ️  Medium-risk PII redacted (regex layer)")
+        logger.info("pii_redacted step=regex_pii severity=medium")
 
     # ── Step 3: Rule-based unsafe content check ───────────────
     is_unsafe, unsafe_reason = _check_unsafe_content(output_text)
@@ -295,7 +304,7 @@ def output_guard_node(state: State) -> dict:
             {"layer": "regex", "reason": "unsafe_content", "detail": unsafe_reason},
             user_id,
         )
-        print(f"[output_guard_agent] ⛔ FLAGGED (Step 3 — Rule-based): {unsafe_reason}")
+        logger.warning("flagged step=rule_based reason=%s", unsafe_reason)
         return {
             "output_flagged": True,
             "output_flag_reason": "unsafe_content",
@@ -331,7 +340,7 @@ def output_guard_node(state: State) -> dict:
             },
             user_id,
         )
-        print(f"[output_guard_agent] ⛔ FLAGGED (Step 4 — LLM Semantic): {llm_unsafe_reason}")
+        logger.warning("flagged step=llm_semantic reason=%s", llm_unsafe_reason)
         return {
             "output_flagged": True,
             "output_flag_reason": "unsafe_content_semantic",
@@ -366,7 +375,7 @@ def output_guard_node(state: State) -> dict:
             },
             user_id,
         )
-        print(f"[output_guard_agent] ⛔ FLAGGED (Step 5 — LLM Guard): {llm_guard_result.reason}")
+        logger.warning("flagged step=llm_guard reason=%s", llm_guard_result.reason)
         return {
             "output_flagged": True,
             "output_flag_reason": f"llm_guard:{','.join(llm_guard_result.flags)}",
@@ -385,7 +394,7 @@ def output_guard_node(state: State) -> dict:
         {"message_length": len(output_text)},
         user_id,
     )
-    print("[output_guard_agent] ✅ Output passed all checks")
+    logger.info("output_passed all_checks=true")
 
     updated_messages = list(messages)
     updated_messages[last_assistant_idx] = {

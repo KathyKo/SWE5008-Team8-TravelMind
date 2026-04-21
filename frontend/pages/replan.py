@@ -3,11 +3,39 @@ pages/replan.py — Dynamic Re-planning page
 """
 
 import time
+import os
+import requests
 import streamlit as st
 from data.store import SITUATIONS, TIME_OPTIONS, ALT_OPTIONS, REPLAN_LOG
 
+AGENTS_REPLAN_URL = os.getenv("AGENTS_REPLAN_URL", "http://agents:8001/replan").rstrip("/")
+
+
+def _build_feedback() -> dict:
+    return {
+        "situation": st.session_state.replan_situation,
+        "time": st.session_state.replan_time,
+        "current_day": "Day 3",
+        "current_time": "14:00",
+        "current_location": "Central Kyoto, near Nishiki Market",
+    }
+
+
+def _call_replan_backend() -> dict:
+    payload = {
+        "user_feedback": _build_feedback(),
+        "user_id": st.session_state.get("user_id", "demo_user"),
+    }
+    resp = requests.post(AGENTS_REPLAN_URL, json=payload, timeout=90)
+    resp.raise_for_status()
+    return resp.json()
+
 
 def render():
+    st.session_state.setdefault("replan_backend_result", {})
+    st.session_state.setdefault("replan_alt_options", ALT_OPTIONS)
+
+    context = (st.session_state.get("replan_backend_result", {}) or {}).get("context", {})
     st.markdown("### Dynamic Re-planning")
     st.markdown("<span style='color:#7a90b0;font-size:14px'>Tell us what changed — TravelMind will adapt your itinerary.</span>", unsafe_allow_html=True)
     st.markdown("")
@@ -18,8 +46,11 @@ def render():
         with c1:
             st.markdown("🟢")
         with c2:
-            st.markdown("**Central Kyoto, near Nishiki Market**")
-            st.caption("Day 3 · 14:00 · Originally: Arashiyama Bamboo Grove")
+            st.markdown(f"**{context.get('location', 'Central Kyoto, near Nishiki Market')}**")
+            st.caption(
+                f"{context.get('current_day', 'Day 3')} · {context.get('current_time', '14:00')} · "
+                f"Originally: {context.get('original_plan_title', 'Debate winner plan')}"
+            )
         with c3:
             st.markdown("🌤 26°C")
 
@@ -84,6 +115,18 @@ def render():
                 log_lines.append(f"<span style='color:{color};font-family:monospace;font-size:11px'>[{tag}]</span> <span style='font-size:12px;color:#7a90b0'>{msg}</span>")
                 log_placeholder.markdown("<br>".join(log_lines), unsafe_allow_html=True)
                 time.sleep(0.5)
+            try:
+                result = _call_replan_backend()
+                replanner_output = result.get("replanner_output", {}) if isinstance(result, dict) else {}
+                alts = replanner_output.get("alternatives")
+                if isinstance(alts, list) and alts:
+                    st.session_state.replan_alt_options = alts
+                else:
+                    st.session_state.replan_alt_options = ALT_OPTIONS
+                st.session_state.replan_backend_result = replanner_output
+            except Exception as exc:
+                st.session_state.replan_alt_options = ALT_OPTIONS
+                st.session_state.replan_backend_result = {"error": str(exc)}
         st.session_state.replan_done = True
         st.rerun()
 
@@ -91,8 +134,12 @@ def render():
     if st.session_state.replan_done:
         st.markdown("---")
         st.markdown("#### Nearby Alternatives")
+        backend_error = (st.session_state.get("replan_backend_result") or {}).get("error")
+        if backend_error:
+            st.info(f"后端重规划暂不可用，已回退到演示方案：{backend_error}")
 
-        for i, alt in enumerate(ALT_OPTIONS):
+        alt_options = st.session_state.get("replan_alt_options") or ALT_OPTIONS
+        for i, alt in enumerate(alt_options):
             with st.container(border=True):
                 chosen = st.session_state.chosen_alt == i
                 c_icon, c_body, c_btn = st.columns([0.5, 5, 1.5])
@@ -120,9 +167,13 @@ def render():
 
         # ── Ripple effect ──────────────────────────────────────
         if st.session_state.chosen_alt is not None:
-            alt = ALT_OPTIONS[st.session_state.chosen_alt]
-            st.warning(
-                f"📅 **Ripple effect:** {alt['name']} selected. "
-                "Bamboo Grove moved to Day 4 (09:00). Tenryuji shifted to Day 4 afternoon. "
-                "Budget unchanged — SGD 2,847 total."
-            )
+            alt = alt_options[st.session_state.chosen_alt]
+            ripple = (st.session_state.get("replan_backend_result") or {}).get("ripple_effect")
+            if ripple:
+                st.warning(f"📅 **Ripple effect:** {ripple}")
+            else:
+                st.warning(
+                    f"📅 **Ripple effect:** {alt['name']} selected. "
+                    "Bamboo Grove moved to Day 4 (09:00). Tenryuji shifted to Day 4 afternoon. "
+                    "Budget unchanged — SGD 2,847 total."
+                )

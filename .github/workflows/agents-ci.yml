@@ -1,20 +1,22 @@
-name: backend-ci
+name: agents-ci
 
 on:
   push:
     branches: ["main", "feature/**"]
     paths:
-      - "backend/**"
-      - ".github/workflows/backend-ci.yml"
-      - ".github/workflows/backend-cd.yml"
-      - "backend/requirements.txt"
+      - "agents/**"
+      - "tools/**"
+      - ".github/workflows/agents-ci.yml"
+      - ".github/workflows/agents-cd.yml"
+      - "agents/requirements.txt"
   pull_request:
     branches: ["main"]
     paths:
-      - "backend/**"
-      - ".github/workflows/backend-ci.yml"
-      - ".github/workflows/backend-cd.yml"
-      - "backend/requirements.txt"
+      - "agents/**"
+      - "tools/**"
+      - ".github/workflows/agents-ci.yml"
+      - ".github/workflows/agents-cd.yml"
+      - "agents/requirements.txt"
   workflow_dispatch:
 
 permissions:
@@ -24,7 +26,7 @@ permissions:
 
 jobs:
   test:
-    name: backend-tests
+    name: agents-tests
     runs-on: ubuntu-latest
     if: ${{ vars.CI_CD_DISABLED != 'true' }}
     steps:
@@ -36,53 +38,59 @@ jobs:
         with:
           python-version: "3.12"
           cache: "pip"
-          cache-dependency-path: backend/requirements.txt
+          cache-dependency-path: agents/requirements.txt
 
       - name: Cache pip
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-backend-${{ hashFiles('backend/requirements.txt') }}
+          key: ${{ runner.os }}-pip-agents-${{ hashFiles('agents/requirements.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-backend-
+            ${{ runner.os }}-pip-agents-
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r backend/requirements.txt
+          python -m pip install -r agents/requirements.txt
 
-      - name: Lint backend code
+      - name: Lint agents code
         run: |
           python -m pip install ruff
-          ruff check backend backend/tests
+          ruff check agents tools
 
-      - name: Run backend tests
+      - name: Compile agents code
         run: |
-          python -m pytest -q backend/tests \
-            --junitxml=backend-test-results.xml \
-            --cov=backend \
-            --cov-report=xml:backend-coverage.xml \
+          python -m compileall agents tools
+
+      - name: Run agents tests
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          python -m pytest -q agents/tests \
+            --junitxml=agents-test-results.xml \
+            --cov=agents \
+            --cov-report=xml:agents-coverage.xml \
             --cov-report=term-missing
 
-      - name: Publish backend test results
+      - name: Publish agents test results
         if: always()
         uses: dorny/test-reporter@v1
         with:
-          name: Backend Test Results
-          path: backend-test-results.xml
+          name: Agents Test Results
+          path: agents-test-results.xml
           reporter: java-junit
           fail-on-error: false
 
-      - name: Extract backend coverage
+      - name: Extract agents coverage
         if: always()
-        id: backend_coverage
+        id: agents_coverage
         run: |
           python - <<'PY'
           import os
           import xml.etree.ElementTree as ET
 
           output = os.environ["GITHUB_OUTPUT"]
-          path = "backend-coverage.xml"
+          path = "agents-coverage.xml"
           rate = 0.0
           if os.path.exists(path):
               root = ET.parse(path).getroot()
@@ -91,34 +99,30 @@ jobs:
               f.write(f"rate={rate:.2f}\n")
           PY
 
-      - name: Add backend coverage to job summary
+      - name: Add agents coverage to job summary
         if: always()
         run: |
-          echo "### Backend Coverage" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Line coverage: **${{ steps.backend_coverage.outputs.rate }}%**" >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Compile backend code
-        run: |
-          python -m compileall backend
+          echo "### Agents Coverage" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Line coverage: **${{ steps.agents_coverage.outputs.rate }}%**" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build backend Docker image
+      - name: Build agents Docker image
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: backend/Dockerfile
+          file: agents/Dockerfile
           load: true
-          tags: travelmind-backend:${{ github.sha }}
-          cache-from: type=gha,scope=backend-image
-          cache-to: type=gha,mode=max,scope=backend-image
+          tags: travelmind-agents:${{ github.sha }}
+          cache-from: type=gha,scope=agents-image
+          cache-to: type=gha,mode=max,scope=agents-image
 
       - name: Trivy image scan
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: image
-          image-ref: travelmind-backend:${{ github.sha }}
+          image-ref: travelmind-agents:${{ github.sha }}
           severity: CRITICAL,HIGH
           ignore-unfixed: true
           exit-code: 0
@@ -128,7 +132,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ secrets.DOCKERHUB_USERNAME }}/travelmind-backend
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/travelmind-agents
           tags: |
             type=sha
             type=ref,event=branch
@@ -146,9 +150,9 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: backend/Dockerfile
+          file: agents/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=backend-image
-          cache-to: type=gha,mode=max,scope=backend-image
+          cache-from: type=gha,scope=agents-image
+          cache-to: type=gha,mode=max,scope=agents-image

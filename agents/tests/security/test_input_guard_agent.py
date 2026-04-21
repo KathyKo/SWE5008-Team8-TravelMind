@@ -4,7 +4,6 @@ from importlib import import_module
 
 ig = import_module("agents.specialists.input_guard_agent")
 
-
 def _setup_oversized(monkeypatch):
     monkeypatch.setattr(ig, "log_event", lambda *args, **kwargs: None)
     monkeypatch.setattr(ig, "MAX_INPUT_LENGTH", 10)
@@ -294,7 +293,6 @@ def test_plan_input_tools_falls_back_on_internal_exception(monkeypatch):
         "run_moderation": True,
         "reason": "fallback_full_scan",
     }
-
 
 def test_input_guard_agent_alias_calls_node(monkeypatch, input_state_builder):
     sentinel = {"ok": True, "source": "node"}

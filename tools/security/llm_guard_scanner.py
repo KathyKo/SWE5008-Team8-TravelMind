@@ -56,6 +56,25 @@ else:
     _INPUT_SCANNERS = []
     _OUTPUT_SCANNERS = []
 
+# Module-level singletons — models load once at import time (app startup),
+# not on the first request.
+_INPUT_SCANNERS = [
+    PromptInjection(threshold=0.75),
+    InputBanTopics(
+        topics=["illegal activity", "drug trafficking", "smuggling"],
+        threshold=0.75,
+    ),
+    TokenLimit(limit=512),
+]
+
+_OUTPUT_SCANNERS = [
+    Sensitive(redact=True),
+    BanTopics(
+        topics=["illegal activity", "drug trafficking", "smuggling"],
+        threshold=0.75,
+    ),
+]
+
 
 @dataclass
 class LLMGuardInputResult:

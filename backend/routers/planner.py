@@ -15,8 +15,7 @@ from typing import Optional
 from sqlalchemy.orm import Session
 
 from backend.agent_client import call_planner, call_planner_revise
-from backend.db.database import engine, get_db
-from backend.db.models import Base
+from backend.db.database import get_db
 from backend.db import crud
 
 router = APIRouter()

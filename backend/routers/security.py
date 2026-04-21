@@ -58,7 +58,6 @@ def security_check_output(request: SecurityRequest):
     except requests.exceptions.RequestException as exc:
         raise HTTPException(status_code=502, detail=f"Agents service unavailable: {exc}") from exc
 
-
 @router.get("/health")
 def health():
     return {"status": "ok", "router": "security-compat"}

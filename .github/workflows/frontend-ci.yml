@@ -2,7 +2,7 @@ name: frontend-ci
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "feature/**"]
     paths:
       - "frontend/**"
       - ".github/workflows/frontend-ci.yml"
@@ -19,6 +19,8 @@ on:
 
 permissions:
   contents: read
+  checks: write
+  pull-requests: write
 
 jobs:
   test:
@@ -35,6 +37,14 @@ jobs:
           python-version: "3.12"
           cache: "pip"
           cache-dependency-path: frontend/requirements.txt
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-frontend-${{ hashFiles('frontend/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-frontend-
 
       - name: Install dependencies
         run: |
@@ -54,11 +64,57 @@ jobs:
         env:
           PYTHONPATH: ${{ github.workspace }}/frontend
         run: |
-          python -m pytest -q frontend/tests
+          python -m pytest -q frontend/tests \
+            --junitxml=frontend-test-results.xml \
+            --cov=frontend \
+            --cov-report=xml:frontend-coverage.xml \
+            --cov-report=term-missing
+
+      - name: Publish frontend test results
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Frontend Test Results
+          path: frontend-test-results.xml
+          reporter: java-junit
+          fail-on-error: false
+
+      - name: Extract frontend coverage
+        if: always()
+        id: frontend_coverage
+        run: |
+          python - <<'PY'
+          import os
+          import xml.etree.ElementTree as ET
+
+          output = os.environ["GITHUB_OUTPUT"]
+          path = "frontend-coverage.xml"
+          rate = 0.0
+          if os.path.exists(path):
+              root = ET.parse(path).getroot()
+              rate = float(root.attrib.get("line-rate", 0.0)) * 100
+          with open(output, "a", encoding="utf-8") as f:
+              f.write(f"rate={rate:.2f}\n")
+          PY
+
+      - name: Add frontend coverage to job summary
+        if: always()
+        run: |
+          echo "### Frontend Coverage" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Line coverage: **${{ steps.frontend_coverage.outputs.rate }}%**" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Build frontend Docker image
-        run: |
-          docker build -f frontend/Dockerfile -t travelmind-frontend:${GITHUB_SHA} .
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: frontend/Dockerfile
+          load: true
+          tags: travelmind-frontend:${{ github.sha }}
+          cache-from: type=gha,scope=frontend-image
+          cache-to: type=gha,mode=max,scope=frontend-image
 
       - name: Trivy image scan
         uses: aquasecurity/trivy-action@master
@@ -68,10 +124,6 @@ jobs:
           severity: CRITICAL,HIGH
           ignore-unfixed: true
           exit-code: 0
-
-      - name: Set up Docker Buildx
-        if: github.event_name != 'pull_request'
-        uses: docker/setup-buildx-action@v3
 
       - name: Extract metadata
         if: github.event_name != 'pull_request'
@@ -100,5 +152,5 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=frontend-image
+          cache-to: type=gha,mode=max,scope=frontend-image

@@ -8,19 +8,19 @@ USERS = {
         "name": "Alice",
         "avatar": "👩",
         "prefs": ["culture", "vegetarian", "low-intensity"],
-        "password": "demo123",
+        "password": "123456",
     },
     "bob@example.com": {
         "name": "Bob",
         "avatar": "👨",
         "prefs": ["food", "moderate"],
-        "password": "demo123",
+        "password": "123456",
     },
     "carol@example.com": {
         "name": "Carol",
         "avatar": "👩",
         "prefs": ["adventure", "outdoor"],
-        "password": "demo123",
+        "password": "123456",
     },
 }
 

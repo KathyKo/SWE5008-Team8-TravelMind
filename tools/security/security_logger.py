@@ -9,6 +9,7 @@ Used by both Agent 5a and Agent 5b.
 
 import json
 import logging
+import sys
 from datetime import datetime, timezone
 from enum import Enum
 
@@ -29,12 +30,13 @@ logger = logging.getLogger("travelmind.security")
 logger.setLevel(logging.INFO)
 
 if not logger.handlers:
-    handler = logging.StreamHandler()
+    handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(logging.Formatter(
         "[%(asctime)s] %(levelname)s %(name)s — %(message)s",
         datefmt="%Y-%m-%dT%H:%M:%SZ",
     ))
     logger.addHandler(handler)
+logger.propagate = False
 
 
 def _build_event(

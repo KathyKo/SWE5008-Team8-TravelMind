@@ -8,7 +8,7 @@ Used by both InputGuardAgent (Agent 5a) (InputGuardAgent) and OutputGuardAgent (
 """
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass

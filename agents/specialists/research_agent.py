@@ -749,6 +749,7 @@ def research_agent(state: dict, tools: dict | None = None) -> dict:
 
     research: dict = {}
     tool_log: list[str] = []
+    tool_log.append("[research_agent_1] start")
 
     try:
         from tools.serp_search import (

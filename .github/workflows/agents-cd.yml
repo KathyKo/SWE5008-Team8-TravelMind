@@ -1,8 +1,8 @@
-name: frontend-cd
+name: agents-cd
 
 on:
   workflow_run:
-    workflows: ["frontend-ci"]
+    workflows: ["agents-ci"]
     types: [completed]
     branches: ["main"]
   workflow_dispatch:
@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   deploy:
-    name: frontend-deploy
+    name: agents-deploy
     runs-on: ubuntu-latest
     if: ${{ vars.CI_CD_DISABLED != 'true' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')) }}
     steps:
@@ -29,12 +29,12 @@ jobs:
             FULL_SHA="${{ github.event.workflow_run.head_sha }}"
             SHORT_SHA="${FULL_SHA:0:7}"
             echo "tag=sha-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
-            echo "Deploying frontend image tag: sha-${SHORT_SHA}"
+            echo "Deploying agents image tag: sha-${SHORT_SHA}"
           else
             TAG="${{ github.event.inputs.image_tag }}"
             TAG="${TAG:-latest}"
             echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-            echo "Deploying frontend image tag: ${TAG}"
+            echo "Deploying agents image tag: ${TAG}"
           fi
 
       - name: Configure AWS credentials
@@ -46,7 +46,7 @@ jobs:
       - name: Download current task definition
         run: |
           aws ecs describe-task-definition \
-            --task-definition travelmind-frontend \
+            --task-definition travelmind-agents \
             --query taskDefinition \
             | jq 'del(.taskDefinitionArn,.revision,.status,.requiresAttributes,.compatibilities,.registeredAt,.registeredBy)' \
             > task-def.json
@@ -56,13 +56,13 @@ jobs:
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: task-def.json
-          container-name: ${{ secrets.FRONTEND_CONTAINER_NAME }}
-          image: ${{ secrets.DOCKERHUB_USERNAME }}/travelmind-frontend:${{ steps.image.outputs.tag }}
+          container-name: ${{ secrets.AGENTS_CONTAINER_NAME }}
+          image: ${{ secrets.DOCKERHUB_USERNAME }}/travelmind-agents:${{ steps.image.outputs.tag }}
 
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ${{ secrets.FRONTEND_ECS_SERVICE }}
-          cluster: ${{ secrets.FRONTEND_ECS_CLUSTER }}
+          service: ${{ secrets.AGENTS_ECS_SERVICE }}
+          cluster: ${{ secrets.AGENTS_ECS_CLUSTER }}
           wait-for-service-stability: true
