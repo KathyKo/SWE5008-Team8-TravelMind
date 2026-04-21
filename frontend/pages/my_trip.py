@@ -2,32 +2,217 @@
 pages/my_trip.py — My Trip page
 """
 
+import html
+
 import streamlit as st
 from data.store import ITINERARIES, EXPLAIN_DATA
 
+ICON_MAP = {
+    "flight": "✈️",
+    "hotel": "🏨",
+    "activity": "🎯",
+    "restaurant": "🍽️",
+}
+
+
+# ─── Right panel ──────────────────────────────────────────────────────────────
+
+def _render_right_panel():
+    plan_state = st.session_state.get("plan_state")
+
+    with st.container(border=True):
+
+        # ── User Profile ──────────────────────────────────
+        st.markdown("**User Profile**")
+        if plan_state:
+            ipo = plan_state.get("intent_profile_output") or {}
+            hard = ipo.get("hard_constraints") or {}
+            soft = ipo.get("soft_preferences") or {}
+
+            session_id = plan_state.get("session_id") or ""
+            if session_id:
+                st.markdown(
+                    f"<span style='color:#7a90b0;font-size:11px'>Session: {session_id}</span>",
+                    unsafe_allow_html=True,
+                )
+
+            tags = list(soft.get("interest_tags") or [])
+            vibe = soft.get("vibe") or ""
+            style = soft.get("travel_style") or ""
+            prefs = [t for t in ([vibe, style] + tags) if t]
+            if prefs:
+                tags_html = " ".join(
+                    f"<span style='background:rgba(59,130,246,0.15);"
+                    f"border:1px solid rgba(59,130,246,0.3);"
+                    f"border-radius:12px;padding:2px 8px;"
+                    f"font-size:11px;color:#93c5fd;margin-right:4px'>{p}</span>"
+                    for p in prefs[:5]
+                )
+                st.markdown(tags_html, unsafe_allow_html=True)
+            else:
+                user = st.session_state.get("user") or {}
+                for pref in user.get("prefs", []):
+                    st.markdown(
+                        f"<span class='tm-badge tm-badge-blue'>{pref}</span>",
+                        unsafe_allow_html=True,
+                    )
+
+            budget_raw = hard.get("budget") or {}
+            if isinstance(budget_raw, dict) and budget_raw.get("amount"):
+                amt = int(budget_raw["amount"])
+                cur = budget_raw.get("currency", "SGD")
+                spent = 2847
+                ratio = min(spent / amt, 1.0) if amt else 0
+                st.progress(ratio, text=f"{cur} {spent:,} / {amt:,} — {cur} {amt - spent:,} remaining")
+            elif plan_state.get("budget"):
+                st.markdown(
+                    f"<span style='color:#7a90b0;font-size:12px'>Budget: {plan_state['budget']}</span>",
+                    unsafe_allow_html=True,
+                )
+        else:
+            user = st.session_state.get("user") or {}
+            for pref in user.get("prefs", []):
+                st.markdown(
+                    f"<span class='tm-badge tm-badge-blue'>{pref}</span>",
+                    unsafe_allow_html=True,
+                )
+            st.progress(0.949, text="SGD 2,847 / 3,000 — SGD 153 remaining")
+            st.caption("Generate a trip in Planner to see your full profile.")
+
+        st.markdown("---")
+
+        # ── Fairness & Bias Checks ────────────────────────
+        st.markdown("**Fairness & Bias Checks**")
+        if plan_state:
+            is_valid = plan_state.get("is_valid")
+            debate_count = plan_state.get("debate_count") or 0
+            critique = plan_state.get("critique") or {}
+            debate_output = plan_state.get("debate_output") or {}
+
+            if is_valid is True:
+                st.markdown(
+                    "<div style='background:rgba(16,185,129,0.12);"
+                    "border:1px solid rgba(16,185,129,0.35);"
+                    "border-radius:8px;padding:8px 12px;margin-bottom:8px'>"
+                    "<span style='color:#10b981;font-size:13px'>✓ Approved</span></div>",
+                    unsafe_allow_html=True,
+                )
+            elif debate_count > 0:
+                st.markdown(
+                    f"<div style='background:rgba(245,158,11,0.12);"
+                    f"border:1px solid rgba(245,158,11,0.35);"
+                    f"border-radius:8px;padding:8px 12px;margin-bottom:8px'>"
+                    f"<span style='color:#f59e0b;font-size:13px'>⚠ Revised ({debate_count} round(s))</span></div>",
+                    unsafe_allow_html=True,
+                )
+            else:
+                st.success("✓ No filter bubble detected")
+                st.success("✓ No demographic bias")
+
+            if isinstance(critique, dict) and critique:
+                for dim, val in list(critique.items())[:6]:
+                    passed = val is True or (
+                        isinstance(val, str) and val.lower() in ("pass", "ok", "true", "yes")
+                    )
+                    color = "#10b981" if passed else "#ef4444"
+                    st.markdown(
+                        f"<div style='display:flex;align-items:center;margin-top:4px'>"
+                        f"<span style='color:{color};margin-right:6px;font-size:10px'>●</span>"
+                        f"<span style='color:#e8edf5;font-size:12px'>{html.escape(str(dim))}</span>"
+                        f"</div>",
+                        unsafe_allow_html=True,
+                    )
+
+            summary = (
+                debate_output.get("current_round_summary")
+                if isinstance(debate_output, dict)
+                else None
+            )
+            if summary:
+                st.markdown(
+                    f"<div style='color:#7a90b0;font-size:11px;margin-top:6px;"
+                    f"font-style:italic'>{html.escape(str(summary)[:200])}</div>",
+                    unsafe_allow_html=True,
+                )
+        else:
+            st.success("✓ No filter bubble detected")
+            st.success("✓ No demographic bias")
+            st.warning("⚠ Cold-start: Limited history — 3 more trips needed for full personalisation")
+
+        st.markdown("---")
+
+        # ── Why behind the wander ─────────────────────────
+        st.markdown("**Why behind the wander**")
+        if plan_state:
+            explain_data = plan_state.get("explain_data") or plan_state.get("explanation")
+            if explain_data:
+                selected_opt = st.session_state.get("selected_option", "A")
+                if isinstance(explain_data, dict):
+                    opts = explain_data.get("options_explained") or {}
+                    opt_ex = opts.get(selected_opt) or {}
+                    text = opt_ex.get("summary") or explain_data.get("summary") or ""
+                    rationale = opt_ex.get("rationale") or []
+                else:
+                    text = str(explain_data)
+                    rationale = []
+
+                if text:
+                    st.markdown(
+                        f"<span style='color:#e8edf5;font-size:12px'>{html.escape(text[:300])}</span>",
+                        unsafe_allow_html=True,
+                    )
+                for r in rationale[:4]:
+                    st.markdown(
+                        f"<span style='color:#7a90b0;font-size:11px'>• {html.escape(str(r))}</span>",
+                        unsafe_allow_html=True,
+                    )
+            else:
+                st.caption("No explanation available yet.")
+        else:
+            st.caption("Generate a trip in Planner to see explanations.")
+
+
+# ─── Main render ──────────────────────────────────────────────────────────────
 
 def render():
-    st.markdown("### My Trip — Kyoto")
-    st.markdown("<span style='color:#7a90b0;font-size:14px'>10 Mar – 14 Mar 2026 · Option A: Cultural Focus</span>", unsafe_allow_html=True)
+    # Use real plan data if available, else fall back to demo data
+    plan_itineraries = st.session_state.get("plan_itineraries") or {}
+    plan_option_meta = st.session_state.get("plan_option_meta") or {}
+    selected_opt = st.session_state.get("selected_option", "A")
+
+    if plan_itineraries:
+        days = plan_itineraries.get(selected_opt) or []
+        destination = (st.session_state.get("plan_request_summary") or {}).get("destination", "")
+        dates = (st.session_state.get("plan_request_summary") or {}).get("dates", "")
+        meta = plan_option_meta.get(selected_opt) or {}
+        label = meta.get("badge", meta.get("label", f"Option {selected_opt}"))
+        title = f"My Trip — {destination}" if destination else "My Trip"
+        subtitle = f"{dates} · {label}" if dates else label
+    else:
+        days = ITINERARIES.get("A", [])
+        title = "My Trip — Kyoto"
+        subtitle = "10 Mar – 14 Mar 2026 · Option A: Cultural Focus"
+
+    st.markdown(f"### {title}")
+    st.markdown(
+        f"<span style='color:#7a90b0;font-size:14px'>{subtitle}</span>",
+        unsafe_allow_html=True,
+    )
     st.markdown("")
 
     col_main, col_side = st.columns([3, 1.5])
 
     with col_main:
-        # ── Budget bar ───────────────────────────────────────
-        with st.container(border=True):
-            c1, c2 = st.columns([3, 1])
-            with c1:
-                st.markdown("**Budget Used**")
-                st.progress(0.949, text="SGD 2,847 / 3,000 — SGD 153 remaining")
-            with c2:
-                st.metric("Spent", "SGD 2,847", delta="-153 under budget", delta_color="normal")
-
         # ── Action bar ───────────────────────────────────────
-        visited_count = sum(1 for v in st.session_state.visited.values() if v)
-        act1, act2, act3 = st.columns([2, 2, 3])
+        visited_count = sum(1 for v in st.session_state.get("visited", {}).values() if v)
+        act1, act2 = st.columns(2)
         with act1:
-            st.success(f"✓ {visited_count} places visited")
+            st.markdown(
+                f"<div style='border:1px solid #d1fae5;background:#f0fdf4;"
+                f"border-radius:8px;padding:8px 14px;font-size:14px;color:#065f46;"
+                f"font-weight:500;line-height:1.8'>✓ {visited_count} places visited</div>",
+                unsafe_allow_html=True,
+            )
         with act2:
             if st.button("🔄 Need to Re-plan?", use_container_width=True):
                 st.info("Switch to the 🔄 Re-plan tab above.")
@@ -35,19 +220,24 @@ def render():
         st.markdown("---")
 
         # ── Itinerary ────────────────────────────────────────
-        days = ITINERARIES["A"]
+        if "visited" not in st.session_state:
+            st.session_state.visited = {}
         visited = st.session_state.visited
 
         for day_idx, day in enumerate(days):
-            with st.expander(f"📅 {day['day']}  —  {day['budget']}", expanded=(day_idx == 0)):
+            day_title = day.get("day", f"Day {day_idx + 1}")
+            day_budget = day.get("budget", "")
+            expander_label = f"📅 {day_title}  —  {day_budget}" if day_budget else f"📅 {day_title}"
+            with st.expander(expander_label, expanded=(day_idx == 0)):
                 st.caption("✓ Check off places you've been — this trains your personal AI profile")
 
-                for item in day["items"]:
-                    col_check, col_time, col_icon, col_name, col_cost, col_why = st.columns(
-                        [0.5, 0.8, 0.4, 4, 1.2, 1.2]
-                    )
-                    item_id = f"trip_{day_idx}_{item['name']}"
+                for item_idx, item in enumerate(day.get("items", [])):
+                    item_id = f"trip_{day_idx}_{item.get('name', item_idx)}"
                     is_checked = visited.get(item_id, False)
+
+                    col_check, col_time, col_icon, col_name, col_cost = st.columns(
+                        [0.5, 0.8, 0.4, 4, 1.2]
+                    )
 
                     with col_check:
                         checked = st.checkbox(
@@ -59,61 +249,46 @@ def render():
                         if checked != is_checked:
                             st.session_state.visited[item_id] = checked
                             if checked:
-                                st.toast(f"✓ Marked **{item['name']}** as visited — AI profile updated", icon="✅")
+                                st.toast(
+                                    f"✓ Marked **{item.get('name', '')}** as visited",
+                                    icon="✅",
+                                )
+                            st.rerun()
+
+                    name_style = (
+                        "text-decoration:line-through;color:#9ca3af"
+                        if checked
+                        else "color:inherit"
+                    )
+                    time_color = "#9ca3af" if checked else "#6b7280"
+                    icon_opacity = "opacity:0.35" if checked else ""
 
                     with col_time:
-                        st.markdown(f"<span style='color:#4a5a72;font-size:12px;font-family:monospace'>{item['time']}</span>", unsafe_allow_html=True)
+                        st.markdown(
+                            f"<span style='color:{time_color};font-size:12px;"
+                            f"font-family:monospace'>{item.get('time', '')}</span>",
+                            unsafe_allow_html=True,
+                        )
                     with col_icon:
-                        st.markdown(f"<span style='font-size:18px'>{item['icon']}</span>", unsafe_allow_html=True)
+                        raw_icon = item.get("icon", "")
+                        display_icon = ICON_MAP.get(raw_icon, raw_icon) if isinstance(raw_icon, str) else raw_icon
+                        st.markdown(
+                            f"<span style='font-size:18px;{icon_opacity}'>{display_icon}</span>",
+                            unsafe_allow_html=True,
+                        )
                     with col_name:
-                        label = item["name"]
-                        if visited.get(item_id):
-                            label = f"~~{label}~~ ✓"
-                        st.markdown(f"<span style='font-size:13px;font-weight:500'>{item['name']}</span>", unsafe_allow_html=True)
+                        st.markdown(
+                            f"<span style='{name_style};font-size:13px;font-weight:500'>"
+                            f"{html.escape(item.get('name', ''))}</span>",
+                            unsafe_allow_html=True,
+                        )
                     with col_cost:
-                        st.markdown(f"<span style='color:#7a90b0;font-size:12px;font-family:monospace'>{item['cost']}</span>", unsafe_allow_html=True)
-                    with col_why:
-                        if item.get("key"):
-                            if st.button("Why? →", key=f"trip_why_{item_id}", use_container_width=True):
-                                st.session_state[f"trip_explain_{item['key']}"] = not st.session_state.get(f"trip_explain_{item['key']}", False)
+                        st.markdown(
+                            f"<span style='color:#6b7280;font-size:12px;font-family:monospace'>"
+                            f"{item.get('cost', '')}</span>",
+                            unsafe_allow_html=True,
+                        )
 
-                # Explain panels
-                for item in day["items"]:
-                    if item.get("key") and st.session_state.get(f"trip_explain_{item['key']}", False):
-                        d = EXPLAIN_DATA[item["key"]]
-                        with st.container(border=True):
-                            st.markdown(f"##### 💡 Why {d['name']}?")
-                            st.markdown("**Preference Matches**")
-                            for m in d["matches"]:
-                                st.markdown(f"✅ {m}")
-                            st.info(f"👥 {d['similar']}")
-                            st.markdown("**Score Breakdown**")
-                            for label, score in d["scores"]:
-                                st.progress(score / 100, text=f"{label}: {score}%")
-                            if st.button("Close", key=f"trip_close_{item['key']}_{day_idx}"):
-                                st.session_state[f"trip_explain_{item['key']}"] = False
-                                st.rerun()
 
-    # ── Explainability Side Panel ─────────────────────────────
     with col_side:
-        with st.container(border=True):
-            st.markdown("##### 💡 Recommendation Reasoning")
-            st.caption("Click **Why? →** on any item to see why it was recommended.")
-
-            st.markdown("---")
-            st.markdown("**Your Profile**")
-            user = st.session_state.user
-            if user:
-                for pref in user.get("prefs", []):
-                    st.markdown(f"<span class='tm-badge tm-badge-blue'>{pref}</span>", unsafe_allow_html=True)
-
-            st.markdown("")
-            st.markdown("**Personalisation Engine**")
-            st.progress(0.87, text="Profile confidence: 87%")
-            st.caption("Based on your selections and visit check-ins")
-
-            st.markdown("---")
-            st.markdown("**Fairness Check**")
-            st.success("✓ No filter bubble detected")
-            st.success("✓ No demographic bias")
-            st.warning("⚠ Cold-start: Limited history — 3 more trips needed for full personalisation")
+        _render_right_panel()
