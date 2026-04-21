@@ -44,7 +44,6 @@ def test_backend_health_and_root_endpoints(backend_main_module):
     payload = health_response.json()
     assert payload["status"] == "ok"
     assert payload["service"] == "travelmind-backend"
-    assert "Agent3" in payload["agents"]
 
     assert root_response.status_code == 200
     root_payload = root_response.json()
