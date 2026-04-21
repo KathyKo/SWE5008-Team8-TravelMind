@@ -8,6 +8,7 @@ Backend and peer agents call this service over HTTP.
 import json
 import logging
 import traceback
+import uuid
 from typing import Any, Iterator
 
 from fastapi import FastAPI, HTTPException, Request
@@ -21,9 +22,12 @@ from agents.specialists.output_guard_agent import output_guard_agent
 from agents.specialists.intent_profile import intent_profile
 from agents.specialists.planner_agent import planner_agent
 from agents.specialists.research_agent import research_agent
+from agents.agent_tools import get_tools_for_agent
 from agents.specialists.explainability_agent import explainability_agent
 from agents.specialists.debate_agent import debate_agent
 from agents.specialists.dynamic_replan_agent import dynamic_replan_agent
+from agents.db.crud import save_plan, load_plan
+from agents.db.database import SessionLocal
 
 log = logging.getLogger(__name__)
 
@@ -198,7 +202,8 @@ def invoke_search(request: Request, payload: AgentInvokeRequest):
     _enforce_agent_port(request, 8102, "search")
     state = payload.state
     try:
-        result = research_agent(state)
+        tools = get_tools_for_agent("research_agent")
+        result = research_agent(state, tools=tools)
         return result
     except Exception as exc:
         traceback.print_exc()
@@ -212,7 +217,18 @@ def invoke_planner(request: Request, payload: AgentInvokeRequest):
     state = payload.state
     try:
         result = planner_agent(state)
-        return result
+        if "error" in result:
+            return result
+        plan_id = str(uuid.uuid4())[:8]
+        db = SessionLocal()
+        try:
+            save_plan(db, plan_id, state, result, via_debate=False)
+        finally:
+            db.close()
+        return {
+            "plan_id": plan_id,
+            "final_itineraries": result.get("final_itineraries", {}),
+        }
     except Exception as exc:
         log.exception("planner failed")
         raise HTTPException(status_code=500, detail=f"planner failed: {exc}") from exc
@@ -234,6 +250,15 @@ def invoke_debate(request: Request, payload: AgentInvokeRequest):
 def invoke_explain(request: Request, payload: AgentInvokeRequest):
     _enforce_agent_port(request, 8105, "explain")
     state = payload.state
+    plan_id = state.get("plan_id")
+    if plan_id:
+        db = SessionLocal()
+        try:
+            plan_data = load_plan(db, plan_id)
+        finally:
+            db.close()
+        if plan_data:
+            state = {**plan_data, **state}
     try:
         result = explainability_agent(state)
         return result

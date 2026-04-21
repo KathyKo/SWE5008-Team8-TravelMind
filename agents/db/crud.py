@@ -30,7 +30,7 @@ def save_plan(db: Session, plan_id: str, state: dict, result: dict, via_debate: 
         tool_log                = result.get("tool_log"),
         # Planner trace — Agent6 needs these when /explain is called lazily on a saved plan
         planner_decision_trace  = result.get("planner_decision_trace") or None,
-        chain_of_thought        = result.get("chain_of_thought") or result.get("planner_chain_of_thought") or None,
+        chain_of_thought        = result.get("planner_chain_of_thought") or None,
         via_debate              = via_debate,
         debate_verdict          = result.get("debate_verdict"),
         debate_history          = result.get("debate_history"),

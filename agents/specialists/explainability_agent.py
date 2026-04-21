@@ -31,13 +31,10 @@ def _llm() -> ChatOpenAI:
 # ===================================================================
 
 def _first_present(state: dict, *keys: str, default: Any = "") -> Any:
-    for scope in (state, state.get("state", {})):
-        if not isinstance(scope, dict):
-            continue
-        for key in keys:
-            value = scope.get(key)
-            if value not in (None, "", [], {}):
-                return value
+    for key in keys:
+        value = state.get(key)
+        if value not in (None, "", [], {}):
+            return value
     return default
 
 
@@ -162,7 +159,11 @@ def _register_place(lookup: dict, item: dict, kind: str) -> None:
 def _build_place_lookup(state: dict) -> dict:
     lookup: dict[str, dict] = {}
     research = state.get("research", {}) or {}
+    if not isinstance(research, dict):
+        research = {}
     inventory = state.get("inventory", {}) or {}
+    if not isinstance(inventory, dict):
+        inventory = {}
     for key in ("maps_attractions", "ta_attractions"):
         for item in research.get(key, []) or []:
             _register_place(lookup, item, "activity")
@@ -435,6 +436,8 @@ def _generate_summary(
     """Call LLM to produce overall + per-day summaries from the decision trace."""
     language = _summary_language(state)
     option_meta = state.get("option_meta", {}) or {}
+    if not isinstance(option_meta, dict):
+        option_meta = {}
     pref_tags = _collect_pref_tags(state)
 
     payload = _build_summary_payload(

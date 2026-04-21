@@ -1,12 +1,10 @@
 from typing import Callable, Dict
 
-from tools import (
-    search_flights,
-    search_hotels,
-    search_weather,
-    web_search,
-    google_search,
-)
+from tools.search_flights import search_flights
+from tools.search_hotels import search_hotels
+from tools.search_weather import search_weather
+from tools.web_search import web_search
+from tools.google_search import google_search
 
 
 # Explicit per-agent tool permissions.

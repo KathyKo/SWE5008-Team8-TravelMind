@@ -156,9 +156,28 @@ def mock_research_result():
 # ── Mock planner result ───────────────────────────────────────────────────────
 
 @pytest.fixture
+def state_with_research(flat_state, mock_research_result):
+    """flat_state augmented with compact research fields so planner_agent can run."""
+    return {
+        **flat_state,
+        "compact_attractions":    mock_research_result["compact_attractions"],
+        "compact_restaurants":    mock_research_result["compact_restaurants"],
+        "flight_options_outbound": mock_research_result["flight_options_outbound"],
+        "flight_options_return":   mock_research_result["flight_options_return"],
+        "hotel_options":           mock_research_result["hotel_options"],
+        "att_list_text":   mock_research_result["att_list_text"],
+        "rest_list_text":  mock_research_result["rest_list_text"],
+        "hotel_list_text": mock_research_result["hotel_list_text"],
+        "flight_out_text": mock_research_result["flight_out_text"],
+        "flight_ret_text": mock_research_result["flight_ret_text"],
+        "tool_log":        mock_research_result["tool_log"],
+    }
+
+
+@pytest.fixture
 def mock_planner_result():
     return {
-        "itineraries": {
+        "final_itineraries": {
             "A": [
                 {
                     "day": 1, "date": "2026-06-01",
@@ -472,11 +491,3 @@ def patch_planner_llm():
         yield mock_instance
 
 
-@pytest.fixture
-def patch_research_agent(mock_research_result):
-    """Patch research_agent in planner_agent so no real API calls are made."""
-    with patch(
-        "agents.specialists.planner_agent.research_agent",
-        return_value=mock_research_result,
-    ):
-        yield

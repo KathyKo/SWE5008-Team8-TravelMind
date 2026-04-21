@@ -26,9 +26,35 @@ Design decision:
 
 from dataclasses import dataclass
 from typing import Optional
-from llm_guard.input_scanners import PromptInjection, TokenLimit, BanTopics as InputBanTopics
-from llm_guard.output_scanners import Sensitive, BanTopics
-from llm_guard import scan_prompt, scan_output
+try:
+    from llm_guard.input_scanners import PromptInjection, TokenLimit, BanTopics as InputBanTopics
+    from llm_guard.output_scanners import Sensitive, BanTopics
+    from llm_guard import scan_prompt, scan_output
+    _LLM_GUARD_AVAILABLE = True
+except Exception:
+    _LLM_GUARD_AVAILABLE = False
+
+# Module-level singletons — models load once at import time (app startup),
+# not on the first request.
+if _LLM_GUARD_AVAILABLE:
+    _INPUT_SCANNERS = [
+        PromptInjection(threshold=0.75),
+        InputBanTopics(
+            topics=["illegal activity", "drug trafficking", "smuggling"],
+            threshold=0.75,
+        ),
+        TokenLimit(limit=512),
+    ]
+    _OUTPUT_SCANNERS = [
+        Sensitive(redact=True),
+        BanTopics(
+            topics=["illegal activity", "drug trafficking", "smuggling"],
+            threshold=0.75,
+        ),
+    ]
+else:
+    _INPUT_SCANNERS = []
+    _OUTPUT_SCANNERS = []
 
 # Module-level singletons — models load once at import time (app startup),
 # not on the first request.

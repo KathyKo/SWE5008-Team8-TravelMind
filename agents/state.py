@@ -62,6 +62,8 @@ class State(TypedDict):
     composite_score: Optional[float] # debate 综合评分
     approval_threshold: Optional[float]  # 通过阈值 (default 75.0)
     debate_output: Optional[dict]
+    debate_history: Optional[list]
+    debate_verdict: Optional[dict]
 
     # ── Replanner ────────────────────────────────────────
     # replanner 仅由用户反馈触发，不参与 debate 循环

@@ -15,7 +15,7 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_openai import ChatOpenAI
 
 from ..llm_config import OPENAI_MODEL
-from .research_agent import _normalize_trip_state, research_agent
+from .research_agent import _normalize_trip_state, _duration_days
 from ..logging_config import get_agent_logger
 
 logger = get_agent_logger("travelmind.agents.planner")
@@ -132,13 +132,11 @@ def _hhmm(minutes: int) -> str:
     return f"{minutes // 60:02d}:{minutes % 60:02d}"
 
 
-def _duration_days(duration) -> int:
-    match = re.search(r"\d+", str(duration or "").strip())
-    return max(1, int(match.group())) if match else 1
-
 
 def _trip_start_date(state: dict) -> date | None:
     hard = state.get("hard_constraints", {}) or {}
+    if not isinstance(hard, dict):
+        hard = {}
     candidates = [
         hard.get("start_date"),
         str(state.get("dates") or "").split(" to ")[0].strip() if state.get("dates") else "",
@@ -598,7 +596,8 @@ def _ensure_boundary_days(
         if not has_last_hotel:
             departure_minutes = _minutes_since_midnight(return_flight.get("departure_time", "")) if return_flight else None
             suggested_hotel_time = (
-                _hhmm(departure_minutes - 240) if departure_minutes is not None and departure_minutes <= 14 * 60
+                _hhmm(max(8 * 60, min(10 * 60, departure_minutes - 180)))
+                if departure_minutes is not None
                 else "09:00"
             )
             last_day.setdefault("items", []).append(
@@ -636,6 +635,106 @@ def _ensure_boundary_days(
     return days, repairs
 
 
+def _reslot_days(days: list) -> list:
+    days = deepcopy(days)
+    for day_idx, day in enumerate(days):
+        items = sorted(day.get("items", []), key=lambda item: _sort_time_value(item.get("time", "")))
+        if not items:
+            continue
+
+        if day_idx == 0:
+            outbound = next((item for item in items if str(item.get("key", "")) == "flight_outbound"), None)
+            hotel = next((item for item in items if str(item.get("icon") or "").lower() == "hotel"), None)
+            other_items = [item for item in items if item is not outbound and item is not hotel]
+            if outbound:
+                arrival_minutes = _minutes_since_midnight(outbound.get("time", "")) or 17 * 60 + 30
+                next_minutes = arrival_minutes + 90
+                for item in other_items:
+                    kind = str(item.get("icon") or "").lower()
+                    if kind == "restaurant":
+                        item["time"] = _hhmm(max(next_minutes, 19 * 60))
+                        next_minutes = _minutes_since_midnight(item["time"]) + 90
+                    else:
+                        item["time"] = _hhmm(next_minutes)
+                        next_minutes += 90
+                if hotel:
+                    hotel["time"] = _hhmm(max(next_minutes, arrival_minutes + 180))
+            day["items"] = sorted(items, key=lambda item: _sort_time_value(item.get("time", "")))
+            continue
+
+        if day_idx == len(days) - 1:
+            hotel = next((item for item in items if str(item.get("icon") or "").lower() == "hotel"), None)
+            flight = next((item for item in items if str(item.get("key", "")) == "flight_return"), None)
+            preflight = [item for item in items if item is not hotel and item is not flight]
+            departure_minutes = _minutes_since_midnight(flight.get("time", "")) if flight else None
+            airport_cutoff = departure_minutes - 180 if departure_minutes is not None else None
+            if hotel:
+                hotel_time = (
+                    _hhmm(max(7 * 60 + 30, airport_cutoff - 90))
+                    if airport_cutoff is not None and airport_cutoff <= 11 * 60
+                    else "09:00"
+                )
+                hotel["time"] = hotel_time
+            if preflight:
+                activity_items = [item for item in preflight if str(item.get("icon") or "").lower() == "activity"]
+                restaurant_items = [item for item in preflight if str(item.get("icon") or "").lower() == "restaurant"]
+                if activity_items:
+                    activity_items[0]["time"] = "10:00" if airport_cutoff is None or airport_cutoff >= 12 * 60 else _hhmm(max(8 * 60 + 45, airport_cutoff - 120))
+                if restaurant_items:
+                    lunch_target = 11 * 60 + 30
+                    if airport_cutoff is not None:
+                        lunch_target = min(lunch_target, airport_cutoff - 60)
+                    restaurant_items[0]["time"] = _hhmm(max(10 * 60 + 45, lunch_target))
+            day["items"] = sorted(items, key=lambda item: _sort_time_value(item.get("time", "")))
+            continue
+
+        activity_items = [item for item in items if str(item.get("icon") or "").lower() == "activity"]
+        restaurant_items = [item for item in items if str(item.get("icon") or "").lower() == "restaurant"]
+
+        if len(activity_items) >= 1:
+            activity_items[0]["time"] = "10:00"
+        if len(restaurant_items) >= 1:
+            restaurant_items[0]["time"] = "12:30"
+        if len(activity_items) >= 2:
+            activity_items[1]["time"] = "15:00"
+        if len(restaurant_items) >= 2:
+            restaurant_items[1]["time"] = "18:30"
+        if len(activity_items) >= 3:
+            activity_items[2]["time"] = "20:00"
+
+        day["items"] = sorted(items, key=lambda item: _sort_time_value(item.get("time", "")))
+    return days
+
+
+def _route_warnings(days: list) -> list[str]:
+    warnings = []
+    for day in days:
+        prev = None
+        for item in day.get("items", []):
+            if str(item.get("icon") or "").lower() not in {"activity", "restaurant"}:
+                continue
+            if prev is None:
+                prev = item
+                continue
+            dist = _haversine_km(prev.get("_lat"), prev.get("_lng"), item.get("_lat"), item.get("_lng"))
+            if dist is not None and dist > 10:
+                warnings.append(
+                    f"{day.get('day', '')}: {prev.get('name', '')} -> {item.get('name', '')} is {dist:.1f} km apart"
+                )
+            prev = item
+    return warnings
+
+
+def _strip_internal_fields(days: list) -> list:
+    cleaned_days = []
+    for day in days:
+        cleaned_items = []
+        for item in day.get("items", []):
+            cleaned_items.append({k: v for k, v in item.items() if not str(k).startswith("_")})
+        cleaned_days.append({**day, "items": cleaned_items})
+    return cleaned_days
+
+
 # Legacy LLM cleanup path kept for revision mode only.
 def _post_process_options(
     options: dict,
@@ -654,74 +753,7 @@ def _post_process_options(
     restaurant_by_name = {item["name"].lower().strip(): item for item in restaurant_entries}
 
     def _is_evening_safe_item(item: dict) -> bool:
-        name_l = str(item.get("name") or "").lower()
-        kind = str(item.get("icon") or "").lower()
-        safe_keywords = (
-            "yokocho",
-            "sky",
-            "tower",
-            "night",
-            "street",
-            "district",
-            "market",
-            "observatory",
-            "view",
-            "teamlab",
-        )
-        daytime_keywords = (
-            "garden",
-            "museum",
-            "palace",
-            "park",
-            "temple",
-            "shrine",
-            "zoo",
-            "aquarium",
-            "national",
-        )
-        if kind in {"restaurant", "hotel", "flight"}:
-            return True
-        if any(keyword in name_l for keyword in safe_keywords):
-            return True
-        if any(keyword in name_l for keyword in daytime_keywords):
-            return False
-        return False
-
-    def _calc_day_centroid(items: list[dict]) -> tuple[float, float] | None:
-        coords = []
-        for item in items:
-            lat = item.get("_lat")
-            lng = item.get("_lng")
-            if lat in (None, "") or lng in (None, ""):
-                continue
-            try:
-                coords.append((float(lat), float(lng)))
-            except Exception:
-                continue
-        if not coords:
-            return None
-        lat = sum(pair[0] for pair in coords) / len(coords)
-        lng = sum(pair[1] for pair in coords) / len(coords)
-        return lat, lng
-
-    def _pick_restaurant(day_items: list[dict], used_names: set[str]) -> dict | None:
-        centroid = _calc_day_centroid(day_items)
-        best_entry = None
-        best_score = None
-        for entry in restaurant_entries:
-            name_l = entry["name"].lower().strip()
-            if name_l in used_names:
-                continue
-            if centroid and entry.get("lat") not in (None, "") and entry.get("lng") not in (None, ""):
-                score = _haversine_km(centroid[0], centroid[1], entry.get("lat"), entry.get("lng"))
-                if score is None:
-                    score = 9999
-            else:
-                score = 9999
-            if best_score is None or score < best_score:
-                best_entry = entry
-                best_score = score
-        return best_entry
+        return str(item.get("icon") or "").lower() in {"restaurant", "hotel", "flight"}
 
     def _pick_restaurant_near(
         target_lat,
@@ -747,33 +779,7 @@ def _post_process_options(
                 best_score = score
         return best_entry
 
-    def _insert_meal(
-        day: dict,
-        meal_label: str,
-        target_time: str,
-        used_names: set[str],
-        stats: dict,
-    ) -> None:
-        restaurant = _pick_restaurant(day.get("items", []), used_names)
-        if not restaurant:
-            stats.setdefault("meal_repairs", []).append(f"{day.get('day', '')}: unable to add {meal_label}")
-            return
-        item = {
-            "time": target_time,
-            "icon": "restaurant",
-            "key": restaurant["key"],
-            "name": restaurant["name"],
-            "cost": restaurant.get("price") or "TBC",
-            "_lat": restaurant.get("lat"),
-            "_lng": restaurant.get("lng"),
-            "_meal_slot": meal_label,
-        }
-        used_names.add(restaurant["name"].lower().strip())
-        day.setdefault("items", []).append(item)
-        day["items"] = sorted(day.get("items", []), key=lambda current: _sort_time_value(current.get("time", "")))
-        stats.setdefault("meal_repairs", []).append(f"{day.get('day', '')}: added {meal_label} at {target_time}")
-
-    def _enforce_boundary_feasibility(days: list, used_names: set[str], stats: dict) -> list:
+    def _enforce_boundary_feasibility(days: list, stats: dict) -> list:
         if not days:
             return days
         days = deepcopy(days)
@@ -807,16 +813,6 @@ def _post_process_options(
             filtered_first_items.append(item)
         first_day["items"] = sorted(filtered_first_items, key=lambda item: _sort_time_value(item.get("time", "")))
 
-        if arrival_minutes is not None:
-            has_dinner = any(
-                str(item.get("icon") or "").lower() == "restaurant"
-                and (_minutes_since_midnight(item.get("time", "")) or 0) >= 17 * 60
-                for item in first_day.get("items", [])
-            )
-            if arrival_minutes <= 21 * 60 and not has_dinner:
-                dinner_time = _shift_clock(selected_outbound.get("time", "") if selected_outbound else "", 120, fallback="20:30")
-                _insert_meal(first_day, "dinner", dinner_time, used_names, stats)
-
         last_day = days[-1]
         selected_return = next(
             (item for item in last_day.get("items", []) if str(item.get("key") or "") == "flight_return"),
@@ -843,40 +839,6 @@ def _post_process_options(
                     continue
                 filtered_last_items.append(item)
             last_day["items"] = sorted(filtered_last_items, key=lambda item: _sort_time_value(item.get("time", "")))
-
-            has_lunch = any(
-                str(item.get("icon") or "").lower() == "restaurant"
-                and 11 * 60 <= (_minutes_since_midnight(item.get("time", "")) or 0) <= 15 * 60
-                for item in last_day.get("items", [])
-            )
-            has_dinner = any(
-                str(item.get("icon") or "").lower() == "restaurant"
-                and (_minutes_since_midnight(item.get("time", "")) or 0) >= 17 * 60
-                for item in last_day.get("items", [])
-            )
-            if return_departure_minutes >= 14 * 60 + 30 and not has_lunch:
-                lunch_time = f"{max(11 * 60 + 30, return_departure_minutes - 300) // 60:02d}:{max(11 * 60 + 30, return_departure_minutes - 300) % 60:02d}"
-                _insert_meal(last_day, "lunch", lunch_time, used_names, stats)
-            if return_departure_minutes >= 20 * 60 and not has_dinner:
-                dinner_minutes = max(17 * 60 + 30, return_departure_minutes - 240)
-                dinner_time = f"{dinner_minutes // 60:02d}:{dinner_minutes % 60:02d}"
-                _insert_meal(last_day, "dinner", dinner_time, used_names, stats)
-
-        for day in days[1:-1]:
-            lunch_exists = any(
-                str(item.get("icon") or "").lower() == "restaurant"
-                and 11 * 60 <= (_minutes_since_midnight(item.get("time", "")) or 0) <= 15 * 60
-                for item in day.get("items", [])
-            )
-            dinner_exists = any(
-                str(item.get("icon") or "").lower() == "restaurant"
-                and (_minutes_since_midnight(item.get("time", "")) or 0) >= 17 * 60
-                for item in day.get("items", [])
-            )
-            if not lunch_exists:
-                _insert_meal(day, "lunch", "12:30", used_names, stats)
-            if not dinner_exists:
-                _insert_meal(day, "dinner", "18:30", used_names, stats)
 
         return days
 
@@ -999,103 +961,6 @@ def _post_process_options(
         if route_repairs:
             stats["route_repairs"] = route_repairs
         return days
-
-    def _reslot_days(days: list) -> list:
-        days = deepcopy(days)
-        for day_idx, day in enumerate(days):
-            items = sorted(day.get("items", []), key=lambda item: _sort_time_value(item.get("time", "")))
-            if not items:
-                continue
-
-            if day_idx == 0:
-                outbound = next((item for item in items if str(item.get("key", "")) == "flight_outbound"), None)
-                hotel = next((item for item in items if str(item.get("icon") or "").lower() == "hotel"), None)
-                other_items = [item for item in items if item is not outbound and item is not hotel]
-                if outbound:
-                    arrival_minutes = _minutes_since_midnight(outbound.get("time", "")) or 17 * 60 + 30
-                    next_minutes = arrival_minutes + 90
-                    for item in other_items:
-                        kind = str(item.get("icon") or "").lower()
-                        if kind == "restaurant":
-                            item["time"] = _hhmm(max(next_minutes, 19 * 60))
-                            next_minutes = _minutes_since_midnight(item["time"]) + 90
-                        else:
-                            item["time"] = _hhmm(next_minutes)
-                            next_minutes += 90
-                    if hotel:
-                        hotel["time"] = _hhmm(max(next_minutes, arrival_minutes + 180))
-                day["items"] = sorted(items, key=lambda item: _sort_time_value(item.get("time", "")))
-                continue
-
-            if day_idx == len(days) - 1:
-                hotel = next((item for item in items if str(item.get("icon") or "").lower() == "hotel"), None)
-                flight = next((item for item in items if str(item.get("key", "")) == "flight_return"), None)
-                preflight = [item for item in items if item is not hotel and item is not flight]
-                departure_minutes = _minutes_since_midnight(flight.get("time", "")) if flight else None
-                airport_cutoff = departure_minutes - 180 if departure_minutes is not None else None
-                if hotel:
-                    hotel_time = (
-                        _hhmm(max(7 * 60 + 30, airport_cutoff - 90))
-                        if airport_cutoff is not None and airport_cutoff <= 11 * 60
-                        else "09:00"
-                    )
-                    hotel["time"] = hotel_time
-                if preflight:
-                    activity_items = [item for item in preflight if str(item.get("icon") or "").lower() == "activity"]
-                    restaurant_items = [item for item in preflight if str(item.get("icon") or "").lower() == "restaurant"]
-                    if activity_items:
-                        activity_items[0]["time"] = "10:00" if airport_cutoff is None or airport_cutoff >= 12 * 60 else _hhmm(max(8 * 60 + 45, airport_cutoff - 120))
-                    if restaurant_items:
-                        lunch_target = 11 * 60 + 30
-                        if airport_cutoff is not None:
-                            lunch_target = min(lunch_target, airport_cutoff - 60)
-                        restaurant_items[0]["time"] = _hhmm(max(10 * 60 + 45, lunch_target))
-                day["items"] = sorted(items, key=lambda item: _sort_time_value(item.get("time", "")))
-                continue
-
-            activity_items = [item for item in items if str(item.get("icon") or "").lower() == "activity"]
-            restaurant_items = [item for item in items if str(item.get("icon") or "").lower() == "restaurant"]
-
-            if len(activity_items) >= 1:
-                activity_items[0]["time"] = "10:00"
-            if len(restaurant_items) >= 1:
-                restaurant_items[0]["time"] = "12:30"
-            if len(activity_items) >= 2:
-                activity_items[1]["time"] = "15:00"
-            if len(restaurant_items) >= 2:
-                restaurant_items[1]["time"] = "18:30"
-            if len(activity_items) >= 3:
-                activity_items[2]["time"] = "20:00"
-
-            day["items"] = sorted(items, key=lambda item: _sort_time_value(item.get("time", "")))
-        return days
-
-    def _route_warnings(days: list) -> list[str]:
-        warnings = []
-        for day in days:
-            prev = None
-            for item in day.get("items", []):
-                if str(item.get("icon") or "").lower() not in {"activity", "restaurant"}:
-                    continue
-                if prev is None:
-                    prev = item
-                    continue
-                dist = _haversine_km(prev.get("_lat"), prev.get("_lng"), item.get("_lat"), item.get("_lng"))
-                if dist is not None and dist > 10:
-                    warnings.append(
-                        f"{day.get('day', '')}: {prev.get('name', '')} -> {item.get('name', '')} is {dist:.1f} km apart"
-                    )
-                prev = item
-        return warnings
-
-    def _strip_internal_fields(days: list) -> list:
-        cleaned_days = []
-        for day in days:
-            cleaned_items = []
-            for item in day.get("items", []):
-                cleaned_items.append({k: v for k, v in item.items() if not str(k).startswith("_")})
-            cleaned_days.append({**day, "items": cleaned_items})
-        return cleaned_days
 
     def _resolve_catalog_item(name: str, key: str) -> tuple[dict | None, str | None]:
         key = str(key or "").strip()
@@ -1273,7 +1138,7 @@ def _post_process_options(
             "badge": option.get("badge", f"Option {option_key}"),
         }
         normalized_days, stats, used_names = _process_days(option.get("days", []))
-        boundary_ready_days = _enforce_boundary_feasibility(normalized_days, used_names, stats)
+        boundary_ready_days = _enforce_boundary_feasibility(normalized_days, stats)
         route_repaired_days = _repair_routes(boundary_ready_days, used_names, stats)
         final_days, boundary_repairs = _ensure_boundary_days(
             route_repaired_days,
@@ -1282,6 +1147,21 @@ def _post_process_options(
             compact_flights_ret,
         )
         final_days = _reslot_days(final_days)
+        for day in final_days:
+            items = day.get("items", [])
+            has_lunch = any(str(i.get("icon") or "").lower() == "restaurant" and (_minutes_since_midnight(i.get("time", "")) or 0) < 16 * 60 for i in items)
+            has_dinner = any(str(i.get("icon") or "").lower() == "restaurant" and (_minutes_since_midnight(i.get("time", "")) or 0) >= 16 * 60 for i in items)
+            if not has_lunch:
+                r = next((e for e in restaurant_entries if e["name"].lower().strip() not in used_names), None)
+                if r:
+                    items.append({"time": "12:30", "icon": "restaurant", "key": r["key"], "name": r["name"], "cost": r.get("price") or "TBC"})
+                    used_names.add(r["name"].lower().strip())
+            if not has_dinner:
+                r = next((e for e in restaurant_entries if e["name"].lower().strip() not in used_names), None)
+                if r:
+                    items.append({"time": "18:30", "icon": "restaurant", "key": r["key"], "name": r["name"], "cost": r.get("price") or "TBC"})
+                    used_names.add(r["name"].lower().strip())
+            day["items"] = sorted(items, key=lambda i: _sort_time_value(i.get("time", "")))
         stats["boundary_repairs"] = boundary_repairs
         stats["route_warnings"] = _route_warnings(final_days)
         normalized_itineraries[option_key] = _strip_internal_fields(normalized_days)
@@ -1325,7 +1205,7 @@ def revise_itinerary(state: dict, critique: str, current_result: dict) -> dict:
     duration = state.get("duration", "")
     budget = state.get("budget", "")
 
-    current_json = json.dumps(current_result.get("itineraries", {}), indent=2, ensure_ascii=False)
+    current_json = json.dumps(current_result.get("final_itineraries", {}), indent=2, ensure_ascii=False)
     prompt = f"""You are Agent3 Planner in revision mode.
 
 Trip: {origin} -> {dest} | {dates} | {duration} | budget: {budget}
@@ -1384,7 +1264,7 @@ Return ONLY valid JSON:
         response = llm.invoke([SystemMessage(content=prompt)], response_format={"type": "json_object"})
         result = json.loads(response.content)
         options = result.get("options", {})
-        itineraries, option_meta, normalized_itineraries, validation_report = _post_process_options(
+        itineraries, option_meta, *_ = _post_process_options(
             options,
             inv["compact_attractions"],
             inv["compact_restaurants"],
@@ -1395,16 +1275,10 @@ Return ONLY valid JSON:
         )
         tool_log.append(f"[planner_agent] Revision complete - {list(options.keys())}")
         return {
-            "itineraries": itineraries,
             "final_itineraries": itineraries,
-            "normalized_itineraries": normalized_itineraries,
-            "validated_itineraries": normalized_itineraries,
-            "raw_planner_output": result,
-            "validation_report": validation_report,
             "option_meta": option_meta,
+            "planner_decision_trace": {},
             "planner_chain_of_thought": result.get("chain_of_thought", ""),
-            "chain_of_thought": result.get("chain_of_thought", ""),
-            "research": inv.get("research", {}),
             "tool_log": tool_log,
             "flight_options_outbound": inv["compact_flights_out"],
             "flight_options_return": inv["compact_flights_ret"],
@@ -1538,54 +1412,6 @@ _ITEM_SIGNAL_KEYWORDS = {
     "neighborhood": {"district", "quarter", "street", "lane", "village", "town", "old town"},
 }
 
-_AREA_LIKE_KEYWORDS = {
-    "yokocho",
-    "memory lane",
-    "food street",
-    "ramen street",
-    "old town",
-    "market lane",
-    "alley",
-}
-
-_TOUR_LIKE_KEYWORDS = {
-    "tour",
-    "tours",
-    "walking tour",
-    "food tours",
-    "guided tour",
-}
-
-_NIGHT_ONLY_KEYWORDS = {
-    "night & light",
-    "night and light",
-    "night light",
-    "illumination",
-}
-
-_PHOTO_SPOT_KEYWORDS = {
-    "word mark",
-    "monument",
-}
-
-_FOOD_ENTITY_KEYWORDS = {
-    "restaurant",
-    "ramen",
-    "sushi",
-    "bistro",
-    "bar",
-    "cafe",
-    "eatery",
-    "grill",
-    "dining",
-    "buffet",
-    "kitchen",
-    "izakaya",
-    "paradise",
-    "gyukatsu",
-    "tonkatsu",
-}
-
 _NON_LOCAL_CUISINE_KEYWORDS = {
     "indian",
     "italian",
@@ -1613,12 +1439,17 @@ def _tokenize_text(text: str) -> list[str]:
 def _build_preference_model(state: dict) -> dict:
     texts: list[str] = [str(state.get("preferences") or "")]
     user_profile = state.get("user_profile") or {}
+    if not isinstance(user_profile, dict):
+        user_profile = {}
     texts.extend(str(pref) for pref in user_profile.get("prefs", []) if pref)
     soft_preferences = state.get("soft_preferences") or {}
+    if not isinstance(soft_preferences, dict):
+        soft_preferences = {}
     texts.extend(str(tag) for tag in soft_preferences.get("interest_tags", []) if tag)
     texts.append(str(soft_preferences.get("vibe") or ""))
     for query in state.get("search_queries") or []:
-        texts.append(str(query.get("query") or ""))
+        if isinstance(query, dict):
+            texts.append(str(query.get("query") or ""))
 
     ignore_tokens = set(_tokenize_text(state.get("origin") or "")) | set(_tokenize_text(state.get("destination") or ""))
     token_counts: Counter[str] = Counter()
@@ -1684,27 +1515,6 @@ def _normalized_name(item: dict | None) -> str:
     return str(item.get("name") or "").strip().lower()
 
 
-def _classify_itinerary_candidate(item: dict) -> str:
-    blob = _text_blob(item)
-    if any(keyword in blob for keyword in _TOUR_LIKE_KEYWORDS):
-        return "tour"
-    if any(keyword in blob for keyword in _NIGHT_ONLY_KEYWORDS):
-        return "night_only"
-    if any(keyword in blob for keyword in _PHOTO_SPOT_KEYWORDS):
-        return "photo_spot"
-    if any(keyword in blob for keyword in _AREA_LIKE_KEYWORDS):
-        return "area"
-    if any(keyword in blob for keyword in _FOOD_ENTITY_KEYWORDS):
-        return "restaurant"
-    return "attraction"
-
-
-def _is_normal_activity_candidate(item: dict) -> bool:
-    return _classify_itinerary_candidate(item) == "attraction"
-
-
-def _is_normal_restaurant_candidate(item: dict) -> bool:
-    return _classify_itinerary_candidate(item) == "restaurant"
 
 
 def _exclude_same_place(candidates: list[dict], blocked_names: set[str]) -> list[dict]:
@@ -1712,12 +1522,6 @@ def _exclude_same_place(candidates: list[dict], blocked_names: set[str]) -> list
         return candidates
     return [item for item in candidates if _normalized_name(item) not in blocked_names]
 
-
-def _merge_used_place_names(*name_sets: set[str]) -> set[str]:
-    merged: set[str] = set()
-    for names in name_sets:
-        merged.update(name for name in names if name)
-    return merged
 
 
 def _items_centroid(items: list[dict]) -> tuple[float, float] | None:
@@ -1752,13 +1556,6 @@ def _activity_relevance_score(item: dict, profile: dict, preference_model: dict)
         + _preference_emphasis(preference_model, "traditional cultural")
         + _preference_emphasis(preference_model, "heritage")
     )
-    local_food_pref = (
-        _preference_emphasis(preference_model, "local")
-        + _preference_emphasis(preference_model, "street food")
-        + _preference_emphasis(preference_model, "hawker")
-        + _preference_emphasis(preference_model, "local street")
-    )
-
     score = _preference_overlap_score(blob, preference_model, cap=10) * 1.4
     score += signals["heritage"] * (4.8 + focus.get("culture", 1.0) * 2.6 + culture_pref * 0.65 + traditional_pref * 0.85)
     score += signals["temple"] * (4.0 + focus.get("culture", 1.0) * 2.1 + culture_pref * 0.55 + traditional_pref * 0.65)
@@ -1767,18 +1564,10 @@ def _activity_relevance_score(item: dict, profile: dict, preference_model: dict)
     score += signals["scenic"] * (1.4 + focus.get("landmark", 0.4) * 1.7 + culture_pref * 0.12)
     score += signals["museum"] * (1.2 + museum_pref * 0.35 + focus.get("culture", 1.0) * 0.45)
 
-    if signals["modern"]:
-        score -= signals["modern"] * max(0.0, traditional_pref * 1.15 + culture_pref * 0.5 + food_pref * 0.35 - modern_pref * 0.55 - focus.get("modern", 0.0) * 3.0)
-    if signals["quirky"]:
-        score -= signals["quirky"] * (5.5 + traditional_pref * 0.9 + culture_pref * 0.45 + food_pref * 0.25)
-    if "natural history" in blob and traditional_pref:
-        score -= 6.0
-    if "discovery centre" in blob or "science centre" in blob or "science center" in blob:
-        score -= 7.0 + traditional_pref * 0.35
-    if signals["museum"] and signals["modern"] and not (signals["heritage"] or signals["temple"]):
-        score -= 4.5 + traditional_pref * 0.55
-    if local_food_pref and not (signals["heritage"] or signals["temple"] or signals["nature"] or signals["scenic"]):
-        score -= 1.8
+    if signals["modern"] and traditional_pref > 2:
+        score -= signals["modern"] * max(0.0, traditional_pref * 0.5 - modern_pref * 0.55 - focus.get("modern", 0.0) * 2.0)
+    if signals["quirky"] and (traditional_pref > 1 or culture_pref > 1):
+        score -= signals["quirky"] * 2.0
     return score
 
 
@@ -2068,9 +1857,6 @@ def _prepare_seed_candidates(
                 )
             )
         ]
-        if len(cluster_members) < 2:
-            continue
-
         candidates.append({
             "seed": seed,
             "name": seed.get("name", ""),
@@ -2087,6 +1873,16 @@ def _prepare_seed_candidates(
         })
         if len(candidates) >= max_candidates:
             break
+
+    if not candidates:
+        for seed in ranked[:max_candidates]:
+            candidates.append({
+                "seed": seed,
+                "name": seed.get("name", ""),
+                "type": str(seed.get("type") or seed.get("category") or ""),
+                "cluster_members": [],
+                "cluster_size": 1,
+            })
 
     return candidates
 
@@ -2490,11 +2286,12 @@ def _choose_cluster_activities(
         )
         for item in available
     ]
-    best_relevance = max(relevance for _, _, relevance in scored_available)
-    relevance_cutoff = max(28.0, best_relevance - (38 if strong_preference else 24))
-    filtered = [item for item, _, relevance in scored_available if relevance >= relevance_cutoff]
-    if filtered:
-        available = filtered
+    if scored_available:
+        best_relevance = max(relevance for _, _, relevance in scored_available)
+        relevance_cutoff = max(24.0, best_relevance - (38 if strong_preference else 24))
+        filtered = [item for item, _, relevance in scored_available if relevance >= relevance_cutoff]
+        if filtered:
+            available = filtered
 
     if discouraged_names:
         fresh_quota = max(0, int(profile.get("fresh_activity_quota", 0)))
@@ -2741,8 +2538,6 @@ def _build_day_activity_pool(
                 <= cluster_radius
             )
         ]
-        if len(cluster_items) < min_cluster_size:
-            continue
         cluster_ranked = sorted(
             cluster_items,
             key=lambda item: _activity_score(item, profile, preference_model, discouraged_names),
@@ -2884,8 +2679,8 @@ def _filter_restaurants_by_fit(
     profile: dict,
     preference_model: dict,
     *,
-    quality_floor: float = -1.5,
-    drop_from_best: float = 6.0,
+    quality_floor: float = -3.0,
+    drop_from_best: float = 10.0,
 ) -> list[dict]:
     if not restaurants:
         return []
@@ -2939,9 +2734,8 @@ def _restaurant_role_compatible(item: dict, profile: dict) -> bool:
         return True
     if not _is_nonlocal_restaurant(item):
         return True
-    signals = _item_signal_counts(_text_blob(item))
     rating = _numeric_rating(item.get("rating"))
-    if signals["fine_dining"] > 0 and rating >= 4.4:
+    if rating >= 4.2:
         return True
     return False
 
@@ -2992,7 +2786,7 @@ def _build_option_restaurant_pools(
     return option_pools
 
 
-def _build_immersion_option_schedule(
+def _build_option_schedule(
     option_key: str,
     profile: dict,
     compact_attractions: list[dict],
@@ -3008,6 +2802,7 @@ def _build_immersion_option_schedule(
     discouraged_restaurants: set[str] | None = None,
     discouraged_activity_centroids: list[tuple[float, float]] | None = None,
 ) -> tuple[list, dict, list[tuple[float, float]], list[dict]]:
+    selection_mode = str(profile.get("selection_mode") or "coverage")
     used_place_names: set[str] = set()
     used_cluster_seeds: set[str] = set()
     day_activity_centroids: list[tuple[float, float]] = []
@@ -3060,59 +2855,175 @@ def _build_immersion_option_schedule(
     for idx in range(middle_days):
         service_date = _service_date(trip_start_date, idx + 1)
         remaining_middle_days = middle_days - idx
-        desired_count = max(
-            int(profile.get("min_activity_count", 2)),
-            min(int(profile.get("target_activity_count", 2)), 2),
-        )
-
-        all_available = [
-            item for item in compact_attractions
-            if item.get("name") and _normalized_name(item) not in used_place_names
-        ]
-        novel_available = [
-            item for item in all_available
-            if not discouraged_activities or _normalized_name(item) not in discouraged_activities
-        ]
-        hard_novel_mode = len(novel_available) >= desired_count * remaining_middle_days
-        source_variants: list[tuple[list[dict], set[str] | None]] = []
-        if hard_novel_mode and novel_available:
-            source_variants.append((novel_available, None))
-        source_variants.append((all_available, discouraged_activities))
-
-        activities: list[dict] = []
-        used_source_novel_only = False
-        centroid_bias = list(discouraged_activity_centroids or []) + day_activity_centroids
-        probe_profile = {**profile, "selection_mode": "coverage", "fresh_activity_quota": 0, "fresh_activity_bonus": 0}
-
         prior_themes = [d["theme"] for d in day_decisions if d.get("theme")]
         selected_seed: dict | None = None
         day_theme = "mixed sightseeing"
         seed_reason = ""
 
-        for source_items, source_discouraged in source_variants:
-            if len(source_items) < desired_count:
-                continue
-            day_pool = _build_day_activity_pool(
-                source_items,
+        if selection_mode == "immersion":
+            desired_count = max(
+                int(profile.get("min_activity_count", 2)),
+                min(int(profile.get("target_activity_count", 2)), 2),
+            )
+
+            all_available = [
+                item for item in compact_attractions
+                if item.get("name") and _normalized_name(item) not in used_place_names
+            ]
+            novel_available = [
+                item for item in all_available
+                if not discouraged_activities or _normalized_name(item) not in discouraged_activities
+            ]
+            hard_novel_mode = len(novel_available) >= desired_count * remaining_middle_days
+            source_variants: list[tuple[list[dict], set[str] | None]] = []
+            if hard_novel_mode and novel_available:
+                source_variants.append((novel_available, None))
+            source_variants.append((all_available, discouraged_activities))
+
+            activities: list[dict] = []
+            used_source_novel_only = False
+            centroid_bias = list(discouraged_activity_centroids or []) + day_activity_centroids
+            probe_profile = {**profile, "selection_mode": "coverage", "fresh_activity_quota": 0, "fresh_activity_bonus": 0}
+
+            for source_items, source_discouraged in source_variants:
+                if len(source_items) < desired_count:
+                    continue
+                day_pool = _build_day_activity_pool(
+                    source_items,
+                    used_place_names,
+                    profile,
+                    preference_model,
+                    desired_count=desired_count,
+                    day_index=idx,
+                    discouraged_names=source_discouraged,
+                    used_cluster_seeds=used_cluster_seeds,
+                    discouraged_centroids=centroid_bias,
+                )
+                if not day_pool:
+                    continue
+
+                seed_candidates = _prepare_seed_candidates(
+                    day_pool,
+                    profile,
+                    preference_model,
+                    cluster_radius=cluster_radius,
+                    max_candidates=5,
+                    discouraged_names=source_discouraged,
+                )
+                if seed_candidates:
+                    selected_seed, day_theme, seed_reason = _llm_select_seed(
+                        seed_candidates,
+                        day_index=idx,
+                        option_key=option_key,
+                        profile=profile,
+                        preference_model=preference_model,
+                        prior_themes=prior_themes,
+                    )
+
+                probe_used_names = set(used_place_names)
+                picked = _choose_cluster_activities(
+                    day_pool,
+                    probe_used_names,
+                    probe_profile,
+                    preference_model,
+                    count=desired_count,
+                    day_index=idx,
+                    discouraged_names=source_discouraged,
+                    forced_seed=selected_seed,
+                )
+                if len(picked) >= int(profile.get("min_activity_count", 2)):
+                    activities = picked
+                    used_source_novel_only = source_discouraged is None and hard_novel_mode
+                    break
+
+            if not activities and all_available:
+                fallback_pool = _build_day_activity_pool(
+                    all_available,
+                    used_place_names,
+                    profile,
+                    preference_model,
+                    desired_count=desired_count,
+                    day_index=idx,
+                    discouraged_names=discouraged_activities,
+                    used_cluster_seeds=used_cluster_seeds,
+                    discouraged_centroids=centroid_bias,
+                )
+                probe_used_names = set(used_place_names)
+                activities = _choose_cluster_activities(
+                    fallback_pool or all_available,
+                    probe_used_names,
+                    probe_profile,
+                    preference_model,
+                    count=desired_count,
+                    day_index=idx,
+                    discouraged_names=discouraged_activities,
+                    forced_seed=selected_seed,
+                )
+
+            blocked_place_names = {_normalized_name(item) for item in activities if _normalized_name(item)}
+            district_restaurants = _build_district_restaurant_pool(
+                option_restaurants,
+                activities,
+                used_place_names,
+                primary_radius_km=2.4,
+                expanded_radius_km=4.0,
+                desired_count=4,
+                discouraged_names=discouraged_restaurants,
+            )
+            district_restaurants = _filter_restaurants_by_fit(
+                district_restaurants,
+                profile,
+                preference_model,
+                quality_floor=-0.5,
+                drop_from_best=5.0,
+            )
+            restaurant_source = district_restaurants or option_restaurants
+            novel_restaurants = [
+                item for item in restaurant_source
+                if not discouraged_restaurants or _normalized_name(item) not in discouraged_restaurants
+            ]
+            novel_restaurants = _filter_restaurants_by_fit(
+                novel_restaurants,
+                profile,
+                preference_model,
+                quality_floor=0.0,
+                drop_from_best=4.0,
+            )
+            if len(novel_restaurants) >= min(2, 2 * remaining_middle_days):
+                restaurant_source = novel_restaurants
+            meal_discouraged_names = discouraged_restaurants if not used_source_novel_only else None
+
+        else:
+            minimum_activity_count = int(profile.get("min_activity_count", 2))
+            activity_count = _preferred_activity_count(
+                compact_attractions,
                 used_place_names,
                 profile,
                 preference_model,
-                desired_count=desired_count,
-                day_index=idx,
-                discouraged_names=source_discouraged,
-                used_cluster_seeds=used_cluster_seeds,
-                discouraged_centroids=centroid_bias,
+                remaining_middle_days,
             )
-            if not day_pool:
-                continue
+            if len(compact_attractions) >= minimum_activity_count:
+                activity_count = max(minimum_activity_count, activity_count)
+
+            day_activity_pool = _build_day_activity_pool(
+                compact_attractions,
+                used_place_names,
+                profile,
+                preference_model,
+                desired_count=activity_count,
+                day_index=idx,
+                discouraged_names=discouraged_activities,
+                used_cluster_seeds=used_cluster_seeds,
+                discouraged_centroids=discouraged_activity_centroids,
+            )
 
             seed_candidates = _prepare_seed_candidates(
-                day_pool,
+                day_activity_pool or compact_attractions,
                 profile,
                 preference_model,
                 cluster_radius=cluster_radius,
                 max_candidates=5,
-                discouraged_names=source_discouraged,
+                discouraged_names=discouraged_activities,
             )
             if seed_candidates:
                 selected_seed, day_theme, seed_reason = _llm_select_seed(
@@ -3123,79 +3034,23 @@ def _build_immersion_option_schedule(
                     preference_model=preference_model,
                     prior_themes=prior_themes,
                 )
+            else:
+                selected_seed, day_theme, seed_reason = None, "mixed sightseeing", "pool too small for seed selection"
 
-            probe_used_names = set(used_place_names)
-            picked = _choose_cluster_activities(
-                day_pool,
-                probe_used_names,
-                probe_profile,
-                preference_model,
-                count=desired_count,
-                day_index=idx,
-                discouraged_names=source_discouraged,
-                forced_seed=selected_seed,
-            )
-            if len(picked) >= int(profile.get("min_activity_count", 2)):
-                activities = picked
-                used_source_novel_only = source_discouraged is None and hard_novel_mode
-                break
-
-        if not activities and all_available:
-            fallback_pool = _build_day_activity_pool(
-                all_available,
-                used_place_names,
-                profile,
-                preference_model,
-                desired_count=desired_count,
-                day_index=idx,
-                discouraged_names=discouraged_activities,
-                used_cluster_seeds=used_cluster_seeds,
-                discouraged_centroids=centroid_bias,
-            )
-            probe_used_names = set(used_place_names)
+            activity_profile = {**profile, "selection_mode": "coverage"}
             activities = _choose_cluster_activities(
-                fallback_pool or all_available,
-                probe_used_names,
-                probe_profile,
+                day_activity_pool or compact_attractions,
+                used_place_names,
+                activity_profile,
                 preference_model,
-                count=desired_count,
+                count=activity_count,
                 day_index=idx,
                 discouraged_names=discouraged_activities,
                 forced_seed=selected_seed,
             )
-
-        blocked_place_names = {_normalized_name(item) for item in activities if _normalized_name(item)}
-        district_restaurants = _build_district_restaurant_pool(
-            option_restaurants,
-            activities,
-            used_place_names,
-            primary_radius_km=2.4,
-            expanded_radius_km=4.0,
-            desired_count=4,
-            discouraged_names=discouraged_restaurants,
-        )
-        district_restaurants = _filter_restaurants_by_fit(
-            district_restaurants,
-            profile,
-            preference_model,
-            quality_floor=-0.5,
-            drop_from_best=5.0,
-        )
-
-        restaurant_source = district_restaurants or option_restaurants
-        novel_restaurants = [
-            item for item in restaurant_source
-            if not discouraged_restaurants or _normalized_name(item) not in discouraged_restaurants
-        ]
-        novel_restaurants = _filter_restaurants_by_fit(
-            novel_restaurants,
-            profile,
-            preference_model,
-            quality_floor=0.0,
-            drop_from_best=4.0,
-        )
-        if len(novel_restaurants) >= min(2, 2 * remaining_middle_days):
-            restaurant_source = novel_restaurants
+            blocked_place_names = {_normalized_name(item) for item in activities if _normalized_name(item)}
+            restaurant_source = option_restaurants
+            meal_discouraged_names = discouraged_restaurants
 
         lunch = _pick_mandatory_meal(
             restaurant_source,
@@ -3206,7 +3061,7 @@ def _build_immersion_option_schedule(
             activities[0] if activities else None,
             meal_kind="lunch",
             service_date=service_date,
-            discouraged_names=discouraged_restaurants if not used_source_novel_only else None,
+            discouraged_names=meal_discouraged_names,
         )
         if lunch is None and allow_global_fallback and fallback_restaurants and restaurant_source is not fallback_restaurants:
             lunch = _pick_mandatory_meal(
@@ -3236,7 +3091,7 @@ def _build_immersion_option_schedule(
             dinner_anchor,
             meal_kind="dinner",
             service_date=service_date,
-            discouraged_names=discouraged_restaurants if not used_source_novel_only else None,
+            discouraged_names=meal_discouraged_names,
         )
         if dinner is None and allow_global_fallback and fallback_restaurants and restaurant_source is not fallback_restaurants:
             dinner = _pick_mandatory_meal(
@@ -3424,11 +3279,12 @@ def _pick_restaurant_for_anchor(
         (item, _restaurant_relevance_score(item, profile, preference_model))
         for item in available
     ]
-    best_relevance = max(relevance for _, relevance in scored_available)
-    relevance_cutoff = max(16.0, best_relevance - (20 if strong_food_preference else 10))
-    filtered = [item for item, relevance in scored_available if relevance >= relevance_cutoff]
-    if filtered:
-        available = filtered
+    if scored_available:
+        best_relevance = max(relevance for _, relevance in scored_available)
+        relevance_cutoff = max(16.0, best_relevance - (20 if strong_food_preference else 10))
+        filtered = [item for item, relevance in scored_available if relevance >= relevance_cutoff]
+        if filtered:
+            available = filtered
     if discouraged_names:
         fresh_quota = max(0, int(profile.get("fresh_restaurant_quota", 0)))
         novel_available = [item for item in available if _normalized_name(item) not in discouraged_names]
@@ -3468,30 +3324,15 @@ def _pick_restaurant_for_anchor(
             ]
         if time_fit:
             available = time_fit
-        else:
-            return None
-    traditional_pref = (
-        _preference_emphasis(preference_model, "traditional")
-        + _preference_emphasis(preference_model, "traditional cultural")
-        + _preference_emphasis(preference_model, "historical")
-        + _preference_emphasis(preference_model, "authentic")
-    )
-    fine_pref = _preference_emphasis(preference_model, "fine dining") + _preference_emphasis(preference_model, "fine")
-    local_pref = (
-        _preference_emphasis(preference_model, "local")
-        + _preference_emphasis(preference_model, "street food")
-        + _preference_emphasis(preference_model, "hawker")
-    )
+        # else: no restaurant fits the time window — skip time filter entirely
+        # (best-effort: schedule it anyway rather than leave the meal slot empty)
     scored_candidates = [
         (item, _restaurant_score(item, profile, preference_model, discouraged_names))
         for item in available
     ]
     if scored_candidates:
         best_quality = max(score for _, score in scored_candidates)
-        quality_floor = -6.0
-        if traditional_pref or fine_pref or local_pref:
-            quality_floor = 0.0
-        quality_cutoff = max(quality_floor, best_quality - 8.0)
+        quality_cutoff = max(-6.0, best_quality - 8.0)
         filtered_quality = [item for item, score in scored_candidates if score >= quality_cutoff]
         if filtered_quality:
             available = filtered_quality
@@ -3658,11 +3499,12 @@ def _pick_activity_near_anchor(
         )
         for item in available
     ]
-    best_relevance = max(relevance for _, _, relevance in scored_available)
-    relevance_cutoff = max(24.0, best_relevance - (34 if strong_preference else 22))
-    filtered = [item for item, _, relevance in scored_available if relevance >= relevance_cutoff]
-    if filtered:
-        available = filtered
+    if scored_available:
+        best_relevance = max(relevance for _, _, relevance in scored_available)
+        relevance_cutoff = max(24.0, best_relevance - (34 if strong_preference else 22))
+        filtered = [item for item, _, relevance in scored_available if relevance >= relevance_cutoff]
+        if filtered:
+            available = filtered
     if discouraged_names:
         novel_available = [item for item in available if _normalized_name(item) not in discouraged_names]
         if novel_available:
@@ -4029,7 +3871,8 @@ def _arrival_day_items(
 
     arrival_anchor = hotel or {}
     dinner_pref = max((arrival_minutes or (17 * 60 + 30)) + 60, 18 * 60)
-    if arrival_minutes is not None and arrival_minutes <= 15 * 60 + 30:
+    effective_arrival = arrival_minutes if arrival_minutes is not None else 14 * 60
+    if effective_arrival <= 17 * 60:
         light_activity = _pick_activity_near_anchor(
             attractions,
             used_place_names,
@@ -4040,9 +3883,9 @@ def _arrival_day_items(
             discouraged_names=discouraged_activities,
         )
         if light_activity:
-            activity_time = max(arrival_minutes + 90, 15 * 60 + 20)
+            activity_time = max(effective_arrival + 90, 14 * 60 + 30)
             activity_end = activity_time + _activity_duration_minutes(light_activity)
-            if activity_time <= _activity_latest_start_minutes(light_activity, service_date) and activity_end <= 17 * 60 + 45:
+            if activity_time <= _activity_latest_start_minutes(light_activity, service_date) and activity_end <= 19 * 60:
                 items.append(
                     {
                         "time": _hhmm(activity_time),
@@ -4163,8 +4006,9 @@ def _departure_day_items(
         )
 
     current = checkout_time + 20
-    available_after_checkout = max(0, (airport_cutoff or current) - current)
-    if available_after_checkout >= 165:
+    default_end = 13 * 60  # assume free until 1pm when no flight data
+    available_after_checkout = max(0, (airport_cutoff or default_end) - current)
+    if available_after_checkout >= 120:
         activity = _pick_activity_near_anchor(
             attractions,
             used_place_names,
@@ -4177,7 +4021,7 @@ def _departure_day_items(
         if activity:
             activity_time = max(current, 9 * 60 + 5)
             activity_end = activity_time + _activity_duration_minutes(activity)
-            if activity_time <= _activity_latest_start_minutes(activity, service_date) and activity_end <= (airport_cutoff or activity_end) - 80:
+            if activity_time <= _activity_latest_start_minutes(activity, service_date) and activity_end <= (airport_cutoff or activity_end):
                 items.append(
                     {
                         "time": _hhmm(activity_time),
@@ -4239,7 +4083,7 @@ def _departure_day_items(
                     }
                 )
                 used_place_names.add(_normalized_name(brunch))
-    elif available_after_checkout >= 75:
+    elif available_after_checkout >= 60:
         brunch = _pick_restaurant_for_anchor(
             restaurants,
             used_place_names,
@@ -4299,319 +4143,6 @@ def _departure_day_items(
     return sorted(items, key=lambda item: _sort_time_value(item.get("time", "")))
 
 
-def _build_option_schedule(
-    option_key: str,
-    profile: dict,
-    compact_attractions: list[dict],
-    option_restaurants: list[dict],
-    fallback_restaurants: list[dict],
-    hotel: dict | None,
-    outbound_flight: dict | None,
-    return_flight: dict | None,
-    duration_days: int,
-    preference_model: dict,
-    trip_start_date: date | None = None,
-    discouraged_activities: set[str] | None = None,
-    discouraged_restaurants: set[str] | None = None,
-    discouraged_activity_centroids: list[tuple[float, float]] | None = None,
-) -> tuple[list, dict, list[tuple[float, float]], list[dict]]:
-    used_place_names: set[str] = set()
-    used_cluster_seeds: set[str] = set()
-    day_activity_centroids: list[tuple[float, float]] = []
-    day_decisions: list[dict] = []
-    allow_global_fallback = str(profile.get("meal_role") or "") == "highlight"
-    days: list[dict] = []
-    stats = {
-        "removed_items": 0,
-        "normalized_items": 0,
-        "duplicate_items": 0,
-        "invalid_items": 0,
-        "sparse_days": [],
-        "boundary_repairs": [],
-        "route_warnings": [],
-    }
-
-    days.append(
-        {
-            "day": "Day 1",
-            "items": _arrival_day_items(
-                profile,
-                outbound_flight,
-                hotel,
-                compact_attractions,
-                option_restaurants,
-                fallback_restaurants,
-                used_place_names,
-                preference_model,
-                service_date=_service_date(trip_start_date, 0),
-                discouraged_activities=discouraged_activities,
-                discouraged_restaurants=discouraged_restaurants,
-                option_key=option_key,
-            ),
-        }
-    )
-    day_decisions.append({
-        "day": "Day 1",
-        "day_type": "arrival",
-        "theme": "arrival evening",
-        "seed_name": None,
-        "seed_reason": "arrival day uses a fixed light-evening template",
-        "activities": [],
-        "lunch": None,
-        "dinner": None,
-    })
-
-    middle_days = max(duration_days - 2, 0)
-    cluster_radius = float(profile.get("cluster_radius_km", 5.0))
-
-    for idx in range(middle_days):
-        minimum_activity_count = int(profile.get("min_activity_count", 2))
-        remaining_middle_days = middle_days - idx
-        activity_count = _preferred_activity_count(
-            compact_attractions,
-            used_place_names,
-            profile,
-            preference_model,
-            remaining_middle_days,
-        )
-        if len(compact_attractions) >= minimum_activity_count:
-            activity_count = max(minimum_activity_count, activity_count)
-
-        day_activity_pool = _build_day_activity_pool(
-            compact_attractions,
-            used_place_names,
-            profile,
-            preference_model,
-            desired_count=activity_count,
-            day_index=idx,
-            discouraged_names=discouraged_activities,
-            used_cluster_seeds=used_cluster_seeds,
-            discouraged_centroids=discouraged_activity_centroids,
-        )
-
-        prior_themes = [d["theme"] for d in day_decisions if d.get("theme")]
-        seed_candidates = _prepare_seed_candidates(
-            day_activity_pool or compact_attractions,
-            profile,
-            preference_model,
-            cluster_radius=cluster_radius,
-            max_candidates=5,
-            discouraged_names=discouraged_activities,
-        )
-        if seed_candidates:
-            selected_seed, day_theme, seed_reason = _llm_select_seed(
-                seed_candidates,
-                day_index=idx,
-                option_key=option_key,
-                profile=profile,
-                preference_model=preference_model,
-                prior_themes=prior_themes,
-            )
-        else:
-            selected_seed, day_theme, seed_reason = None, "mixed sightseeing", "pool too small for seed selection"
-
-        activity_profile = (
-            profile
-            if str(profile.get("selection_mode") or "coverage") != "immersion"
-            else {**profile, "selection_mode": "coverage"}
-        )
-        activities = _choose_cluster_activities(
-            day_activity_pool or compact_attractions,
-            used_place_names,
-            activity_profile,
-            preference_model,
-            count=activity_count,
-            day_index=idx,
-            discouraged_names=discouraged_activities,
-            forced_seed=selected_seed,
-        )
-        blocked_place_names = {_normalized_name(item) for item in activities if _normalized_name(item)}
-        lunch = _pick_mandatory_meal(
-            option_restaurants,
-            used_place_names,
-            blocked_place_names,
-            profile,
-            preference_model,
-            activities[0] if activities else None,
-            meal_kind="lunch",
-            service_date=_service_date(trip_start_date, idx + 1),
-            discouraged_names=discouraged_restaurants,
-        )
-        if lunch is None and allow_global_fallback and fallback_restaurants and fallback_restaurants is not option_restaurants:
-            lunch = _pick_mandatory_meal(
-                fallback_restaurants,
-                used_place_names,
-                blocked_place_names,
-                profile,
-                preference_model,
-                activities[0] if activities else None,
-                meal_kind="lunch",
-                service_date=_service_date(trip_start_date, idx + 1),
-                discouraged_names=discouraged_restaurants,
-            )
-        reserved_restaurants = set(used_place_names)
-        if lunch and lunch.get("name"):
-            reserved_restaurants.add(_normalized_name(lunch))
-            blocked_place_names.add(_normalized_name(lunch))
-        dinner_anchor = activities[-1] if activities else lunch
-        dinner = _pick_mandatory_meal(
-            option_restaurants,
-            reserved_restaurants,
-            blocked_place_names,
-            profile,
-            preference_model,
-            dinner_anchor,
-            meal_kind="dinner",
-            service_date=_service_date(trip_start_date, idx + 1),
-            discouraged_names=discouraged_restaurants,
-        )
-        if dinner is None and allow_global_fallback and fallback_restaurants and fallback_restaurants is not option_restaurants:
-            dinner = _pick_mandatory_meal(
-                fallback_restaurants,
-                reserved_restaurants,
-                blocked_place_names,
-                profile,
-                preference_model,
-                dinner_anchor,
-                meal_kind="dinner",
-                service_date=_service_date(trip_start_date, idx + 1),
-                discouraged_names=discouraged_restaurants,
-            )
-        items = _middle_day_items(
-            profile,
-            activities,
-            lunch,
-            dinner,
-            day_index=idx + 1,
-            service_date=_service_date(trip_start_date, idx + 1),
-        )
-        meal_total = sum(1 for item in items if item.get("icon") == "restaurant")
-        if meal_total < 2:
-            has_lunch = any(
-                item.get("icon") == "restaurant"
-                and (_minutes_since_midnight(item.get("time", "")) or 0) < 16 * 60
-                for item in items
-            )
-            has_dinner = any(
-                item.get("icon") == "restaurant"
-                and (_minutes_since_midnight(item.get("time", "")) or 0) >= 16 * 60
-                for item in items
-            )
-            if not has_lunch:
-                _append_missing_meal(
-                    items, option_restaurants, used_place_names, profile, preference_model,
-                    meal_kind="lunch",
-                    service_date=_service_date(trip_start_date, idx + 1),
-                    discouraged_restaurants=discouraged_restaurants,
-                )
-                if not any(
-                    item.get("icon") == "restaurant"
-                    and (_minutes_since_midnight(item.get("time", "")) or 0) < 16 * 60
-                    for item in items
-                ) and fallback_restaurants and fallback_restaurants is not option_restaurants:
-                    _append_missing_meal(
-                        items, fallback_restaurants, used_place_names, profile, preference_model,
-                        meal_kind="lunch",
-                        service_date=_service_date(trip_start_date, idx + 1),
-                        discouraged_restaurants=discouraged_restaurants,
-                    )
-            if not has_dinner:
-                _append_missing_meal(
-                    items, option_restaurants, used_place_names, profile, preference_model,
-                    meal_kind="dinner",
-                    service_date=_service_date(trip_start_date, idx + 1),
-                    discouraged_restaurants=discouraged_restaurants,
-                )
-                if not any(
-                    item.get("icon") == "restaurant"
-                    and (_minutes_since_midnight(item.get("time", "")) or 0) >= 16 * 60
-                    for item in items
-                ) and fallback_restaurants and fallback_restaurants is not option_restaurants:
-                    _append_missing_meal(
-                        items, fallback_restaurants, used_place_names, profile, preference_model,
-                        meal_kind="dinner",
-                        service_date=_service_date(trip_start_date, idx + 1),
-                        discouraged_restaurants=discouraged_restaurants,
-                    )
-            items.sort(key=lambda item: _sort_time_value(item.get("time", "")))
-        items = _enforce_restaurant_time_buffers(items, min_restaurant_block_minutes=80)
-        activity_total = sum(1 for item in items if item.get("icon") == "activity")
-        meal_total = sum(1 for item in items if item.get("icon") == "restaurant")
-        if activity_total < minimum_activity_count or meal_total < 2:
-            stats["sparse_days"].append(
-                {"day_index": idx + 2, "activity_count": activity_total, "meal_count": meal_total}
-            )
-        activity_centroid = _items_centroid(activities)
-        if activity_centroid is not None:
-            day_activity_centroids.append(activity_centroid)
-        for item in items:
-            if item.get("icon") in {"activity", "restaurant"}:
-                normalized = _normalized_name(item)
-                if normalized:
-                    used_place_names.add(normalized)
-        days.append({"day": f"Day {idx + 2}", "items": items})
-
-        day_decisions.append({
-            "day": f"Day {idx + 2}",
-            "day_type": "middle",
-            "theme": day_theme,
-            "seed_name": selected_seed.get("name") if selected_seed else None,
-            "seed_reason": seed_reason,
-            "activities": [
-                {
-                    "name": a.get("name", ""),
-                    "type": str(a.get("type") or a.get("category") or ""),
-                }
-                for a in activities
-            ],
-            "lunch": _meal_trace(lunch, "lunch", preference_model),
-            "dinner": _meal_trace(dinner, "dinner", preference_model),
-        })
-
-    days.append(
-        {
-            "day": f"Day {duration_days}",
-            "items": _departure_day_items(
-                profile,
-                return_flight,
-                hotel,
-                compact_attractions,
-                option_restaurants,
-                fallback_restaurants,
-                used_place_names,
-                preference_model,
-                service_date=_service_date(trip_start_date, duration_days - 1),
-                discouraged_activities=discouraged_activities,
-                discouraged_restaurants=discouraged_restaurants,
-            ),
-        }
-    )
-    day_decisions.append({
-        "day": f"Day {duration_days}",
-        "day_type": "departure",
-        "theme": "departure day",
-        "seed_name": None,
-        "seed_reason": "departure day uses checkout + last visit + airport template",
-        "activities": [],
-        "lunch": None,
-        "dinner": None,
-    })
-
-    seen_place_names: set[str] = set()
-    for day in days:
-        for item in day.get("items", []):
-            name = _normalized_name(item)
-            if not name:
-                continue
-            if item.get("icon") in {"activity", "restaurant"}:
-                if name in seen_place_names:
-                    stats["duplicate_items"] += 1
-                else:
-                    seen_place_names.add(name)
-    stats["route_warnings"] = []
-    return days, stats, day_activity_centroids, day_decisions
-
-
 # Main route-first scheduler used by planner_from_research().
 def _build_deterministic_plan(
     compact_attractions: list[dict],
@@ -4623,11 +4154,8 @@ def _build_deterministic_plan(
     preference_model: dict,
     trip_start_date: date | None = None,
 ) -> tuple[dict, dict, dict, dict, dict, dict]:
-    #compact_attractions = [item for item in compact_attractions if _is_normal_activity_candidate(item)]  
-    #compact_restaurants = [item for item in compact_restaurants if _is_normal_restaurant_candidate(item)]
-    compact_attractions = [item for item in compact_attractions ]
-    compact_restaurants = [item for item in compact_restaurants ]
-   
+    compact_attractions = [item for item in compact_attractions if item.get("name")]
+    compact_restaurants = [item for item in compact_restaurants if item.get("name")]
     attraction_lookup = _name_lookup(compact_attractions)
     restaurant_lookup = _name_lookup(compact_restaurants)
     outbound_flight = _pick_outbound_flight(compact_flights_out)
@@ -4651,40 +4179,22 @@ def _build_deterministic_plan(
     for option_key, profile in _OPTION_PROFILES.items():
         hotel = hotel_by_option.get(option_key)
         option_restaurants = restaurant_pools.get(option_key) or compact_restaurants
-        if str(profile.get("selection_mode") or "") == "immersion":
-            days, stats, day_centroids, day_decisions = _build_immersion_option_schedule(
-                option_key,
-                profile,
-                compact_attractions,
-                option_restaurants,
-                compact_restaurants,
-                hotel,
-                outbound_flight,
-                return_flight,
-                duration_days,
-                preference_model,
-                trip_start_date=trip_start_date,
-                discouraged_activities=prior_option_activity_names,
-                discouraged_restaurants=None,
-                discouraged_activity_centroids=prior_option_activity_centroids,
-            )
-        else:
-            days, stats, day_centroids, day_decisions = _build_option_schedule(
-                option_key,
-                profile,
-                compact_attractions,
-                option_restaurants,
-                compact_restaurants,
-                hotel,
-                outbound_flight,
-                return_flight,
-                duration_days,
-                preference_model,
-                trip_start_date=trip_start_date,
-                discouraged_activities=prior_option_activity_names,
-                discouraged_restaurants=None,
-                discouraged_activity_centroids=prior_option_activity_centroids,
-            )
+        days, stats, day_centroids, day_decisions = _build_option_schedule(
+            option_key,
+            profile,
+            compact_attractions,
+            option_restaurants,
+            compact_restaurants,
+            hotel,
+            outbound_flight,
+            return_flight,
+            duration_days,
+            preference_model,
+            trip_start_date=trip_start_date,
+            discouraged_activities=prior_option_activity_names,
+            discouraged_restaurants=None,
+            discouraged_activity_centroids=prior_option_activity_centroids,
+        )
 
         final_itineraries[option_key] = days
         normalized_itineraries[option_key] = deepcopy(days)
@@ -4818,9 +4328,9 @@ def planner_from_research(state: dict, research_result: dict) -> dict:
         (
             result,
             itineraries,
-            normalized_itineraries,
+            _,
             option_meta,
-            validation_report,
+            _,
             planner_decision_trace,
         ) = _build_deterministic_plan(
             compact_attractions,
@@ -4838,16 +4348,10 @@ def planner_from_research(state: dict, research_result: dict) -> dict:
         tool_log.append(f"[planner_agent] Generated options: {list(itineraries.keys())}")
 
         return {
-            "itineraries": itineraries,
             "final_itineraries": itineraries,
-            "validated_itineraries": itineraries,
             "option_meta": option_meta,
-            "validation_report": validation_report,
             "planner_decision_trace": planner_decision_trace,
             "planner_chain_of_thought": planner_chain_of_thought,
-            "chain_of_thought": planner_chain_of_thought,
-            "research": research,
-            "state": state,
             "tool_log": tool_log,
             "flight_options_outbound": compact_flights_out,
             "flight_options_return": compact_flights_ret,
@@ -4861,8 +4365,7 @@ def planner_from_research(state: dict, research_result: dict) -> dict:
         return {"error": str(exc)}
 
 
-# Thin wrapper kept for call sites that still expect planner to trigger research first.
-def planner_agent(state: dict, tools: dict | None = None) -> dict:
+def planner_agent(state: dict) -> dict:
     logger.info("[planner_agent] start")
     state = _normalize_trip_state(state)
     logger.info(
@@ -4874,6 +4377,8 @@ def planner_agent(state: dict, tools: dict | None = None) -> dict:
 
     # Check if research payload already exists in state to avoid duplicate external calls
     inventory = state.get("inventory") or {}
+    if not isinstance(inventory, dict):
+        inventory = {}
     has_research_data = any(
         [
             bool(state.get("research")),
@@ -4918,10 +4423,5 @@ def planner_agent(state: dict, tools: dict | None = None) -> dict:
         )
         return planner_from_research(state, seeded_research_result)
 
-    logger.info("[planner_agent] no research data in state, calling research_agent")
-    research_result = research_agent(state, tools or {})
-    if "error" in research_result:
-        logger.error("[planner_agent] research_agent failed: %s", research_result.get("error"))
-        return research_result
-    logger.info("[planner_agent] research_agent completed, calling planner_from_research")
-    return planner_from_research(state, research_result)
+    logger.error("[planner_agent] no research data found in state — search_node must run before planner")
+    return {"error": "No research data in state. Ensure search_node runs before planner_node."}

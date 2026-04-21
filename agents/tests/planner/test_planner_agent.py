@@ -56,11 +56,7 @@ from agents.specialists.planner_agent import (  # noqa: E402
     _preference_overlap_score,
     _preference_emphasis,
     _normalized_name,
-    _classify_itinerary_candidate,
-    _is_normal_activity_candidate,
-    _is_normal_restaurant_candidate,
     _exclude_same_place,
-    _merge_used_place_names,
     _items_centroid,
     _haversine_km,
     _is_nonlocal_restaurant,
@@ -180,7 +176,7 @@ class TestPlannerFromResearch:
     def test_output_schema(self, flat_state, mock_research_result, patch_planner_llm):
         result = planner_from_research(flat_state, mock_research_result)
         assert "error" not in result, f"Unexpected error: {result.get('error')}"
-        assert "itineraries" in result
+        assert "final_itineraries" in result
         assert "option_meta" in result
         assert "flight_options_outbound" in result
         assert "flight_options_return" in result
@@ -189,7 +185,7 @@ class TestPlannerFromResearch:
     def test_itineraries_has_abc_options(self, flat_state, mock_research_result, patch_planner_llm):
         result = planner_from_research(flat_state, mock_research_result)
         if "error" not in result:
-            itins = result.get("itineraries", {})
+            itins = result.get("final_itineraries", {})
             for option in ("A", "B", "C"):
                 assert option in itins, f"Missing itinerary option {option}"
 
@@ -211,10 +207,10 @@ class TestPlannerFromResearch:
 
 class TestPlannerAgent:
 
-    def test_output_schema(self, flat_state, patch_research_agent, patch_planner_llm):
-        result = planner_agent(flat_state)
+    def test_output_schema(self, state_with_research, patch_planner_llm):
+        result = planner_agent(state_with_research)
         assert "error" not in result, f"Unexpected error: {result.get('error')}"
-        assert "itineraries" in result
+        assert "final_itineraries" in result
         assert "option_meta" in result
         assert "flight_options_outbound" in result
         assert "flight_options_return" in result
@@ -222,17 +218,27 @@ class TestPlannerAgent:
         assert "tool_log" in result
 
     def test_propagates_research_error(self, flat_state):
-        from unittest.mock import patch
-        with patch("agents.specialists.planner_agent.research_agent",
-                   return_value={"error": "API timeout"}):
-            result = planner_agent(flat_state)
+        result = planner_agent(flat_state)
         assert "error" in result
-        assert result["error"] == "API timeout"
+        assert "No research data" in result["error"]
 
     def test_accepts_hard_constraints_state(
-        self, hard_constraints_state, patch_research_agent, patch_planner_llm
+        self, hard_constraints_state, mock_research_result, patch_planner_llm
     ):
-        result = planner_agent(hard_constraints_state)
+        state = {
+            **hard_constraints_state,
+            "compact_attractions":     mock_research_result["compact_attractions"],
+            "compact_restaurants":     mock_research_result["compact_restaurants"],
+            "flight_options_outbound": mock_research_result["flight_options_outbound"],
+            "flight_options_return":   mock_research_result["flight_options_return"],
+            "hotel_options":           mock_research_result["hotel_options"],
+            "att_list_text":   mock_research_result["att_list_text"],
+            "rest_list_text":  mock_research_result["rest_list_text"],
+            "hotel_list_text": mock_research_result["hotel_list_text"],
+            "flight_out_text": mock_research_result["flight_out_text"],
+            "flight_ret_text": mock_research_result["flight_ret_text"],
+        }
+        result = planner_agent(state)
         assert "error" not in result, f"Unexpected error: {result.get('error')}"
 
 
@@ -255,7 +261,7 @@ class TestReviseItinerary:
             mock_planner_result,
         )
         assert "error" not in result, f"Unexpected error: {result.get('error')}"
-        assert "itineraries" in result
+        assert "final_itineraries" in result
         assert "option_meta" in result
 
 
@@ -547,24 +553,6 @@ class TestScoringHelpers:
     def test_normalized_name_none_returns_empty(self):
         assert _normalized_name(None) == ""
 
-    def test_classify_itinerary_candidate_restaurant(self):
-        assert _classify_itinerary_candidate(
-            {"name": "Ramen Restaurant", "type": "restaurant", "description": "dining"}
-        ) == "restaurant"
-
-    def test_classify_itinerary_candidate_attraction(self):
-        assert _classify_itinerary_candidate(
-            {"name": "Senso-ji Temple", "type": "attraction", "description": "historic"}
-        ) == "attraction"
-
-    def test_is_normal_activity_candidate_true(self):
-        assert _is_normal_activity_candidate({"name": "Senso-ji Temple", "type": "attraction"}) is True
-
-    def test_is_normal_restaurant_candidate_true(self):
-        assert _is_normal_restaurant_candidate(
-            {"name": "Ramen Bar", "type": "restaurant", "description": "noodle restaurant"}
-        ) is True
-
     def test_exclude_same_place_filters_blocked(self):
         items = [{"name": "Senso-ji Temple"}, {"name": "Shinjuku Gyoen"}]
         result = _exclude_same_place(items, {"senso-ji temple"})
@@ -573,9 +561,6 @@ class TestScoringHelpers:
     def test_exclude_same_place_empty_blocked_returns_all(self):
         items = [{"name": "A"}, {"name": "B"}]
         assert _exclude_same_place(items, set()) == items
-
-    def test_merge_used_place_names_combines_sets(self):
-        assert _merge_used_place_names({"a", "b"}, {"c"}, {"d"}) == {"a", "b", "c", "d"}
 
     def test_items_centroid_returns_average(self):
         centroid = _items_centroid([{"lat": 35.0, "lng": 139.0}, {"lat": 35.2, "lng": 139.2}])
@@ -884,30 +869,6 @@ class TestSchedulingHelpers:
 
 
 # ── 16. Additional branch coverage: classify / relevance ─────────────────────
-
-class TestClassifyBranches:
-    """Cover tour/night_only/photo_spot/area branches (lines 1687-1693)."""
-
-    def test_classify_returns_tour(self):
-        assert _classify_itinerary_candidate(
-            {"name": "Tokyo Walking Tour", "type": "attraction", "description": "guided tour"}
-        ) == "tour"
-
-    def test_classify_returns_night_only(self):
-        assert _classify_itinerary_candidate(
-            {"name": "Night Light Show", "type": "attraction", "description": "illumination night and light"}
-        ) == "night_only"
-
-    def test_classify_returns_photo_spot(self):
-        assert _classify_itinerary_candidate(
-            {"name": "Tokyo Sign Monument", "type": "attraction", "description": "monument photo spot"}
-        ) == "photo_spot"
-
-    def test_classify_returns_area(self):
-        assert _classify_itinerary_candidate(
-            {"name": "Memory Lane Yokocho", "type": "attraction", "description": "alley yokocho"}
-        ) == "area"
-
 
 class TestActivityRelevanceDeductions:
     """Cover deduction branches in _activity_relevance_score (lines 1770-1778)."""
@@ -2156,7 +2117,7 @@ class TestDepartureDayItems:
         assert "hotel" not in icons
 
     def test_early_departure_skips_activity(self):
-        # Departure at 09:00 → available_after_checkout < 165 min → activity branch skipped
+        # Departure at 09:00 → available_after_checkout < 120 min → activity branch skipped
         return_flight = {
             "airline": "SQ", "flight_number": "SQ638",
             "departure_time": "09:00", "arrival_time": "15:00",
@@ -2173,11 +2134,11 @@ class TestDepartureDayItems:
         assert "activity" not in icons
 
     def test_mid_day_departure_triggers_brunch_only(self):
-        # Departure at 14:30 → available_after_checkout ~160 min: 75 <= 160 < 165
+        # Departure at 12:30 → available_after_checkout ~70 min: 60 <= 70 < 120
         # → elif branch: activity skipped, brunch attempted
         return_flight = {
             "airline": "SQ", "flight_number": "SQ638",
-            "departure_time": "14:30", "arrival_time": "22:00",
+            "departure_time": "12:30", "arrival_time": "20:00",
             "departure_airport": "NRT", "arrival_airport": "SIN",
             "price_usd": 430,
         }
@@ -2188,7 +2149,7 @@ class TestDepartureDayItems:
         )
         icons = [item["icon"] for item in result]
         assert "flight" in icons
-        # No activity (not enough time for >= 165 min window)
+        # No activity (not enough time for >= 120 min window)
         assert "activity" not in icons
 
 

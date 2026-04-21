@@ -31,8 +31,9 @@ if sys.stderr.encoding != "utf-8":
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 project_root = Path(__file__).parent
-sys.path.insert(0, str(project_root))
-sys.path.insert(0, str(project_root / "backend"))
+repo_root = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(repo_root))
+sys.path.insert(0, str(repo_root / "backend"))
 
 load_dotenv()
 
@@ -254,11 +255,11 @@ def _compact_inventory_for_plan(result: dict, activity_names: set[str], restaura
 
 
 def _compact_plan_result(result: dict, *, include_explain: bool = False) -> dict:
-    itineraries = result.get("itineraries", {}) or {}
+    itineraries = (result.get("final_itineraries") or result.get("itineraries", {})) or {}
     activity_names, restaurant_names, hotel_names = _collect_plan_item_names(itineraries)
 
     compact = {
-        "itineraries": itineraries,
+        "final_itineraries": itineraries,
         "option_meta": result.get("option_meta", {}) or {},
         "validation_report": result.get("validation_report", {}) or {},
         "planner_decision_trace": result.get("planner_decision_trace", {}) or {},
@@ -460,7 +461,7 @@ def print_report(result: dict, mode: str, input_path: Path, test_state: dict) ->
             for line in inventory["att_list_text"].splitlines()[:5]:
                 print(f"    {_terminal_text(line)}")
 
-    itineraries = result.get("itineraries", {})
+    itineraries = result.get("final_itineraries") or result.get("itineraries", {})
     if itineraries:
         _print_section("ITINERARIES")
         for line in _summarise_itineraries(itineraries):
