@@ -294,7 +294,6 @@ def test_plan_input_tools_falls_back_on_internal_exception(monkeypatch):
         "reason": "fallback_full_scan",
     }
 
-
 def test_input_guard_agent_alias_calls_node(monkeypatch, input_state_builder):
     sentinel = {"ok": True, "source": "node"}
     monkeypatch.setattr(ig, "input_guard_node", lambda _state: sentinel)
