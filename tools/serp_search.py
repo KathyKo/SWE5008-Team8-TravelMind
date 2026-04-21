@@ -42,15 +42,18 @@ def _serpapi_request(engine: str, params: dict) -> dict | None:
     if not SERPAPI_KEY:
         print("[SerpAPI] SERPAPI_API_KEY not set.")
         return None
+    print(f"[SerpAPI] REQUEST engine={engine} params={params}")
     try:
         from serpapi import GoogleSearch
         result = GoogleSearch({**params, "api_key": SERPAPI_KEY, "engine": engine}).get_dict()
         if "error" in result:
-            print(f"[SerpAPI] {engine} error: {result['error']}")
+            print(f"[SerpAPI] ERROR engine={engine} error={result['error']}")
             return None
+        top_keys = list(result.keys())
+        print(f"[SerpAPI] RESPONSE engine={engine} top_keys={top_keys}")
         return result
     except Exception as e:
-        print(f"[SerpAPI] {engine} exception: {e}")
+        print(f"[SerpAPI] EXCEPTION engine={engine} exception={e}")
         return None
 
 

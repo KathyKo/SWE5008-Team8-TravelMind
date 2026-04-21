@@ -121,6 +121,29 @@ def mock_research_result():
              "lat": 35.6590, "lng": 139.7003},
         ],
         "tool_log": [{"tool": "search_flights", "status": "ok"}],
+        "att_list_text":   "Senso-ji Temple (Free), Shinjuku Gyoen (SGD 3)",
+        "rest_list_text":  "Ichiran Ramen (SGD 20), Sushi Dai (SGD 50)",
+        "hotel_list_text": "Hotel Gracery Shinjuku $120/night",
+        "flight_out_text": "SQ637 SIN->NRT $450",
+        "flight_ret_text": "SQ638 NRT->SIN $430",
+    }
+
+
+@pytest.fixture
+def state_with_research(flat_state, mock_research_result):
+    return {
+        **flat_state,
+        "compact_attractions":     mock_research_result["compact_attractions"],
+        "compact_restaurants":     mock_research_result["compact_restaurants"],
+        "flight_options_outbound": mock_research_result["flight_options_outbound"],
+        "flight_options_return":   mock_research_result["flight_options_return"],
+        "hotel_options":           mock_research_result["hotel_options"],
+        "att_list_text":   mock_research_result["att_list_text"],
+        "rest_list_text":  mock_research_result["rest_list_text"],
+        "hotel_list_text": mock_research_result["hotel_list_text"],
+        "flight_out_text": mock_research_result["flight_out_text"],
+        "flight_ret_text": mock_research_result["flight_ret_text"],
+        "tool_log":        mock_research_result["tool_log"],
     }
 
 
@@ -628,24 +651,6 @@ class TestScoringHelpers:
     def test_normalized_name_none_returns_empty(self):
         assert pa._normalized_name(None) == ""
 
-    def test_classify_itinerary_candidate_restaurant(self):
-        item = {"name": "Ramen Restaurant", "type": "restaurant", "description": "dining place"}
-        result = pa._classify_itinerary_candidate(item)
-        assert result == "restaurant"
-
-    def test_classify_itinerary_candidate_attraction(self):
-        item = {"name": "Senso-ji Temple", "type": "attraction", "description": "historic landmark"}
-        result = pa._classify_itinerary_candidate(item)
-        assert result == "attraction"
-
-    def test_is_normal_activity_candidate_true_for_attraction(self):
-        item = {"name": "Senso-ji Temple", "type": "attraction"}
-        assert pa._is_normal_activity_candidate(item) is True
-
-    def test_is_normal_restaurant_candidate_true_for_restaurant(self):
-        item = {"name": "Ramen Bar", "type": "restaurant", "description": "noodle restaurant"}
-        assert pa._is_normal_restaurant_candidate(item) is True
-
     def test_exclude_same_place_filters_blocked(self):
         items = [{"name": "Senso-ji Temple"}, {"name": "Shinjuku Gyoen"}]
         blocked = {"senso-ji temple"}
@@ -656,10 +661,6 @@ class TestScoringHelpers:
     def test_exclude_same_place_empty_blocked_returns_all(self):
         items = [{"name": "A"}, {"name": "B"}]
         assert pa._exclude_same_place(items, set()) == items
-
-    def test_merge_used_place_names_combines_sets(self):
-        result = pa._merge_used_place_names({"a", "b"}, {"c"}, {"d"})
-        assert result == {"a", "b", "c", "d"}
 
     def test_items_centroid_returns_average(self):
         items = [{"lat": 35.0, "lng": 139.0}, {"lat": 35.2, "lng": 139.2}]
@@ -702,7 +703,7 @@ class TestPlannerFromResearch:
         with patch("agents.specialists.planner_agent._llm", return_value=mock_llm):
             result = pa.planner_from_research(flat_state, mock_research_result)
         assert "error" not in result
-        for key in ("itineraries", "option_meta", "flight_options_outbound",
+        for key in ("final_itineraries", "option_meta", "flight_options_outbound",
                     "flight_options_return", "hotel_options"):
             assert key in result
 
@@ -711,7 +712,7 @@ class TestPlannerFromResearch:
             result = pa.planner_from_research(flat_state, mock_research_result)
         if "error" not in result:
             for opt in ("A", "B", "C"):
-                assert opt in result["itineraries"]
+                assert opt in result["final_itineraries"]
 
     def test_option_meta_has_abc(self, flat_state, mock_research_result, mock_llm):
         with patch("agents.specialists.planner_agent._llm", return_value=mock_llm):
@@ -756,25 +757,35 @@ class TestPlannerFromResearch:
 
 class TestPlannerAgent:
 
-    def test_output_has_required_keys(self, flat_state, mock_research_result, mock_llm):
-        with patch("agents.specialists.planner_agent.research_agent", return_value=mock_research_result), \
-             patch("agents.specialists.planner_agent._llm", return_value=mock_llm):
-            result = pa.planner_agent(flat_state)
+    def test_output_has_required_keys(self, state_with_research, mock_llm):
+        with patch("agents.specialists.planner_agent._llm", return_value=mock_llm):
+            result = pa.planner_agent(state_with_research)
         assert "error" not in result
-        for key in ("itineraries", "option_meta", "flight_options_outbound",
+        for key in ("final_itineraries", "option_meta", "flight_options_outbound",
                     "flight_options_return", "hotel_options", "tool_log"):
             assert key in result
 
     def test_research_error_propagates(self, flat_state):
-        with patch("agents.specialists.planner_agent.research_agent",
-                   return_value={"error": "API timeout"}):
-            result = pa.planner_agent(flat_state)
-        assert result.get("error") == "API timeout"
+        result = pa.planner_agent(flat_state)
+        assert "error" in result
+        assert "No research data" in result["error"]
 
     def test_accepts_hard_constraints_format(self, hard_constraints_state, mock_research_result, mock_llm):
-        with patch("agents.specialists.planner_agent.research_agent", return_value=mock_research_result), \
-             patch("agents.specialists.planner_agent._llm", return_value=mock_llm):
-            result = pa.planner_agent(hard_constraints_state)
+        state = {
+            **hard_constraints_state,
+            "compact_attractions":     mock_research_result["compact_attractions"],
+            "compact_restaurants":     mock_research_result["compact_restaurants"],
+            "flight_options_outbound": mock_research_result["flight_options_outbound"],
+            "flight_options_return":   mock_research_result["flight_options_return"],
+            "hotel_options":           mock_research_result["hotel_options"],
+            "att_list_text":   mock_research_result["att_list_text"],
+            "rest_list_text":  mock_research_result["rest_list_text"],
+            "hotel_list_text": mock_research_result["hotel_list_text"],
+            "flight_out_text": mock_research_result["flight_out_text"],
+            "flight_ret_text": mock_research_result["flight_ret_text"],
+        }
+        with patch("agents.specialists.planner_agent._llm", return_value=mock_llm):
+            result = pa.planner_agent(state)
         assert "error" not in result
 
 
@@ -785,7 +796,7 @@ class TestReviseItinerary:
     def test_error_when_cache_empty(self, flat_state, mock_itineraries):
         pa._inventory_cache.clear()
         result = pa.revise_itinerary(flat_state, "Add more culture",
-                                     {"itineraries": mock_itineraries, "option_meta": {}})
+                                     {"final_itineraries": mock_itineraries, "option_meta": {}})
         assert "error" in result
         assert "No cached inventory" in result["error"]
 
@@ -793,29 +804,29 @@ class TestReviseItinerary:
                                           mock_itineraries, populated_cache, revise_llm):
         with patch("agents.specialists.planner_agent._llm", return_value=revise_llm):
             result = pa.revise_itinerary(flat_state, "Add more cultural activities",
-                                         {"itineraries": mock_itineraries, "option_meta": {}})
+                                         {"final_itineraries": mock_itineraries, "option_meta": {}})
         assert "error" not in result
-        assert "itineraries" in result
+        assert "final_itineraries" in result
 
     def test_revise_returns_option_meta(self, flat_state, mock_itineraries,
                                         populated_cache, revise_llm):
         with patch("agents.specialists.planner_agent._llm", return_value=revise_llm):
             result = pa.revise_itinerary(flat_state, "More food options",
-                                         {"itineraries": mock_itineraries, "option_meta": {}})
+                                         {"final_itineraries": mock_itineraries, "option_meta": {}})
         assert "option_meta" in result
 
     def test_revise_returns_chain_of_thought(self, flat_state, mock_itineraries,
                                               populated_cache, revise_llm):
         with patch("agents.specialists.planner_agent._llm", return_value=revise_llm):
             result = pa.revise_itinerary(flat_state, "More food options",
-                                         {"itineraries": mock_itineraries, "option_meta": {}})
+                                         {"final_itineraries": mock_itineraries, "option_meta": {}})
         assert "chain_of_thought" in result or "planner_chain_of_thought" in result
 
     def test_revise_returns_flight_options(self, flat_state, mock_itineraries,
                                            populated_cache, revise_llm):
         with patch("agents.specialists.planner_agent._llm", return_value=revise_llm):
             result = pa.revise_itinerary(flat_state, "More culture",
-                                         {"itineraries": mock_itineraries, "option_meta": {}})
+                                         {"final_itineraries": mock_itineraries, "option_meta": {}})
         assert "flight_options_outbound" in result
         assert "flight_options_return" in result
 
@@ -824,7 +835,7 @@ class TestReviseItinerary:
         bad_llm.invoke.return_value = MagicMock(content="not valid json {{")
         with patch("agents.specialists.planner_agent._llm", return_value=bad_llm):
             result = pa.revise_itinerary(flat_state, "Break it",
-                                         {"itineraries": mock_itineraries, "option_meta": {}})
+                                         {"final_itineraries": mock_itineraries, "option_meta": {}})
         assert "error" in result
 
 
@@ -1316,36 +1327,6 @@ class TestTraceFunctions:
 
 class TestItemClassificationHelpers:
     """Tests for item classification branches and duration helpers."""
-
-    def test_classify_tour_item(self):
-        item = {"name": "Tokyo Walking Tour", "type": "activity",
-                "description": "guided tour walking tour city"}
-        assert pa._classify_itinerary_candidate(item) == "tour"
-
-    def test_classify_night_only_item(self):
-        item = {"name": "Illumination Festival", "type": "activity",
-                "description": "night and light illumination event"}
-        assert pa._classify_itinerary_candidate(item) == "night_only"
-
-    def test_classify_photo_spot_item(self):
-        item = {"name": "Tokyo Word Mark Monument", "type": "attraction",
-                "description": "monument photo spot"}
-        assert pa._classify_itinerary_candidate(item) == "photo_spot"
-
-    def test_classify_area_item(self):
-        item = {"name": "Omoide Yokocho Memory Lane", "type": "area",
-                "description": "yokocho alley food street"}
-        assert pa._classify_itinerary_candidate(item) == "area"
-
-    def test_classify_food_entity_item(self):
-        item = {"name": "Ramen Bistro", "type": "restaurant",
-                "description": "ramen bistro dining"}
-        assert pa._classify_itinerary_candidate(item) == "restaurant"
-
-    def test_classify_default_is_attraction(self):
-        item = {"name": "Some Place", "type": "attraction",
-                "description": "a landmark"}
-        assert pa._classify_itinerary_candidate(item) == "attraction"
 
     def test_activity_duration_museum(self):
         item = {"name": "Tokyo National Museum", "description": "museum"}

@@ -63,9 +63,7 @@ def call_planner(state: dict) -> dict:
             return {"error": f"Planner agent HTTP error: {e}"}
     else:
         from agents.specialists.planner_agent import planner_agent
-        from agents.agent_tools import get_tools_for_agent
-        tools = get_tools_for_agent("planner_agent")
-        return planner_agent(state, tools=tools)
+        return planner_agent(state)
 
 
 def call_planner_revise(state: dict, critique: str, current_result: dict) -> dict:

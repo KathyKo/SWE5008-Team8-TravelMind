@@ -1,4 +1,5 @@
 from typing import TypedDict, Optional, Annotated, List
+
 import operator
 
 
@@ -46,6 +47,7 @@ class State(TypedDict):
     maps_attractions: Optional[str]
 
     # ── Planner ──────────────────────────────────────────
+    plan_id: Optional[str]
     itineraries: Optional[list]
     final_itineraries: Optional[list]
     validated_itineraries: Optional[list]

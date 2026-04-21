@@ -450,10 +450,10 @@ class TestCollectPrefTags:
         assert "food" in tags
 
     def test_skips_non_dict_scope(self):
-        # state.get("state") returns a non-dict — the inner loop must skip it
+        # state with a non-dict "state" key — should not crash, outer scope still works
         state = {"preferences": "culture", "state": "not-a-dict"}
         tags = _collect_pref_tags(state)
-        assert "culture" in tags  # outer scope still works
+        assert "culture" in tags
 
     def test_deduplicates_tags(self):
         tags = _collect_pref_tags({"preferences": "food, Food, FOOD"})
