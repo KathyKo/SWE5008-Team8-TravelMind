@@ -381,3 +381,5 @@ def render():
 
     with col_side:
         _render_right_panel()
+
+

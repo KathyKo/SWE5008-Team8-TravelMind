@@ -15,11 +15,10 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-# DEV: security stack (heavy llm-guard/torch) disabled for faster Docker — see requirements.txt
-# from agents.routers.security import router as security_router
+from agents.routers.security import router as security_router
 from agents.graph import build_travel_graph, default_graph_initial_state
-# from agents.specialists.input_guard_agent import input_guard_agent
-# from agents.specialists.output_guard_agent import output_guard_agent
+from agents.specialists.input_guard_agent import input_guard_agent
+from agents.specialists.output_guard_agent import output_guard_agent
 from agents.specialists.intent_profile import intent_profile
 from agents.specialists.planner_agent import planner_agent
 from agents.specialists.research_agent import research_agent
@@ -170,26 +169,26 @@ def health_check():
     return {"status": "ok", "service": "travelmind-agents"}
 
 
-# @app.post("/api/invoke/input_guard")
-# def invoke_input_guard(request: Request, payload: AgentInvokeRequest):
-#     _enforce_agent_port(request, 8100, "input_guard")
-#     try:
-#         result = input_guard_agent(payload.state)
-#         return result
-#     except Exception as exc:
-#         log.exception("input_guard failed")
-#         raise HTTPException(status_code=500, detail=f"input_guard failed: {exc}") from exc
-#
-#
-# @app.post("/api/invoke/output_guard")
-# def invoke_output_guard(request: Request, payload: AgentInvokeRequest):
-#     _enforce_agent_port(request, 8106, "output_guard")
-#     try:
-#         result = output_guard_agent(payload.state)
-#         return result
-#     except Exception as exc:
-#         log.exception("output_guard failed")
-#         raise HTTPException(status_code=500, detail=f"output_guard failed: {exc}") from exc
+@app.post("/api/invoke/input_guard")
+def invoke_input_guard(request: Request, payload: AgentInvokeRequest):
+    _enforce_agent_port(request, 8100, "input_guard")
+    try:
+        result = input_guard_agent(payload.state)
+        return result
+    except Exception as exc:
+        log.exception("input_guard failed")
+        raise HTTPException(status_code=500, detail=f"input_guard failed: {exc}") from exc
+
+
+@app.post("/api/invoke/output_guard")
+def invoke_output_guard(request: Request, payload: AgentInvokeRequest):
+    _enforce_agent_port(request, 8106, "output_guard")
+    try:
+        result = output_guard_agent(payload.state)
+        return result
+    except Exception as exc:
+        log.exception("output_guard failed")
+        raise HTTPException(status_code=500, detail=f"output_guard failed: {exc}") from exc
 
 
 @app.post("/api/invoke/intent_profile")
@@ -307,4 +306,4 @@ def invoke_fairness_check(payload: SelectedOptionCheckRequest):
         log.exception("fairness-check failed")
         raise HTTPException(status_code=500, detail=f"fairness-check failed: {exc}") from exc
 
-# app.include_router(security_router)
+app.include_router(security_router)

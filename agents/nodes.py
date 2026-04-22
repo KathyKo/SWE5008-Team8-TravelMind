@@ -169,10 +169,9 @@ def orchestrator_node(state: State) -> Dict:
         return {"next_node": "END"}
 
     # ── 1. Input Guard (security gate) ──────────────────────────
-    # DEV: input_guard disabled in graph — keep block commented for quick restore
-    # if state.get("threat_blocked") is True:
-    #     logger.info("[Orchestrator] input blocked by input_guard, workflow terminated.")
-    #     return {"next_node": "END"}
+    if state.get("threat_blocked") is True:
+        logger.info("[Orchestrator] input blocked by input_guard, workflow terminated.")
+        return {"next_node": "END"}
 
     # ── 2. User feedback → Replanner (priority higher than normal workflow) ───
     #    User submitted a modification feedback at H.I.T. Checkpoint
@@ -238,10 +237,9 @@ def orchestrator_node(state: State) -> Dict:
         return {"next_node": "explain"}
 
     # ── 8. Output Guard (output security check) ───────────────────
-    # DEV: output_guard disabled in graph — finish after explain
-    # if not state.get("output_guard_decision"):
-    #     logger.info("[Orchestrator] → output_guard (output security check)")
-    #     return {"next_node": "output_guard"}
+    if not state.get("output_guard_decision"):
+        logger.info("[Orchestrator] → output_guard (output security check)")
+        return {"next_node": "output_guard"}
 
     # ── 9. All workflow completed ───────────────────────────────────
     logger.info("[Orchestrator] workflow completed.")
