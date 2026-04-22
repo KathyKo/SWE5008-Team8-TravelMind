@@ -233,7 +233,7 @@ def orchestrator_node(state: State) -> Dict:
     # 6c. debate passed (is_valid=True) or reached the maximum number of rounds → force push
 
     # ── 7. Explainability (explainability) ─────────────────────
-    if  state.get("explanation") is None :
+    if not state.get("explanation") and not state.get("explain_data"):
         logger.info("[Orchestrator] → explain (generate decision explanation)")
         return {"next_node": "explain"}
 
