@@ -5,7 +5,6 @@ pages/my_trip.py — My Trip page
 import html
 
 import streamlit as st
-from data.store import ITINERARIES, EXPLAIN_DATA
 
 ICON_MAP = {
     "flight": "✈️",
@@ -24,17 +23,17 @@ def _render_right_panel():
 
         # ── User Profile ──────────────────────────────────
         st.markdown("**User Profile**")
+        user = st.session_state.get("user") or {}
+        username = user.get("name") or user.get("username") or ""
+        if username:
+            st.markdown(
+                f"<span style='font-size:14px;font-weight:700;color:inherit'>{html.escape(username)}</span>",
+                unsafe_allow_html=True,
+            )
+
         if plan_state:
             ipo = plan_state.get("intent_profile_output") or {}
-            hard = ipo.get("hard_constraints") or {}
             soft = ipo.get("soft_preferences") or {}
-
-            session_id = plan_state.get("session_id") or ""
-            if session_id:
-                st.markdown(
-                    f"<span style='color:#7a90b0;font-size:11px'>Session: {session_id}</span>",
-                    unsafe_allow_html=True,
-                )
 
             tags = list(soft.get("interest_tags") or [])
             vibe = soft.get("vibe") or ""
@@ -50,34 +49,17 @@ def _render_right_panel():
                 )
                 st.markdown(tags_html, unsafe_allow_html=True)
             else:
-                user = st.session_state.get("user") or {}
                 for pref in user.get("prefs", []):
                     st.markdown(
                         f"<span class='tm-badge tm-badge-blue'>{pref}</span>",
                         unsafe_allow_html=True,
                     )
-
-            budget_raw = hard.get("budget") or {}
-            if isinstance(budget_raw, dict) and budget_raw.get("amount"):
-                amt = int(budget_raw["amount"])
-                cur = budget_raw.get("currency", "SGD")
-                spent = 2847
-                ratio = min(spent / amt, 1.0) if amt else 0
-                st.progress(ratio, text=f"{cur} {spent:,} / {amt:,} — {cur} {amt - spent:,} remaining")
-            elif plan_state.get("budget"):
-                st.markdown(
-                    f"<span style='color:#7a90b0;font-size:12px'>Budget: {plan_state['budget']}</span>",
-                    unsafe_allow_html=True,
-                )
         else:
-            user = st.session_state.get("user") or {}
             for pref in user.get("prefs", []):
                 st.markdown(
                     f"<span class='tm-badge tm-badge-blue'>{pref}</span>",
                     unsafe_allow_html=True,
                 )
-            st.progress(0.949, text="SGD 2,847 / 3,000 — SGD 153 remaining")
-            st.caption("Generate a trip in Planner to see your full profile.")
 
         st.markdown("---")
 
@@ -144,28 +126,36 @@ def _render_right_panel():
         # ── Why behind the wander ─────────────────────────
         st.markdown("**Why behind the wander**")
         if plan_state:
-            explain_data = plan_state.get("explain_data") or plan_state.get("explanation")
-            if explain_data:
-                selected_opt = st.session_state.get("selected_option", "A")
-                if isinstance(explain_data, dict):
-                    opts = explain_data.get("options_explained") or {}
-                    opt_ex = opts.get(selected_opt) or {}
-                    text = opt_ex.get("summary") or explain_data.get("summary") or ""
-                    rationale = opt_ex.get("rationale") or []
-                else:
-                    text = str(explain_data)
-                    rationale = []
+            summary_block = plan_state.get("summary") or {}
+            overall = ""
+            day_summaries = {}
+            if isinstance(summary_block, dict):
+                overall = summary_block.get("overall_summary") or ""
+                day_summaries = summary_block.get("day_summaries") or {}
 
-                if text:
-                    st.markdown(
-                        f"<span style='color:#e8edf5;font-size:12px'>{html.escape(text[:300])}</span>",
-                        unsafe_allow_html=True,
-                    )
-                for r in rationale[:4]:
-                    st.markdown(
-                        f"<span style='color:#7a90b0;font-size:11px'>• {html.escape(str(r))}</span>",
-                        unsafe_allow_html=True,
-                    )
+            if not overall:
+                # fallback: older pipeline format
+                ex = plan_state.get("explain_data") or plan_state.get("explanation") or {}
+                if isinstance(ex, dict):
+                    overall = ex.get("summary") or ex.get("overall_summary") or ""
+
+            if overall:
+                day_html = ""
+                if isinstance(day_summaries, dict):
+                    for day_key, day_text in day_summaries.items():
+                        day_html += (
+                            f"<div style='margin-top:6px'>"
+                            f"<span style='font-weight:600;font-size:11px'>{html.escape(str(day_key))}:</span> "
+                            f"<span style='font-size:11px;color:#6b7280'>{html.escape(str(day_text))}</span>"
+                            f"</div>"
+                        )
+                st.markdown(
+                    f"<div style='max-height:260px;overflow-y:auto;padding-right:4px'>"
+                    f"<div style='font-size:12px;margin-bottom:6px'>{html.escape(str(overall))}</div>"
+                    f"{day_html}"
+                    f"</div>",
+                    unsafe_allow_html=True,
+                )
             else:
                 st.caption("No explanation available yet.")
         else:
@@ -189,9 +179,9 @@ def render():
         title = f"My Trip — {destination}" if destination else "My Trip"
         subtitle = f"{dates} · {label}" if dates else label
     else:
-        days = ITINERARIES.get("A", [])
-        title = "My Trip — Kyoto"
-        subtitle = "10 Mar – 14 Mar 2026 · Option A: Cultural Focus"
+        days = []
+        title = "My Trip"
+        subtitle = ""
 
     st.markdown(f"### {title}")
     st.markdown(
@@ -215,7 +205,8 @@ def render():
             )
         with act2:
             if st.button("🔄 Need to Re-plan?", use_container_width=True):
-                st.info("Switch to the 🔄 Re-plan tab above.")
+                st.session_state._pending_nav = "replan"
+                st.rerun()
 
         st.markdown("---")
 

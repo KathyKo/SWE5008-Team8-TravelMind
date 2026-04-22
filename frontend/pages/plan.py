@@ -534,6 +534,7 @@ def render():
                 st.rerun()
 
             st.session_state.agent_status = _agent_status_from_graph_state(final_state)
+            st.session_state.plan_state = final_state
 
             itins = _itineraries_from_state(final_state)
             st.session_state.plan_itineraries = itins
