@@ -5,7 +5,6 @@ pages/plan.py — Plan Your Trip page
 import html
 import json
 import os
-import re
 import uuid
 from datetime import date, timedelta
 
@@ -41,36 +40,6 @@ DURATION_OPTIONS = [
     "6 days", "7 days", "10 days", "14 days",
 ]
 
-# Selectbox: first value means "not chosen" (shown via format_func).
-DURATION_SELECT_OPTIONS = [""] + DURATION_OPTIONS
-
-
-def _duration_label_from_days(n: int) -> str:
-    if n <= 0:
-        return ""
-    return "1 day" if n == 1 else f"{n} days"
-
-
-def _duration_from_message(msg: str) -> str:
-    """
-    Infer a duration string compatible with graph payload / date math.
-    Frontend-only heuristic when the Duration control is left empty.
-    """
-    if not msg or not msg.strip():
-        return ""
-    t = msg.strip()
-
-    if re.search(r"(1\s*week|a week)", t):
-        return "7 days"
-    if re.search(r"(两\s*周|两周|两个星期|two weeks)", t):
-        return "14 days"
-
-    m = re.search(r"(\d+)\s*(?:days?|天|晚|夜|day|days)", t, re.IGNORECASE)
-    if m:
-        return _duration_label_from_days(int(m.group(1)))
-
-    return ""
-
 PIPELINE_STEPS = [
     {"key": "intent", "icon": "🧠", "name": "Intent & Profile Agent"},
     {"key": "research", "icon": "🔍", "name": "Research Agent"},
@@ -90,46 +59,43 @@ def _render_agent_panel(placeholder, status: dict):
         "pending": {
             "bg": "rgba(255,255,255,0.04)",
             "border": "rgba(255,255,255,0.08)",
-            "color": "#111111",
+            "color": "#7a90b0",
             "label": "pending",
         },
         "running": {
             "bg": "rgba(59,158,255,0.12)",
             "border": "rgba(59,158,255,0.35)",
-            "color": "#111111",
+            "color": "#3b9eff",
             "label": "running",
         },
         "success": {
             "bg": "rgba(16,185,129,0.12)",
             "border": "rgba(16,185,129,0.35)",
-            "color": "#111111",
+            "color": "#10b981",
             "label": "success",
         },
         "error": {
             "bg": "rgba(239,68,68,0.12)",
             "border": "rgba(239,68,68,0.35)",
-            "color": "#111111",
+            "color": "#ef4444",
             "label": "failed",
         },
         "skipped": {
             "bg": "rgba(255,255,255,0.02)",
             "border": "rgba(255,255,255,0.06)",
-            "color": "#111111",
+            "color": "#4a5a72",
             "label": "skipped",
         },
     }
 
     with placeholder.container():
-        st.markdown(
-            "<p style='margin:0 0 8px 0;color:#111111;font-weight:600'>Agent Activity</p>",
-            unsafe_allow_html=True,
-        )
+        st.markdown("**Agent Activity**")
         for step in PIPELINE_STEPS:
             s = status.get(step["key"], {"state": "pending", "detail": ""})
             style = style_map.get(s["state"], style_map["pending"])
             detail = html.escape(s.get("detail") or "")
             detail_html = (
-                f"<div style='color:#111111;font-size:12px;margin-top:4px'>{detail}</div>"
+                f"<div style='color:#7a90b0;font-size:12px;margin-top:4px'>{detail}</div>"
                 if detail
                 else ""
             )
@@ -142,7 +108,7 @@ def _render_agent_panel(placeholder, status: dict):
     padding:10px 12px;
     margin-bottom:8px;">
   <div style="display:flex;justify-content:space-between;align-items:center;">
-    <span style="color:#111111;font-size:13px">
+    <span style="color:#e8edf5;font-size:13px">
       <span style="margin-right:6px">{step['icon']}</span>
       <strong>{step['name']}</strong>
     </span>
@@ -456,21 +422,6 @@ def render_itinerary(option: str, itineraries: dict, option_meta: dict):
 
 
 def render():
-    st.markdown(
-        """
-<style>
-  /* Trip description: keep typed text clearly light on dark Streamlit theme */
-  section.main div[data-testid="stTextArea"] textarea {
-    color: #f8fafc !important;
-    caret-color: #f8fafc !important;
-  }
-  section.main div[data-testid="stTextArea"] textarea::placeholder {
-    color: rgba(148, 163, 184, 0.95) !important;
-  }
-</style>
-""",
-        unsafe_allow_html=True,
-    )
     st.markdown("### Plan Your Trip")
     st.markdown(
         "<span style='color:#7a90b0;font-size:14px'>"
@@ -526,9 +477,8 @@ def render():
             with row1_c3:
                 duration = st.selectbox(
                     "Duration",
-                    DURATION_SELECT_OPTIONS,
-                    index=0,
-                    format_func=lambda x: "(Select duration)" if x == "" else x,
+                    DURATION_OPTIONS,
+                    index=4,
                     key="plan_duration",
                 )
 
@@ -555,18 +505,11 @@ def render():
                 )
 
             _, btn_col = st.columns([4, 1.5])
-            msg_inferred_duration = _duration_from_message(user_msg)
-            duration_ready = bool(duration) or bool(msg_inferred_duration)
             with btn_col:
                 generate = st.button(
                     "Generate Options",
                     type="primary",
                     use_container_width=True,
-                    disabled=not duration_ready,
-                )
-            if not duration_ready:
-                st.caption(
-                    "please select **Duration**, or write the number of days in the description (e.g. *5 days*, *5 days*, *one week*)."
                 )
 
         if generate:
@@ -574,12 +517,7 @@ def render():
                 st.warning("Please describe your trip first.")
                 return
 
-            effective_duration = duration if duration else _duration_from_message(user_msg)
-            if not effective_duration:
-                st.warning("please select Duration, or write the number of days in the description.")
-                return
-
-            duration_days = effective_duration.split()[0]
+            duration_days = duration.split()[0]
             end_date = start_date + timedelta(days=int(duration_days))
             dates_str = f"{start_date.isoformat()} to {end_date.isoformat()}"
             budget_str = f"{budget_currency} {budget_amount}"
@@ -590,7 +528,7 @@ def render():
                 "messages": [{"role": "user", "content": user_msg.strip()}],
                 "dates": dates_str,
                 "budget": budget_str,
-                "duration": effective_duration,
+                "duration": duration,
                 "outbound_time_pref": out_pref,
                 "return_time_pref": ret_pref,
             }
@@ -640,7 +578,7 @@ def render():
                 "destination": final_state.get("destination") or "",
                 "dates": final_state.get("dates") or dates_str,
                 "budget": final_state.get("budget") or budget_str,
-                "duration": final_state.get("duration") or effective_duration,
+                "duration": final_state.get("duration") or duration,
             }
             st.session_state.plan_generated = bool(itins)
             if not itins:
@@ -734,8 +672,4 @@ def render():
                             st.toast("Itinerary saved to My Trip with fairness checks!")
                 with col_view:
                     if st.button("View in My Trip", use_container_width=True):
-                        try:
-                            st.switch_page("pages/my_trip.py")
-                        except Exception:
-                            # Fallback for older Streamlit versions without switch_page
-                            st.info("Please open the 'My Trip' page from the navigation menu.")
+                        st.info("Switch to the My Trip tab above.")
