@@ -86,6 +86,7 @@ def _state_for_client(state: dict[str, Any]) -> dict[str, Any]:
         "debate_output",
         "explanation",
         "explain_data",
+        "summary",
         "output_guard_decision",
         "output_flagged",
         "output_flag_reason",

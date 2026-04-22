@@ -489,6 +489,9 @@ def main():
     from pages.replan import render as render_replan
     from pages.security import render as render_security
 
+    if st.session_state.get("_pending_nav"):
+        st.session_state.main_section_key = st.session_state.pop("_pending_nav")
+
     nav = st.radio(
         "Main navigation",
         ["plan", "my_trip", "replan", "security"],
