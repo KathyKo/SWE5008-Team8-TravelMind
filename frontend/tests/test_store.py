@@ -12,7 +12,6 @@ def test_demo_users_are_seeded():
     assert USERS["alice@example.com"]["password"] == "123456"
     assert "culture" in USERS["alice@example.com"]["prefs"]
 
-
 def test_itinerary_option_metadata_has_three_variants():
     assert set(OPTION_META) == {"A", "B", "C"}
     assert OPTION_META["A"]["label"].startswith("Option A")
