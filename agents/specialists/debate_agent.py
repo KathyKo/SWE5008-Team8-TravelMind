@@ -1,4 +1,4 @@
-"""Debate specialist: DB-driven rounds with planner revision and judge fallback."""
+"""Debate specialist: state-driven rounds with planner revision and judge fallback."""
 
 from __future__ import annotations
 
@@ -11,9 +11,8 @@ from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 
-from agents.db.crud import load_plan, update_plan_result
+from agents.db.crud import update_plan_result
 from agents.db.database import SessionLocal
-from agents.db.models import Plan
 from agents.llm_config import DEBATE_MODEL, DMX_API_KEY, DMX_BASE_URL, JUDGE_MODEL
 from agents.specialists.planner_agent import revise_itinerary
 from agents.logging_config import get_agent_logger
@@ -145,27 +144,37 @@ def _winner_by_scores(scores: dict) -> Optional[str]:
     return best_key
 
 
-def _resolve_active_plan_id() -> Optional[str]:
+def _plan_payload_from_state(state: dict) -> dict:
     """
-    Resolve debate target directly from DB to avoid state-input coupling.
-    Priority:
-    1) latest plan with no debate_verdict yet
-    2) latest plan overall
+    Build debate input directly from planner output in state.
+    Required (minimum): itineraries.
+    Strongly recommended: option_meta + transport/hotel/tool trace fields.
     """
-    db = SessionLocal()
-    try:
-        row = (
-            db.query(Plan.plan_id)
-            .filter(Plan.debate_verdict.is_(None))
-            .order_by(Plan.created_at.desc())
-            .first()
-        )
-        if row:
-            return row[0]
-        latest = db.query(Plan.plan_id).order_by(Plan.created_at.desc()).first()
-        return latest[0] if latest else None
-    finally:
-        db.close()
+    payload = {
+        "plan_id": state.get("plan_id") or state.get("session_id"),
+        "origin": state.get("origin"),
+        "destination": state.get("destination"),
+        "dates": state.get("dates"),
+        "duration": state.get("duration"),
+        "budget": state.get("budget"),
+        "preferences": state.get("preferences"),
+        "itineraries": state.get("itineraries")
+        or state.get("final_itineraries")
+        or state.get("validated_itineraries")
+        or {},
+        "option_meta": state.get("option_meta") or {},
+        "flight_options_outbound": state.get("flight_options_outbound") or [],
+        "flight_options_return": state.get("flight_options_return") or [],
+        "hotel_options": state.get("hotel_options") or [],
+        "tool_log": list(state.get("tool_log") or []),
+        "planner_decision_trace": state.get("planner_decision_trace") or {},
+        "chain_of_thought": state.get("chain_of_thought")
+        or state.get("planner_chain_of_thought")
+        or "",
+        "debate_history": deepcopy(state.get("debate_history") or []),
+        "debate_verdict": state.get("debate_verdict"),
+    }
+    return payload
 
 
 def _build_round_critique_payload(plan_payload: dict, history: list[dict], round_num: int) -> dict:
@@ -273,11 +282,13 @@ def _merge_revised_plan(plan_payload: dict, revised: dict) -> dict:
 
 def _persist_plan_debate(
     *,
-    plan_id: str,
+    plan_id: Optional[str],
     plan_payload: dict,
     debate_history: list[dict],
     debate_verdict: Optional[dict],
 ) -> None:
+    if not plan_id:
+        return
     db = SessionLocal()
     try:
         revised = {
@@ -300,33 +311,20 @@ def _persist_plan_debate(
 def debate_agent(_state: dict) -> dict:
     """
     Debate Agent entrypoint.
-    Input source is DB only (to minimize state-coupling and cross-turn mismatch).
+    Input source is planner output from state (not DB load).
     """
     logger.info("[debate_agent] start")
-    plan_id = _resolve_active_plan_id()
-    logger.info("[debate_agent] resolved active plan_id=%s", plan_id)
-    if not plan_id:
-        logger.info("[debate_agent] no active plan found in DB")
-        return {
-            "is_valid": False,
-            "debate_count": 0,
-            "debate_output": {"error": "No plan found in DB for debate."},
-            "next_node": "orchestrator",
-        }
+    plan_payload = _plan_payload_from_state(_state or {})
+    plan_id = plan_payload.get("plan_id")
+    logger.info("[debate_agent] using state-driven payload, plan_id=%s", plan_id)
 
-    db = SessionLocal()
-    try:
-        plan_payload = load_plan(db, plan_id)
-    finally:
-        db.close()
-
-    if not plan_payload:
-        logger.info("[debate_agent] plan_id=%s not found in DB payload", plan_id)
+    if not plan_payload.get("itineraries"):
+        logger.info("[debate_agent] missing itineraries in state payload")
         return {
             "plan_id": plan_id,
             "is_valid": False,
-            "debate_count": 0,
-            "debate_output": {"error": f"Plan '{plan_id}' not found in agents/db."},
+            "debate_count": int((_state or {}).get("debate_count", 0)),
+            "debate_output": {"error": "Missing planner output: 'itineraries' is required for debate."},
             "next_node": "orchestrator",
         }
 
@@ -349,6 +347,8 @@ def debate_agent(_state: dict) -> dict:
             "plan_id": plan_id,
             "is_valid": bool(existing_verdict),
             "debate_count": MAX_DEBATE_ROUNDS,
+            "debate_history": debate_history,
+            "debate_verdict": existing_verdict,
             "debate_output": {
                 "debate_history": debate_history,
                 "debate_verdict": existing_verdict,
@@ -428,6 +428,16 @@ def debate_agent(_state: dict) -> dict:
             "plan_id": plan_id,
             "is_valid": True,
             "debate_count": round_num,
+            "debate_history": debate_history,
+            "debate_verdict": debate_verdict,
+            "itineraries": plan_payload.get("itineraries", {}),
+            "option_meta": plan_payload.get("option_meta", {}),
+            "flight_options_outbound": plan_payload.get("flight_options_outbound", []),
+            "flight_options_return": plan_payload.get("flight_options_return", []),
+            "hotel_options": plan_payload.get("hotel_options", []),
+            "tool_log": plan_payload.get("tool_log", []),
+            "planner_decision_trace": plan_payload.get("planner_decision_trace", {}),
+            "chain_of_thought": plan_payload.get("chain_of_thought", ""),
             "debate_output": {
                 "debate_history": debate_history,
                 "debate_verdict": debate_verdict,
@@ -485,6 +495,16 @@ def debate_agent(_state: dict) -> dict:
             "plan_id": plan_id,
             "is_valid": False,
             "debate_count": round_num,
+            "debate_history": debate_history,
+            "debate_verdict": None,
+            "itineraries": plan_payload.get("itineraries", {}),
+            "option_meta": plan_payload.get("option_meta", {}),
+            "flight_options_outbound": plan_payload.get("flight_options_outbound", []),
+            "flight_options_return": plan_payload.get("flight_options_return", []),
+            "hotel_options": plan_payload.get("hotel_options", []),
+            "tool_log": plan_payload.get("tool_log", []),
+            "planner_decision_trace": plan_payload.get("planner_decision_trace", {}),
+            "chain_of_thought": plan_payload.get("chain_of_thought", ""),
             "debate_output": {
                 "debate_history": debate_history,
                 "debate_verdict": None,
@@ -542,6 +562,16 @@ def debate_agent(_state: dict) -> dict:
         "plan_id": plan_id,
         "is_valid": True,
         "debate_count": round_num,
+        "debate_history": debate_history,
+        "debate_verdict": debate_verdict,
+        "itineraries": plan_payload.get("itineraries", {}),
+        "option_meta": plan_payload.get("option_meta", {}),
+        "flight_options_outbound": plan_payload.get("flight_options_outbound", []),
+        "flight_options_return": plan_payload.get("flight_options_return", []),
+        "hotel_options": plan_payload.get("hotel_options", []),
+        "tool_log": plan_payload.get("tool_log", []),
+        "planner_decision_trace": plan_payload.get("planner_decision_trace", {}),
+        "chain_of_thought": plan_payload.get("chain_of_thought", ""),
         "debate_output": {
             "debate_history": debate_history,
             "debate_verdict": debate_verdict,
