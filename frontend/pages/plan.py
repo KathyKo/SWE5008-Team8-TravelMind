@@ -21,7 +21,7 @@ GRAPH_STREAM_URL = os.getenv(
 ).rstrip("/")
 FAIRNESS_CHECK_URL = os.getenv(
     "AGENTS_FAIRNESS_CHECK_URL",
-    GRAPH_STREAM_URL.replace("/api/invoke/graph/stream", "/api/invoke/fairness-check"),
+    f"{os.getenv('BACKEND_URL', 'http://localhost:8000').rstrip('/')}/fairness/check-selected-option",
 ).rstrip("/")
 
 TIME_PREF_OPTIONS = [
@@ -103,17 +103,11 @@ def _render_agent_panel(placeholder, status: dict):
             "color": "#111111",
             "label": "failed",
         },
-        "skipped": {
-            "bg": "rgba(255,255,255,0.02)",
-            "border": "rgba(255,255,255,0.06)",
-            "color": "#111111",
-            "label": "skipped",
-        },
     }
 
     with placeholder.container():
         st.markdown(
-            "<p style='margin:0 0 8px 0;color:#e8edf5;font-weight:600'>Agent Activity</p>",
+            "<p style='margin:0 0 10px 0;color:#111111;font-weight:800;font-size:24px;letter-spacing:0.01em'>Agent Activity</p>",
             unsafe_allow_html=True,
         )
         for step in PIPELINE_STEPS:
@@ -121,7 +115,7 @@ def _render_agent_panel(placeholder, status: dict):
             style = style_map.get(s["state"], style_map["pending"])
             detail = html.escape(s.get("detail") or "")
             detail_html = (
-                f"<div style='color:#a8bdd9;font-size:12px;margin-top:4px'>{detail}</div>"
+                f"<div style='color:#1f2937;font-size:13px;line-height:1.5;margin-top:8px;font-weight:500'>{detail}</div>"
                 if detail
                 else ""
             )
@@ -130,20 +124,21 @@ def _render_agent_panel(placeholder, status: dict):
 <div style="
     background:{style['bg']};
     border:1px solid {style['border']};
-    border-radius:10px;
-    padding:10px 12px;
-    margin-bottom:8px;">
-  <div style="display:flex;justify-content:space-between;align-items:center;">
-    <span style="color:#f1f5f9;font-size:13px">
+    border-radius:12px;
+    padding:12px 14px;
+    margin-bottom:10px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+    <span style="color:#111111;font-size:25px;font-weight:700;line-height:1.35">
       <span style="margin-right:6px">{step['icon']}</span>
       <strong>{step['name']}</strong>
     </span>
     <span style="
         color:{style['color']};
-        font-size:11px;
+        font-size:14px;
+        font-weight:700;
         font-family:monospace;
         text-transform:uppercase;
-        letter-spacing:0.5px">
+        letter-spacing:0.6px">
       {style['label']}
     </span>
   </div>
@@ -266,7 +261,7 @@ def _agent_status_from_graph_state(s: dict) -> dict:
             "detail": (s.get("threat_detail") or s.get("threat_type") or "blocked at input"),
         }
         for k in ("research", "planner", "debate", "safety", "explain"):
-            status[k] = {"state": "skipped", "detail": "workflow stopped"}
+            status[k] = {"state": "error", "detail": "workflow stopped"}
         return status
 
     origin = s.get("origin") or ""
@@ -282,7 +277,7 @@ def _agent_status_from_graph_state(s: dict) -> dict:
         }
     else:
         status["intent"] = {
-            "state": "error" if err else "skipped",
+            "state": "error",
             "detail": (err or "no intent fields in result")[:220],
         }
 
@@ -298,7 +293,7 @@ def _agent_status_from_graph_state(s: dict) -> dict:
         status["research"] = {"state": "success", "detail": detail[:220]}
     else:
         status["research"] = {
-            "state": "error" if err else "skipped",
+            "state": "error",
             "detail": (err or "no research output")[:220],
         }
 
@@ -328,7 +323,7 @@ def _agent_status_from_graph_state(s: dict) -> dict:
             "detail": f"completed with revisions (rounds≈{rounds})",
         }
     else:
-        status["debate"] = {"state": "skipped", "detail": "no debate verdict in state"}
+        status["debate"] = {"state": "error", "detail": "no debate verdict in state"}
 
     og_raw = s.get("output_guard_decision")
     if isinstance(og_raw, dict):
@@ -349,12 +344,12 @@ def _agent_status_from_graph_state(s: dict) -> dict:
         reason = s.get("output_flag_reason") or og or "flagged"
         status["safety"] = {"state": "error", "detail": str(reason)[:220]}
     else:
-        status["safety"] = {"state": "skipped", "detail": "no output guard decision"}
+        status["safety"] = {"state": "error", "detail": "no output guard decision"}
 
     if s.get("explanation") or s.get("explain_data"):
         status["explain"] = {"state": "success", "detail": "explanation generated"}
     else:
-        status["explain"] = {"state": "skipped", "detail": "no explain payload"}
+        status["explain"] = {"state": "error", "detail": "no explain payload"}
 
     return status
 
@@ -423,30 +418,32 @@ def render_itinerary(option: str, itineraries: dict, option_meta: dict):
         day_budget = day.get("budget", "")
         with st.expander(f"{day_title}  —  {day_budget}", expanded=(day_idx == 0)):
             for item in day.get("items", []):
-                col_time, col_icon, col_name, col_cost = st.columns([0.8, 0.4, 4, 1.2])
+                st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
+                col_time, col_name, col_cost = st.columns([0.8, 4, 1.2])
                 with col_time:
                     st.markdown(
-                        f"<span style='color:#7a90b0;font-size:12px;font-family:monospace'>"
+                        f"<span style='color:#6b7280;font-size:12px;font-family:monospace'>"
                         f"{item.get('time', '')}</span>",
                         unsafe_allow_html=True,
                     )
-                with col_icon:
-                    st.markdown(
-                        f"<span style='font-size:18px'>{item.get('icon', '')}</span>",
-                        unsafe_allow_html=True,
-                    )
+                # with col_icon:
+                #     st.markdown(
+                #         f"<span style='font-size:18px'>{item.get('icon', '')}</span>",
+                #         unsafe_allow_html=True,
+                #     )
                 with col_name:
                     st.markdown(
-                        f"<span style='color:#e8edf5;font-size:13px;font-weight:500'>"
+                        f"<span style='color:#1f2937;font-size:13px;font-weight:500;line-height:1.45'>"
                         f"{item.get('name', '')}</span>",
                         unsafe_allow_html=True,
                     )
                 with col_cost:
                     st.markdown(
-                        f"<span style='color:#7a90b0;font-size:12px;font-family:monospace'>"
+                        f"<span style='color:#6b7280;font-size:12px;font-family:monospace'>"
                         f"{item.get('cost', '')}</span>",
                         unsafe_allow_html=True,
                     )
+                st.markdown("<div style='height:2px'></div>", unsafe_allow_html=True)
 
 
 def render():
