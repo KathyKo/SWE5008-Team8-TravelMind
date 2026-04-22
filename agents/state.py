@@ -45,6 +45,7 @@ class State(TypedDict):
     research: Optional[dict]
     inventory: Optional[dict]        # attractions / hotels / flights
     maps_attractions: Optional[str]
+    
 
     # ── Planner ──────────────────────────────────────────
     itineraries: Optional[list]

@@ -125,11 +125,13 @@ cp .env.example .env
 docker compose up --build
 ```
 
-| Service | URL |
-|---|---|
-| Frontend | http://localhost:8501 |
-| Backend API | http://localhost:8000 |
-| API Docs (Swagger) | http://localhost:8000/docs |
+
+| Service            | URL                                                      |
+| ------------------ | -------------------------------------------------------- |
+| Frontend           | [http://localhost:8501](http://localhost:8501)           |
+| Backend API        | [http://localhost:8000](http://localhost:8000)           |
+| API Docs (Swagger) | [http://localhost:8000/docs](http://localhost:8000/docs) |
+
 
 ### 3. Run services individually
 
@@ -147,49 +149,58 @@ cd backend && uvicorn main:app --reload --port 8000
 
 Copy `.env.example` to `.env` and fill in all values:
 
-| Variable | Description |
-|---|---|
-| `OPENAI_API_KEY` | OpenAI API key |
-| `OPENAI_MODEL` | Model name (default: `gpt-5-mini-2025-08-07`) |
-| `TAVILY_API_KEY` | Tavily web search API key |
-| `GOOGLE_API_KEY` | Google Custom Search API key |
-| `GOOGLE_CSE_ID` | Google Custom Search Engine ID |
-| `OPENWEATHER_API_KEY` | OpenWeatherMap API key |
+
+| Variable              | Description                                   |
+| --------------------- | --------------------------------------------- |
+| `OPENAI_API_KEY`      | OpenAI API key                                |
+| `OPENAI_MODEL`        | Model name (default: `gpt-5-mini-2025-08-07`) |
+| `TAVILY_API_KEY`      | Tavily web search API key                     |
+| `GOOGLE_API_KEY`      | Google Custom Search API key                  |
+| `GOOGLE_CSE_ID`       | Google Custom Search Engine ID                |
+| `OPENWEATHER_API_KEY` | OpenWeatherMap API key                        |
+
 
 ---
 
 ## Demo Accounts
 
-| User | Email | Password | Profile |
-|---|---|---|---|
-| Alice | alice@example.com | demo123 | Culture lover · Vegetarian · Low intensity |
-| Bob | bob@example.com | demo123 | Foodie · Moderate |
-| Carol | carol@example.com | demo123 | Adventure · Outdoor |
+
+| User  | Email                                         | Password | Profile                                    |
+| ----- | --------------------------------------------- | -------- | ------------------------------------------ |
+| Alice | [alice@example.com](mailto:alice@example.com) | demo123  | Culture lover · Vegetarian · Low intensity |
+| Bob   | [bob@example.com](mailto:bob@example.com)     | demo123  | Foodie · Moderate                          |
+| Carol | [carol@example.com](mailto:carol@example.com) | demo123  | Adventure · Outdoor                        |
+
 
 ---
 
 ## Agents
 
-| Agent | Responsibility |
-|---|---|
-| Orchestrator | Routes user requests to the appropriate specialist |
-| Concierge | Gathers user preferences — destination, dates, budget, interests |
-| Booking Agent | Searches and presents flight and hotel options |
-| Local Guide | Recommends attractions, activities, and local experiences |
-| Summarizer | Produces the final consolidated travel itinerary |
+
+| Agent         | Responsibility                                                   |
+| ------------- | ---------------------------------------------------------------- |
+| Orchestrator  | Routes user requests to the appropriate specialist               |
+| Concierge     | Gathers user preferences — destination, dates, budget, interests |
+| Booking Agent | Searches and presents flight and hotel options                   |
+| Local Guide   | Recommends attractions, activities, and local experiences        |
+| Summarizer    | Produces the final consolidated travel itinerary                 |
+
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Frontend | Streamlit |
-| Backend | FastAPI + Uvicorn |
-| Agent Orchestration | LangGraph 0.2 |
-| LLM | OpenAI GPT-5-mini |
-| Search | Tavily + Google Custom Search |
-| Weather | OpenWeatherMap API |
-| Containerisation | Docker + Docker Compose |
+
+| Layer               | Technology                    |
+| ------------------- | ----------------------------- |
+| Frontend            | Streamlit                     |
+| Backend             | FastAPI + Uvicorn             |
+| Agent Orchestration | LangGraph 0.2                 |
+| LLM                 | OpenAI GPT-5-mini             |
+| Search              | Tavily + Google Custom Search |
+| Weather             | OpenWeatherMap API            |
+| Containerisation    | Docker + Docker Compose       |
+
 
 ---
+
