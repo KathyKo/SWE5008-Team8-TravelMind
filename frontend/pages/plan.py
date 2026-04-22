@@ -19,10 +19,6 @@ GRAPH_STREAM_URL = os.getenv(
     "AGENTS_GRAPH_STREAM_URL",
     "http://localhost:8001/api/invoke/graph/stream",
 ).rstrip("/")
-FAIRNESS_CHECK_URL = os.getenv(
-    "AGENTS_FAIRNESS_CHECK_URL",
-    GRAPH_STREAM_URL.replace("/api/invoke/graph/stream", "/api/invoke/fairness-check"),
-).rstrip("/")
 
 TIME_PREF_OPTIONS = [
     "No preference",
@@ -372,31 +368,6 @@ def _itineraries_from_state(s: dict) -> dict:
     return raw if isinstance(raw, dict) else {}
 
 
-def _run_selected_option_fairness_check(
-    *,
-    option: str,
-    state: dict,
-) -> tuple[dict | None, str | None]:
-    try:
-        resp = requests.post(
-            FAIRNESS_CHECK_URL,
-            json={"state": state, "selected_option": option},
-            timeout=120,
-        )
-        if resp.status_code != 200:
-            try:
-                detail = resp.json().get("detail", resp.text)
-            except Exception:
-                detail = resp.text
-            return None, f"fairness-check failed (HTTP {resp.status_code}): {detail}"
-        payload = resp.json()
-        if not isinstance(payload, dict):
-            return None, "fairness-check returned invalid payload"
-        return payload, None
-    except requests.exceptions.RequestException as exc:
-        return None, f"fairness-check connection error: {exc.__class__.__name__}: {exc}"
-
-
 def render_explain_modal(key: str):
     d = EXPLAIN_DATA.get(key)
     if not d:
@@ -706,32 +677,7 @@ def render():
                         type="primary",
                         use_container_width=True,
                     ):
-                        selected_days = itineraries.get(opt) or []
-                        state_for_check = dict(st.session_state.get("plan_state") or {})
-                        state_for_check["itineraries"] = itineraries
-                        state_for_check["option_meta"] = option_meta
-                        state_for_check["selected_plan"] = selected_days
-                        state_for_check["selected_option"] = opt
-                        summary = st.session_state.get("plan_request_summary") or {}
-                        for k in ("origin", "destination", "dates", "duration", "budget"):
-                            if summary.get(k) and not state_for_check.get(k):
-                                state_for_check[k] = summary[k]
-
-                        with st.spinner("Running fairness & bias checks..."):
-                            fairness_result, fairness_err = _run_selected_option_fairness_check(
-                                option=opt,
-                                state=state_for_check,
-                            )
-
-                        if fairness_err:
-                            st.error(fairness_err)
-                        else:
-                            st.session_state.selected_option = opt
-                            st.session_state.selected_option_check = fairness_result
-                            plan_state = dict(st.session_state.get("plan_state") or {})
-                            plan_state["selected_option_check"] = fairness_result
-                            st.session_state.plan_state = plan_state
-                            st.toast("Itinerary saved to My Trip with fairness checks!")
+                        st.toast("Itinerary saved to My Trip!")
                 with col_view:
                     if st.button("View in My Trip", use_container_width=True):
                         try:

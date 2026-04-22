@@ -4,9 +4,6 @@ agents/routers/security.py — security check endpoints
 Provides:
   POST /security/check        — input guard (threat detection on user text)
   POST /security/check-output — output guard (validation of assistant responses)
-
-NOTE: This router is not mounted from agents/main.py when the security stack is
-disabled (no llm-guard in image). Re-enable alongside main.py + requirements.txt.
 """
 
 from typing import Optional

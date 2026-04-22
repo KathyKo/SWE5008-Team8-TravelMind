@@ -22,8 +22,7 @@ def save_plan(db: Session, plan_id: str, state: dict, result: dict, via_debate: 
         dates                   = state.get("dates", ""),
         duration                = state.get("duration", ""),
         budget                  = state.get("budget", ""),
-        # DB column is NOT NULL; normalize None to empty string.
-        preferences             = state.get("preferences") or "",
+        preferences             = state.get("preferences", ""),
         hard_constraints        = state.get("hard_constraints") or None,
         soft_preferences        = state.get("soft_preferences") or None,
         search_queries          = state.get("search_queries")   or None,
