@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 from langgraph.graph import StateGraph, START, END
 
 from .nodes import (
-    input_guard_node,
+    # input_guard_node,   # DEV: security agent disabled
     intent_profile_node,
     search_node,
     orchestrator_node,
@@ -10,9 +10,8 @@ from .nodes import (
     replanner_node,
     debate_node,
     explain_node,
-    output_guard_node,
+    # output_guard_node,  # DEV: security agent disabled
     orchestrator_routing,
-    
 )
 from .state import State
 
@@ -28,7 +27,7 @@ def build_travel_graph():
     builder = StateGraph(State)
 
     # 1. Add all nodes (8 agents + orchestrator )
-    builder.add_node("input_guard", input_guard_node)                # Agent 5   (input guard)
+    # builder.add_node("input_guard", input_guard_node)                # DEV: disabled (security)
     builder.add_node("intent_profile", intent_profile_node)          # Agent 1   (intent profile)
     builder.add_node("search", search_node)                          # Agent 2   (web search)
     builder.add_node("orchestrator", orchestrator_node)              # Agent 9   (orchestrator)
@@ -36,32 +35,34 @@ def build_travel_graph():
     builder.add_node("replanner", replanner_node)                    # Agent 7   (replanner)
     builder.add_node("debate", debate_node)                          # Agent 4   (debate)
     builder.add_node("explain", explain_node)                        # Agent 6   (explain)
-    builder.add_node("output_guard", output_guard_node)              # Agent 8   (output guard)
+    # builder.add_node("output_guard", output_guard_node)              # DEV: disabled (security)
 
     # 2. Define edges (The flow)
-    builder.add_edge(START, "input_guard")
-    builder.add_edge("input_guard", "orchestrator")
+    # DEV: skip input_guard — enter orchestrator first, then route straight to search (see nodes.py).
+    builder.add_edge(START, "orchestrator")
+    # builder.add_edge(START, "input_guard")
+    # builder.add_edge("input_guard", "orchestrator")
     builder.add_edge("intent_profile", "orchestrator")
     builder.add_edge("search", "orchestrator")
     builder.add_edge("planner", "orchestrator")
     builder.add_edge("replanner", "orchestrator")
     builder.add_edge("debate", "orchestrator")
     builder.add_edge("explain", "orchestrator")
-    builder.add_edge("output_guard", END)
+    # builder.add_edge("output_guard", END)  # DEV: orchestrator returns END after explain
 
     # From orchestrator, route to the selected agent
     builder.add_conditional_edges(
         "orchestrator",
         orchestrator_routing,
         {
-            "input_guard": "input_guard",
+            # "input_guard": "input_guard",      # DEV: disabled
             "intent_profile": "intent_profile",
             "search": "search",
             "planner": "planner",
             "replanner": "replanner",
             "debate": "debate",
             "explain": "explain",
-            "output_guard": "output_guard",
+            # "output_guard": "output_guard",    # DEV: disabled
             "END": END,
         },
     )

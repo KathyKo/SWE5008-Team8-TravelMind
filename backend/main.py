@@ -16,7 +16,8 @@ Interactive docs:
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.routers import research, planner, explainability, security, auth
+# security router proxies to agents /security/* — disabled while agents security stack is off
+from backend.routers import research, planner, explainability, auth
 
 
 @asynccontextmanager
@@ -58,7 +59,7 @@ app.add_middleware(
 app.include_router(research.router,       prefix="/research",       tags=["Agent2 Research"])
 app.include_router(planner.router,        prefix="/planner",        tags=["Agent3 Planner"])
 app.include_router(explainability.router, prefix="/explainability", tags=["Agent6 Explainability"])
-app.include_router(security.router,       prefix="/travel",         tags=["Travel Compatibility"])
+# app.include_router(security.router,       prefix="/travel",         tags=["Travel Compatibility"])
 app.include_router(auth.router,           prefix="/auth",           tags=["Auth"])
 
 

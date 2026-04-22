@@ -15,10 +15,11 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from agents.routers.security import router as security_router
+# DEV: security stack (heavy llm-guard/torch) disabled for faster Docker — see requirements.txt
+# from agents.routers.security import router as security_router
 from agents.graph import build_travel_graph, default_graph_initial_state
-from agents.specialists.input_guard_agent import input_guard_agent
-from agents.specialists.output_guard_agent import output_guard_agent
+# from agents.specialists.input_guard_agent import input_guard_agent
+# from agents.specialists.output_guard_agent import output_guard_agent
 from agents.specialists.intent_profile import intent_profile
 from agents.specialists.planner_agent import planner_agent
 from agents.specialists.research_agent import research_agent
@@ -26,6 +27,7 @@ from agents.agent_tools import get_tools_for_agent
 from agents.specialists.explainability_agent import explainability_agent
 from agents.specialists.debate_agent import debate_agent
 from agents.specialists.dynamic_replan_agent import dynamic_replan_agent
+from agents.specialists.debate_agent import evaluate_selected_option_fairness
 from agents.db.crud import save_plan, load_plan
 from agents.db.database import SessionLocal
 
@@ -51,6 +53,11 @@ def _enforce_agent_port(request: Request, expected_port: int, agent_name: str) -
 
 class AgentInvokeRequest(BaseModel):
     state: dict[str, Any]
+
+
+class SelectedOptionCheckRequest(BaseModel):
+    state: dict[str, Any]
+    selected_option: str
 
 
 def _merge_graph_initial(incoming: dict[str, Any]) -> dict[str, Any]:
@@ -163,26 +170,26 @@ def health_check():
     return {"status": "ok", "service": "travelmind-agents"}
 
 
-@app.post("/api/invoke/input_guard")
-def invoke_input_guard(request: Request, payload: AgentInvokeRequest):
-    _enforce_agent_port(request, 8100, "input_guard")
-    try:
-        result = input_guard_agent(payload.state)
-        return result
-    except Exception as exc:
-        log.exception("input_guard failed")
-        raise HTTPException(status_code=500, detail=f"input_guard failed: {exc}") from exc
-
-
-@app.post("/api/invoke/output_guard")
-def invoke_output_guard(request: Request, payload: AgentInvokeRequest):
-    _enforce_agent_port(request, 8106, "output_guard")
-    try:
-        result = output_guard_agent(payload.state)
-        return result
-    except Exception as exc:
-        log.exception("output_guard failed")
-        raise HTTPException(status_code=500, detail=f"output_guard failed: {exc}") from exc
+# @app.post("/api/invoke/input_guard")
+# def invoke_input_guard(request: Request, payload: AgentInvokeRequest):
+#     _enforce_agent_port(request, 8100, "input_guard")
+#     try:
+#         result = input_guard_agent(payload.state)
+#         return result
+#     except Exception as exc:
+#         log.exception("input_guard failed")
+#         raise HTTPException(status_code=500, detail=f"input_guard failed: {exc}") from exc
+#
+#
+# @app.post("/api/invoke/output_guard")
+# def invoke_output_guard(request: Request, payload: AgentInvokeRequest):
+#     _enforce_agent_port(request, 8106, "output_guard")
+#     try:
+#         result = output_guard_agent(payload.state)
+#         return result
+#     except Exception as exc:
+#         log.exception("output_guard failed")
+#         raise HTTPException(status_code=500, detail=f"output_guard failed: {exc}") from exc
 
 
 @app.post("/api/invoke/intent_profile")
@@ -279,4 +286,25 @@ def invoke_replanner(request: Request, payload: AgentInvokeRequest):
         log.exception("replanner failed")
         raise HTTPException(status_code=500, detail=f"replanner failed: {exc}") from exc
 
-app.include_router(security_router)
+
+@app.post("/api/invoke/fairness-check")
+def invoke_fairness_check(payload: SelectedOptionCheckRequest):
+    """
+    UI-triggered fairness/bias check for a selected itinerary option.
+    This is a direct judge-model call and does not use orchestrator routing.
+    """
+    try:
+        result = evaluate_selected_option_fairness(
+            payload.state,
+            payload.selected_option,
+        )
+        if "error" in result:
+            raise HTTPException(status_code=400, detail=result["error"])
+        return result
+    except HTTPException:
+        raise
+    except Exception as exc:
+        log.exception("fairness-check failed")
+        raise HTTPException(status_code=500, detail=f"fairness-check failed: {exc}") from exc
+
+# app.include_router(security_router)
