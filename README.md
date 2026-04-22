@@ -150,7 +150,7 @@ Copy `.env.example` to `.env` and fill in all values:
 | Variable | Description |
 |---|---|
 | `OPENAI_API_KEY` | OpenAI API key |
-| `OPENAI_MODEL` | Model name (default: `gpt-5-mini-2025-08-07`) |
+| `OPENAI_MODEL` | Model name (default: `gpt-4.1-nano-2025-04-14`) |
 | `TAVILY_API_KEY` | Tavily web search API key |
 | `GOOGLE_API_KEY` | Google Custom Search API key |
 | `GOOGLE_CSE_ID` | Google Custom Search Engine ID |

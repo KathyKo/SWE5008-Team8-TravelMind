@@ -163,7 +163,51 @@ def _render_right_panel():
 
 
 # ─── Main render ──────────────────────────────────────────────────────────────
+def _build_replan_request_from_my_trip(days: list[dict], selected_opt: str) -> dict:
+    visited = st.session_state.get("visited", {}) or {}
+    replace_item_keys: list[str] = []
+    locked_item_keys: list[str] = []
+    replace_item_names: list[str] = []
+    locked_item_names: list[str] = []
 
+    for day_idx, day in enumerate(days):
+        for item_idx, item in enumerate(day.get("items", [])):
+            item_id = f"trip_{day_idx}_{item.get('name', item_idx)}"
+            item_key = str(item.get("key") or f"item_{day_idx}_{item_idx}")
+            item_name = str(item.get("name") or "")
+            if visited.get(item_id, False):
+                replace_item_keys.append(item_key)
+                if item_name:
+                    replace_item_names.append(item_name)
+            else:
+                locked_item_keys.append(item_key)
+                if item_name:
+                    locked_item_names.append(item_name)
+
+    summary = st.session_state.get("plan_request_summary") or {}
+    plan_state = st.session_state.get("plan_state") or {}
+
+    return {
+        "plan_id": st.session_state.get("plan_id"),
+        "origin": summary.get("origin") or plan_state.get("origin"),
+        "destination": summary.get("destination") or plan_state.get("destination"),
+        "dates": summary.get("dates") or plan_state.get("dates"),
+        "duration": summary.get("duration") or plan_state.get("duration"),
+        "budget": summary.get("budget") or plan_state.get("budget"),
+        "preferences": plan_state.get("preferences"),
+        "itineraries": st.session_state.get("plan_itineraries") or {},
+        "option_meta": st.session_state.get("plan_option_meta") or {},
+        "replan_request": {
+            "selected_option": selected_opt,
+            "itinerary_days": days,
+            "replace_item_keys": replace_item_keys,
+            "replace_item_names": replace_item_names,
+            "locked_item_keys": locked_item_keys,
+            "locked_item_names": locked_item_names,
+            "round": 1,
+            "source": "my_trip_checked_items",
+        },
+    }
 def render():
     # Use real plan data if available, else fall back to demo data
     plan_itineraries = st.session_state.get("plan_itineraries") or {}
@@ -203,9 +247,17 @@ def render():
                 f"font-weight:500;line-height:1.8'>✓ {visited_count} places visited</div>",
                 unsafe_allow_html=True,
             )
-        with act2:
-            if st.button("🔄 Need to Re-plan?", use_container_width=True):
-                st.session_state._pending_nav = "replan"
+    with act2:
+        if st.button("🔄 Need to Dynamic Replan?", use_container_width=True):
+            request_payload = _build_replan_request_from_my_trip(days,selected_opt)
+            if not request_payload["replan_request"]["replace_item_keys"]:
+                st.warning("Please tick the itinerary items you want to modify before running dynamic replan.")
+                return
+            else:
+                st.session_state.replan_pending_state = request_payload
+                st.session_state.replan_error = ""
+                st.session_state.replan_unsatisfied = {}
+                st.session_state.pending_nav = "replan"
                 st.rerun()
 
         st.markdown("---")

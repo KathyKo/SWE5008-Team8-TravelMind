@@ -5,6 +5,7 @@ pages/plan.py — Plan Your Trip page
 import html
 import json
 import os
+import re
 import uuid
 from datetime import date, timedelta
 
@@ -17,6 +18,10 @@ from data.store import EXPLAIN_DATA
 GRAPH_STREAM_URL = os.getenv(
     "AGENTS_GRAPH_STREAM_URL",
     "http://localhost:8001/api/invoke/graph/stream",
+).rstrip("/")
+FAIRNESS_CHECK_URL = os.getenv(
+    "AGENTS_FAIRNESS_CHECK_URL",
+    GRAPH_STREAM_URL.replace("/api/invoke/graph/stream", "/api/invoke/fairness-check"),
 ).rstrip("/")
 
 TIME_PREF_OPTIONS = [
@@ -44,6 +49,28 @@ PIPELINE_STEPS = [
     {"key": "safety", "icon": "🛡️", "name": "Risk & Safety Agent"},
     {"key": "explain", "icon": "💡", "name": "Explainability Agent"},
 ]
+# Selectbox: first value means "not chosen" (shown via format_func).
+DURATION_SELECT_OPTIONS = [""] + DURATION_OPTIONS
+def _duration_label_from_days(n: int) -> str:
+    if n <= 0:
+        return ""
+    return "1 day" if n == 1 else f"{n} days"
+def _duration_from_message(msg: str) -> str:
+    """
+    Infer a duration string compatible with graph payload / date math.
+    Frontend-only heuristic when the Duration control is left empty.
+    """
+    if not msg or not msg.strip():
+        return ""
+    t = msg.strip()
+    if re.search(r"(一\s*周|一周|一个星期|下个星期|a week)", t):
+        return "7 days"
+    if re.search(r"(两\s*周|两周|两个星期|two weeks)", t):
+        return "14 days"
+    m = re.search(r"(\d+)\s*(?:days?|天|晚|夜)", t, re.IGNORECASE)
+    if m:
+        return _duration_label_from_days(int(m.group(1)))
+    return ""
 
 
 def _init_agent_status() -> dict:
@@ -55,43 +82,46 @@ def _render_agent_panel(placeholder, status: dict):
         "pending": {
             "bg": "rgba(255,255,255,0.04)",
             "border": "rgba(255,255,255,0.08)",
-            "color": "#7a90b0",
+            "color": "#111111",
             "label": "pending",
         },
         "running": {
             "bg": "rgba(59,158,255,0.12)",
             "border": "rgba(59,158,255,0.35)",
-            "color": "#3b9eff",
+            "color": "#111111",
             "label": "running",
         },
         "success": {
             "bg": "rgba(16,185,129,0.12)",
             "border": "rgba(16,185,129,0.35)",
-            "color": "#10b981",
+            "color": "#111111",
             "label": "success",
         },
         "error": {
             "bg": "rgba(239,68,68,0.12)",
             "border": "rgba(239,68,68,0.35)",
-            "color": "#ef4444",
+            "color": "#111111",
             "label": "failed",
         },
         "skipped": {
             "bg": "rgba(255,255,255,0.02)",
             "border": "rgba(255,255,255,0.06)",
-            "color": "#4a5a72",
+            "color": "#111111",
             "label": "skipped",
         },
     }
 
     with placeholder.container():
-        st.markdown("**Agent Activity**")
+        st.markdown(
+            "<p style='margin:0 0 8px 0;color:#e8edf5;font-weight:600'>Agent Activity</p>",
+            unsafe_allow_html=True,
+        )
         for step in PIPELINE_STEPS:
             s = status.get(step["key"], {"state": "pending", "detail": ""})
             style = style_map.get(s["state"], style_map["pending"])
             detail = html.escape(s.get("detail") or "")
             detail_html = (
-                f"<div style='color:#7a90b0;font-size:12px;margin-top:4px'>{detail}</div>"
+                f"<div style='color:#a8bdd9;font-size:12px;margin-top:4px'>{detail}</div>"
                 if detail
                 else ""
             )
@@ -104,7 +134,7 @@ def _render_agent_panel(placeholder, status: dict):
     padding:10px 12px;
     margin-bottom:8px;">
   <div style="display:flex;justify-content:space-between;align-items:center;">
-    <span style="color:#e8edf5;font-size:13px">
+    <span style="color:#f1f5f9;font-size:13px">
       <span style="margin-right:6px">{step['icon']}</span>
       <strong>{step['name']}</strong>
     </span>
@@ -334,6 +364,33 @@ def _itineraries_from_state(s: dict) -> dict:
     return raw if isinstance(raw, dict) else {}
 
 
+def _run_selected_option_fairness_check(
+    *,
+    option: str,
+    state: dict,
+) -> tuple[dict | None, str | None]:
+    try:
+        resp = requests.post(
+            FAIRNESS_CHECK_URL,
+            json={"state": state, "selected_option": option},
+            timeout=120,
+        )
+        if resp.status_code != 200:
+            try:
+                detail = resp.json().get("detail", resp.text)
+            except Exception:
+                detail = resp.text
+            if resp.status_code == 404:
+                return None, "__FAIRNESS_CHECK_UNAVAILABLE__"
+            return None, f"fairness-check failed (HTTP {resp.status_code}): {detail}"
+        payload = resp.json()
+        if not isinstance(payload, dict):
+            return None, "fairness-check returned invalid payload"
+        return payload, None
+    except requests.exceptions.RequestException as exc:
+        return None, f"fairness-check connection error: {exc.__class__.__name__}: {exc}"
+
+
 def render_explain_modal(key: str):
     d = EXPLAIN_DATA.get(key)
     if not d:
@@ -393,6 +450,21 @@ def render_itinerary(option: str, itineraries: dict, option_meta: dict):
 
 
 def render():
+    st.markdown(
+        """
+<style>
+  /* Trip description: keep typed text clearly light on dark Streamlit theme */
+  section.main div[data-testid="stTextArea"] textarea {
+    color: #f8fafc !important;
+    caret-color: #f8fafc !important;
+  }
+  section.main div[data-testid="stTextArea"] textarea::placeholder {
+    color: rgba(148, 163, 184, 0.95) !important;
+  }
+</style>
+""",
+        unsafe_allow_html=True,
+    )
     st.markdown("### Plan Your Trip")
     st.markdown(
         "<span style='color:#7a90b0;font-size:14px'>"
@@ -448,8 +520,9 @@ def render():
             with row1_c3:
                 duration = st.selectbox(
                     "Duration",
-                    DURATION_OPTIONS,
-                    index=4,
+                    DURATION_SELECT_OPTIONS,
+                    index=0,
+                    format_func=lambda x: "(Select duration)" if x == "" else x,
                     key="plan_duration",
                 )
 
@@ -476,11 +549,18 @@ def render():
                 )
 
             _, btn_col = st.columns([4, 1.5])
+            msg_inferred_duration = _duration_from_message(user_msg)
+            duration_ready = bool(duration) or bool(msg_inferred_duration)
             with btn_col:
                 generate = st.button(
                     "Generate Options",
                     type="primary",
                     use_container_width=True,
+                    disabled=not duration_ready,
+                )
+            if not duration_ready:
+                st.caption(
+                    "Please select **Duration**, or write the duration in the description (e.g. *5 days*, *5 days*, *a week*)."
                 )
 
         if generate:
@@ -488,7 +568,11 @@ def render():
                 st.warning("Please describe your trip first.")
                 return
 
-            duration_days = duration.split()[0]
+            effective_duration = duration if duration else _duration_from_message(user_msg)
+            if not effective_duration:
+                st.warning("Please select Duration, or write the duration in the description (e.g. *5 days*, *5 days*, *a week*).")
+                return
+            duration_days = effective_duration.split()[0]
             end_date = start_date + timedelta(days=int(duration_days))
             dates_str = f"{start_date.isoformat()} to {end_date.isoformat()}"
             budget_str = f"{budget_currency} {budget_amount}"
@@ -499,7 +583,7 @@ def render():
                 "messages": [{"role": "user", "content": user_msg.strip()}],
                 "dates": dates_str,
                 "budget": budget_str,
-                "duration": duration,
+                "duration": effective_duration,
                 "outbound_time_pref": out_pref,
                 "return_time_pref": ret_pref,
             }
@@ -549,7 +633,7 @@ def render():
                 "destination": final_state.get("destination") or "",
                 "dates": final_state.get("dates") or dates_str,
                 "budget": final_state.get("budget") or budget_str,
-                "duration": final_state.get("duration") or duration,
+                "duration": final_state.get("duration") or effective_duration,
             }
             st.session_state.plan_generated = bool(itins)
             if not itins:
@@ -615,7 +699,40 @@ def render():
                         type="primary",
                         use_container_width=True,
                     ):
-                        st.toast("Itinerary saved to My Trip!")
+                        selected_days = itineraries.get(opt) or []
+                        state_for_check = dict(st.session_state.get("plan_state") or {})
+                        state_for_check["itineraries"] = itineraries
+                        state_for_check["option_meta"] = option_meta
+                        state_for_check["selected_plan"] = selected_days
+                        state_for_check["selected_option"] = opt
+                        summary = st.session_state.get("plan_request_summary") or {}
+                        for k in ("origin", "destination", "dates", "duration", "budget"):
+                            if summary.get(k) and not state_for_check.get(k):
+                                state_for_check[k] = summary[k]
+
+                        with st.spinner("Running fairness & bias checks..."):
+                            fairness_result, fairness_err = _run_selected_option_fairness_check(
+                                option=opt,
+                                state=state_for_check,
+                            )
+
+                        if fairness_err:
+                            if fairness_err == "__FAIRNESS_CHECK_UNAVAILABLE__":
+                                st.session_state.selected_option = opt
+                                plan_state = dict(st.session_state.get("plan_state") or {})
+                                st.session_state.plan_state = plan_state
+                                st.toast("Itinerary saved to My Trip!")
+                            else:
+                                st.error(fairness_err)
+                        else:
+                            st.session_state.selected_option = opt
+                            st.session_state.selected_option_check = fairness_result
+                            plan_state = dict(st.session_state.get("plan_state") or {})
+                            plan_state["selected_option_check"] = fairness_result
+                            st.session_state.plan_state = plan_state
+                            st.toast("Itinerary saved to My Trip with fairness checks!")
                 with col_view:
                     if st.button("View in My Trip", use_container_width=True):
-                        st.info("Switch to the My Trip tab above.")
+                        st.session_state.pending_nav = "my_trip"
+                        st.rerun()
+                        
