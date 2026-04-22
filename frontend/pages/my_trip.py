@@ -15,10 +15,62 @@ ICON_MAP = {
 }
 
 
+def _build_replan_request_from_my_trip(days: list[dict], selected_opt: str) -> dict:
+    visited = st.session_state.get("visited", {}) or {}
+    replace_item_keys: list[str] = []
+    locked_item_keys: list[str] = []
+    replace_item_names: list[str] = []
+    locked_item_names: list[str] = []
+
+    for day_idx, day in enumerate(days):
+        for item_idx, item in enumerate(day.get("items", [])):
+            item_id = f"trip_{day_idx}_{item.get('name', item_idx)}"
+            item_key = str(item.get("key") or f"item_{day_idx}_{item_idx}")
+            item_name = str(item.get("name") or "")
+            if visited.get(item_id, False):
+                replace_item_keys.append(item_key)
+                if item_name:
+                    replace_item_names.append(item_name)
+            else:
+                locked_item_keys.append(item_key)
+                if item_name:
+                    locked_item_names.append(item_name)
+
+    summary = st.session_state.get("plan_request_summary") or {}
+    plan_state = st.session_state.get("plan_state") or {}
+
+    return {
+        "plan_id": st.session_state.get("plan_id"),
+        "origin": summary.get("origin") or plan_state.get("origin"),
+        "destination": summary.get("destination") or plan_state.get("destination"),
+        "dates": summary.get("dates") or plan_state.get("dates"),
+        "duration": summary.get("duration") or plan_state.get("duration"),
+        "budget": summary.get("budget") or plan_state.get("budget"),
+        "preferences": plan_state.get("preferences"),
+        "itineraries": st.session_state.get("plan_itineraries") or {},
+        "option_meta": st.session_state.get("plan_option_meta") or {},
+        "replan_request": {
+            "selected_option": selected_opt,
+            "itinerary_days": days,
+            "replace_item_keys": replace_item_keys,
+            "replace_item_names": replace_item_names,
+            "locked_item_keys": locked_item_keys,
+            "locked_item_names": locked_item_names,
+            "round": 1,
+            "source": "my_trip_checked_items",
+        },
+    }
+
+
 # ─── Right panel ──────────────────────────────────────────────────────────────
 
 def _render_right_panel():
     plan_state = st.session_state.get("plan_state")
+    selected_check = (
+        st.session_state.get("selected_option_check")
+        or (plan_state or {}).get("selected_option_check")
+        or {}
+    )
 
     with st.container(border=True):
 
@@ -83,7 +135,53 @@ def _render_right_panel():
 
         # ── Fairness & Bias Checks ────────────────────────
         st.markdown("**Fairness & Bias Checks**")
-        if plan_state:
+        if selected_check:
+            filter_bubble_detected = bool(selected_check.get("filter_bubble_detected"))
+            demographic_bias_detected = bool(selected_check.get("demographic_bias_detected"))
+            filter_bubble_detail = str(selected_check.get("filter_bubble_detail") or "").strip()
+            demographic_bias_detail = str(selected_check.get("demographic_bias_detail") or "").strip()
+            cold_start_note = str(selected_check.get("cold_start_note") or "").strip()
+            confidence = str(selected_check.get("personalization_confidence") or "").lower()
+
+            if not filter_bubble_detected:
+                with st.expander("✅ No filter bubble detected", expanded=False):
+                    st.markdown(
+                        f"<span style='color:#d1fae5;font-size:13px;line-height:1.65'>"
+                        f"{html.escape(filter_bubble_detail or 'No obvious echo-chamber pattern found in this itinerary.')}"
+                        f"</span>",
+                        unsafe_allow_html=True,
+                    )
+            else:
+                with st.expander("⚠ Filter bubble risk detected", expanded=False):
+                    st.markdown(
+                        f"<span style='color:#fde68a;font-size:13px;line-height:1.65'>"
+                        f"{html.escape(filter_bubble_detail or 'This itinerary may over-focus on narrow activity types.')}"
+                        f"</span>",
+                        unsafe_allow_html=True,
+                    )
+
+            if not demographic_bias_detected:
+                with st.expander("✅ No demographic bias", expanded=False):
+                    st.markdown(
+                        f"<span style='color:#d1fae5;font-size:13px;line-height:1.65'>"
+                        f"{html.escape(demographic_bias_detail or 'No direct demographic bias indicators were found.')}"
+                        f"</span>",
+                        unsafe_allow_html=True,
+                    )
+            else:
+                with st.expander("⚠ Demographic bias risk detected", expanded=False):
+                    st.markdown(
+                        f"<span style='color:#fde68a;font-size:13px;line-height:1.65'>"
+                        f"{html.escape(demographic_bias_detail or 'Potential demographic sensitivity detected; review is recommended.')}"
+                        f"</span>",
+                        unsafe_allow_html=True,
+                    )
+
+            if cold_start_note:
+                st.warning(f"⚠ {cold_start_note}")
+            elif confidence == "low":
+                st.warning("⚠ Cold-start: Limited history - 3 more trips needed for full personalisation")
+        elif plan_state:
             is_valid = plan_state.get("is_valid")
             debate_count = plan_state.get("debate_count") or 0
             critique = plan_state.get("critique") or {}
@@ -143,7 +241,18 @@ def _render_right_panel():
 
         # ── Why behind the wander ─────────────────────────
         st.markdown("**Why behind the wander**")
-        if plan_state:
+        if selected_check and selected_check.get("summary"):
+            st.markdown(
+                f"<span style='color:#e8edf5;font-size:15px;line-height:1.75'>"
+                f"{html.escape(str(selected_check.get('summary'))[:320])}</span>",
+                unsafe_allow_html=True,
+            )
+            for r in (selected_check.get("highlights") or [])[:4]:
+                st.markdown(
+                    f"<span style='color:#7a90b0;font-size:14px;line-height:1.7'>• {html.escape(str(r))}</span>",
+                    unsafe_allow_html=True,
+                )
+        elif plan_state:
             explain_data = plan_state.get("explain_data") or plan_state.get("explanation")
             if explain_data:
                 selected_opt = st.session_state.get("selected_option", "A")
@@ -214,8 +323,16 @@ def render():
                 unsafe_allow_html=True,
             )
         with act2:
-            if st.button("🔄 Need to Re-plan?", use_container_width=True):
-                st.info("Switch to the 🔄 Re-plan tab above.")
+            if st.button("🔄 Need to Dynamic Replan?", use_container_width=True):
+                request_payload = _build_replan_request_from_my_trip(days, selected_opt)
+                if not request_payload["replan_request"]["replace_item_keys"]:
+                    st.warning("Please tick the itinerary items you want to modify before running dynamic replan.")
+                else:
+                    st.session_state.replan_pending_state = request_payload
+                    st.session_state.replan_unsatisfied = {}
+                    st.session_state.replan_error = ""
+                    st.session_state.pending_nav = "replan"
+                    st.rerun()
 
         st.markdown("---")
 

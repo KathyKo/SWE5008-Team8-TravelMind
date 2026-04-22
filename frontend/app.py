@@ -296,6 +296,7 @@ def init_state():
         "plan_flight_return": [],
         "plan_hotel_options": [],
         "plan_request_summary": {},
+        "selected_option_check": {},
         "agent_status": {},
         "main_section_key": "plan",
         "security_log": [],
@@ -306,6 +307,12 @@ def init_state():
         "replan_done": False,
         "chosen_alt": None,
         "active_pipe_stage": None,
+        "replan_pending_state": None,
+        "replan_backend_result": {},
+        "replan_current_days": [],
+        "replan_unsatisfied": {},
+        "replan_error": "",
+        "pending_nav": None,
     }
     for k, v in defaults.items():
         if k not in st.session_state:
@@ -482,6 +489,12 @@ def main():
         return
 
     topbar()
+
+    # Defer nav switch requests to here (before nav widget is instantiated).
+    pending_nav = st.session_state.get("pending_nav")
+    if pending_nav in {"plan", "my_trip", "replan", "security"}:
+        st.session_state.main_section_key = pending_nav
+        st.session_state.pending_nav = None
 
     # Import pages here to avoid circular imports
     from pages.plan import render as render_plan

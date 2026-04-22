@@ -56,25 +56,6 @@ else:
     _INPUT_SCANNERS = []
     _OUTPUT_SCANNERS = []
 
-# Module-level singletons — models load once at import time (app startup),
-# not on the first request.
-_INPUT_SCANNERS = [
-    PromptInjection(threshold=0.75),
-    InputBanTopics(
-        topics=["illegal activity", "drug trafficking", "smuggling"],
-        threshold=0.75,
-    ),
-    TokenLimit(limit=512),
-]
-
-_OUTPUT_SCANNERS = [
-    Sensitive(redact=True),
-    BanTopics(
-        topics=["illegal activity", "drug trafficking", "smuggling"],
-        threshold=0.75,
-    ),
-]
-
 
 @dataclass
 class LLMGuardInputResult:
@@ -108,6 +89,14 @@ def scan_input_llm_guard(text: str) -> LLMGuardInputResult:
     Note: PII detection is handled separately via pii_scanner module
           (regex-based NER, independent of LLM Guard)
     """
+    if not _LLM_GUARD_AVAILABLE:
+        return LLMGuardInputResult(
+            is_safe=True,
+            threat_type=None,
+            risk_score=0.0,
+            sanitised_text=text,
+            reason="LLM Guard not installed (skipped)",
+        )
     try:
         sanitised_text, results, is_valid = scan_prompt(_INPUT_SCANNERS, text)
 
@@ -164,6 +153,14 @@ def scan_output_llm_guard(prompt: str, output: str) -> LLMGuardOutputResult:
         prompt: The original user prompt (required by LLM Guard for context)
         output: The agent's response text to validate
     """
+    if not _LLM_GUARD_AVAILABLE:
+        return LLMGuardOutputResult(
+            is_safe=True,
+            flags=[],
+            risk_score=0.0,
+            sanitised_text=output,
+            reason="LLM Guard not installed (skipped)",
+        )
     try:
         sanitised_text, results, is_valid = scan_output(
             _OUTPUT_SCANNERS, prompt, output
