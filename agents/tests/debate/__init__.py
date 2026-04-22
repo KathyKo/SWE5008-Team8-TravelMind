@@ -1,1 +1,0 @@
-"""Debate agent test package."""

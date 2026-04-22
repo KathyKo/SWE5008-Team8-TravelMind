@@ -12,13 +12,14 @@ Architecture intent preserved:
 
 Port map:
   8001  general / graph stream / health
+  8100  input_guard
   8101  intent_profile
   8102  search (research)
   8103  planner
   8104  debate
   8105  explain
+  8106  output_guard
   8107  replanner
-  (8100 input_guard / 8106 output_guard omitted when security stack disabled in main.py)
 """
 
 import asyncio
@@ -31,7 +32,7 @@ from agents.main import app  # single import — all module-level models load he
 
 log = logging.getLogger(__name__)
 
-AGENT_PORTS = [8001, 8101, 8102, 8103, 8104, 8105, 8107]
+AGENT_PORTS = [8001, 8100, 8101, 8102, 8103, 8104, 8105, 8106, 8107]
 
 
 async def main() -> None:

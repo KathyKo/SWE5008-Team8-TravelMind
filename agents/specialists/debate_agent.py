@@ -86,31 +86,6 @@ Return strict JSON:
 }}
 """
 
-SELECTED_OPTION_CHECK_SYSTEM_PROMPT = """
-You are a fairness and bias checker for a selected travel itinerary.
-Assess ONLY the selected option using these checks:
-1) filter_bubble_risk
-2) demographic_bias_risk
-3) personalization_confidence (cold-start if history is limited)
-
-Return strict JSON:
-{{
-  "filter_bubble_detected": true | false,
-  "demographic_bias_detected": true | false,
-  "filter_bubble_detail": "<1-2 sentence explanation for this check>",
-  "demographic_bias_detail": "<1-2 sentence explanation for this check>",
-  "personalization_confidence": "low" | "medium" | "high",
-  "cold_start_note": "<short warning or empty>",
-  "summary": "<short plain-language assessment>",
-  "highlights": ["<bullet>", "<bullet>", "<bullet>"]
-}}
-
-Rules:
-- Prefer conservative judgments.
-- If no historical behavior data is provided, set personalization_confidence to low
-  and provide a cold_start_note.
-"""
-
 
 def _debate_llm(*, temperature: float = 0.2) -> ChatOpenAI:
     return ChatOpenAI(
@@ -268,99 +243,6 @@ def _build_judge_payload(plan_payload: dict, history: list[dict]) -> dict:
     )
     raw["dimension_scores"] = _safe_round_dim_scores(raw)
     return raw
-
-
-def _build_selected_option_check_payload(
-    *,
-    selected_option: str,
-    selected_plan: list[dict],
-    trip_context: dict,
-) -> dict:
-    chain = (
-        ChatPromptTemplate.from_messages(
-            [
-                ("system", SELECTED_OPTION_CHECK_SYSTEM_PROMPT),
-                (
-                    "human",
-                    "Selected option: {selected_option}\n"
-                    "Selected itinerary:\n{selected_plan_json}\n\n"
-                    "Trip context:\n{trip_context_json}",
-                ),
-            ]
-        )
-        | _judge_llm(temperature=0.1)
-        | JsonOutputParser()
-    )
-    return chain.invoke(
-        {
-            "selected_option": selected_option,
-            "selected_plan_json": json.dumps(selected_plan, ensure_ascii=False, indent=2),
-            "trip_context_json": json.dumps(trip_context, ensure_ascii=False, indent=2),
-        }
-    )
-
-
-def evaluate_selected_option_fairness(state: dict, selected_option: str) -> dict:
-    """
-    Run judge-model fairness/bias checks for a user-selected itinerary option.
-    This path is UI-triggered and does not go through orchestrator.
-    """
-    payload = _plan_payload_from_state(state or {})
-    itineraries = payload.get("itineraries") or {}
-    if selected_option not in itineraries:
-        return {
-            "error": f"Selected option '{selected_option}' not found in itineraries."
-        }
-
-    selected_plan = itineraries.get(selected_option) or []
-    try:
-        result = _build_selected_option_check_payload(
-            selected_option=selected_option,
-            selected_plan=selected_plan,
-            trip_context={
-                "origin": payload.get("origin"),
-                "destination": payload.get("destination"),
-                "dates": payload.get("dates"),
-                "duration": payload.get("duration"),
-                "budget": payload.get("budget"),
-                "preferences": payload.get("preferences"),
-                "option_meta": (payload.get("option_meta") or {}).get(selected_option, {}),
-                "history_available": bool(payload.get("debate_history")),
-            },
-        )
-    except Exception as exc:
-        logger.exception(
-            "[evaluate_selected_option_fairness] selected_option=%s failed",
-            selected_option,
-        )
-        return {"error": f"fairness check failed: {exc}"}
-
-    confidence = str(result.get("personalization_confidence", "low")).lower()
-    cold_start_note = str(result.get("cold_start_note") or "").strip()
-    if confidence == "low" and not cold_start_note:
-        cold_start_note = "Cold-start: Limited history - more trips needed for full personalisation"
-
-    highlights = result.get("highlights")
-    if not isinstance(highlights, list):
-        highlights = []
-
-    return {
-        "selected_option": selected_option,
-        "filter_bubble_detected": bool(result.get("filter_bubble_detected")),
-        "demographic_bias_detected": bool(result.get("demographic_bias_detected")),
-        "filter_bubble_detail": str(
-            result.get("filter_bubble_detail")
-            or "Reviewed itinerary diversity and activity spread; no clear filter-bubble pattern was found."
-        ).strip(),
-        "demographic_bias_detail": str(
-            result.get("demographic_bias_detail")
-            or "No explicit demographic exclusion or unfair targeting cues were identified in this itinerary."
-        ).strip(),
-        "personalization_confidence": confidence if confidence in {"low", "medium", "high"} else "low",
-        "cold_start_note": cold_start_note,
-        "summary": str(result.get("summary") or "").strip(),
-        "highlights": [str(x) for x in highlights[:4]],
-    }
 
 
 def _round_from_history(history: list[dict]) -> int:
