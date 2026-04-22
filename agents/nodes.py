@@ -91,11 +91,6 @@ def planner_node(state: State) -> Dict:
     reset is_valid=None to let orchestrator re-route to debate for review.
     """
     result = call_remote_agent("planner", state)
-    # Prevent graph infinite loop when planner returns a hard error
-    # (e.g. missing required fields under DEV flow that skips intent_profile).
-    if result.get("error"):
-        result["error_message"] = f"planner failed: {result['error']}"
-        return result
     result["is_valid"] = None
     return result
 
@@ -193,20 +188,6 @@ def orchestrator_node(state: State) -> Dict:
     #    First planning: itineraries does not exist
     #    Re-planning after debate failure: planner_node will reset is_valid=None when returning
     if not state.get("itineraries") and not state.get("final_itineraries"):
-        # Under DEV flow we skip intent profiling, so ensure core fields exist
-        # before calling planner to avoid planner-error -> retry recursion loop.
-        missing_fields = [
-            field for field in ("destination", "origin")
-            if not state.get(field)
-        ]
-        if missing_fields:
-            msg = (
-                "Missing required fields for planner: "
-                + ", ".join(missing_fields)
-                + ". Please provide them in request state."
-            )
-            logger.error("[Orchestrator] %s", msg)
-            return {"error_message": msg, "next_node": "END"}
         logger.info("[Orchestrator] → planner (generate itinerary)")
         return {"next_node": "planner"}
 

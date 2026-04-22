@@ -27,7 +27,7 @@ def build_travel_graph():
     builder = StateGraph(State)
 
     # 1. Add all nodes (8 agents + orchestrator )
-    builder.add_node("input_guard", input_guard_node)
+    builder.add_node("input_guard", input_guard_node)                # Agent 5   (input guard)
     builder.add_node("intent_profile", intent_profile_node)          # Agent 1   (intent profile)
     builder.add_node("search", search_node)                          # Agent 2   (web search)
     builder.add_node("orchestrator", orchestrator_node)              # Agent 9   (orchestrator)
@@ -35,7 +35,7 @@ def build_travel_graph():
     builder.add_node("replanner", replanner_node)                    # Agent 7   (replanner)
     builder.add_node("debate", debate_node)                          # Agent 4   (debate)
     builder.add_node("explain", explain_node)                        # Agent 6   (explain)
-    builder.add_node("output_guard", output_guard_node)
+    builder.add_node("output_guard", output_guard_node)              # Agent 8   (output guard)
 
     # 2. Define edges (The flow)
     builder.add_edge(START, "input_guard")
