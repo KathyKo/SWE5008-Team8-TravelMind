@@ -19,7 +19,15 @@ def backend_main_module(monkeypatch):
     fake_pkg.__path__ = []
     monkeypatch.setitem(sys.modules, "backend.routers", fake_pkg)
 
-    for name in ("research", "planner", "explainability", "security", "auth"):
+    for name in (
+        "research",
+        "planner",
+        "explainability",
+        "security",
+        "auth",
+        "agent_proxy",
+        "graph_proxy",
+    ):
         module = types.ModuleType(f"backend.routers.{name}")
         module.router = APIRouter()
         monkeypatch.setitem(sys.modules, f"backend.routers.{name}", module)
