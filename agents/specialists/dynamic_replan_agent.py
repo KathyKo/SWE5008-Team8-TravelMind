@@ -68,6 +68,10 @@ def _norm_name(item: dict[str, Any]) -> str:
     return str(item.get("name") or "").strip().lower()
 
 
+def _canonical_item_name(text: str) -> str:
+    return _normalize_match_text(text)
+
+
 def _is_activity_or_restaurant(item: dict[str, Any]) -> bool:
     return str(item.get("icon") or "").lower() in {"activity", "restaurant"}
 
@@ -795,7 +799,7 @@ def postprocess_replan_output(payload: dict[str, Any], output: dict[str, Any]) -
 # verifier
 # ----------------------------
 DEFAULT_BASE_URL = "https://www.dmxapi.cn/v1"
-DEFAULT_VERIFIER_MODEL = "gpt-4.1-nano-2025-04-14"
+DEFAULT_VERIFIER_MODEL = "gpt-5-mini-2025-08-07"
 
 
 def _norm(text: str) -> str:
@@ -1243,6 +1247,9 @@ def _collect_replan_candidates_from_other_options(
     selected_option: str,
     forbidden_names: set[str],
 ) -> list[dict[str, Any]]:
+    forbidden_canonical_names = {
+        _canonical_item_name(name) for name in forbidden_names if _canonical_item_name(name)
+    }
     pool: list[dict[str, Any]] = []
     for opt_key, days in (itineraries or {}).items():
         if str(opt_key) == str(selected_option):
@@ -1253,7 +1260,8 @@ def _collect_replan_candidates_from_other_options(
                 if icon not in {"activity", "restaurant"}:
                     continue
                 name = str(item.get("name", "")).strip()
-                if not name or name.lower() in forbidden_names:
+                canonical_name = _canonical_item_name(name)
+                if not name or canonical_name in forbidden_canonical_names:
                     continue
                 pool.append(
                     {
@@ -1264,8 +1272,185 @@ def _collect_replan_candidates_from_other_options(
                 )
     dedup: dict[str, dict[str, Any]] = {}
     for item in pool:
-        dedup.setdefault(item["name"].lower(), item)
+        canonical_name = _canonical_item_name(item["name"])
+        if canonical_name:
+            dedup.setdefault(canonical_name, item)
     return list(dedup.values())
+
+
+def _extract_research_payload_for_replan(state: dict[str, Any]) -> dict[str, Any]:
+    inventory = state.get("inventory") or {}
+    if not isinstance(inventory, dict):
+        inventory = {}
+    return {
+        "compact_attractions": state.get("compact_attractions") or inventory.get("attractions") or [],
+        "compact_restaurants": state.get("compact_restaurants") or inventory.get("restaurants") or [],
+        "compact_hotels": state.get("compact_hotels") or state.get("hotel_options") or inventory.get("hotels") or [],
+        "compact_flights_out": state.get("compact_flights_out") or state.get("flight_options_outbound") or inventory.get("flights_outbound") or [],
+        "compact_flights_ret": state.get("compact_flights_ret") or state.get("flight_options_return") or inventory.get("flights_return") or [],
+        "att_list_text": state.get("att_list_text") or inventory.get("att_list_text", ""),
+        "rest_list_text": state.get("rest_list_text") or inventory.get("rest_list_text", ""),
+        "hotel_list_text": state.get("hotel_list_text") or inventory.get("hotel_list_text", ""),
+        "flight_out_text": state.get("flight_out_text") or inventory.get("flight_out_text", ""),
+        "flight_ret_text": state.get("flight_ret_text") or inventory.get("flight_ret_text", ""),
+        "tool_log": list(state.get("tool_log") or []),
+        "hotel_opts": state.get("hotel_opts") or state.get("hotel_options") or inventory.get("hotels") or [],
+    }
+
+
+def _collect_typed_replan_candidates(
+    *,
+    state: dict[str, Any],
+    selected_option: str,
+    forbidden_names: set[str],
+) -> dict[str, list[dict[str, Any]]]:
+    forbidden_canonical_names = {
+        _canonical_item_name(name) for name in forbidden_names if _canonical_item_name(name)
+    }
+    payload = _extract_research_payload_for_replan(state)
+
+    def _filter_name(name: str) -> bool:
+        canonical_name = _canonical_item_name(name)
+        return bool(canonical_name) and canonical_name not in forbidden_canonical_names
+
+    activity_candidates: list[dict[str, Any]] = []
+    for item in payload["compact_attractions"]:
+        name = str(item.get("name", "")).strip()
+        if not _filter_name(name):
+            continue
+        activity_candidates.append(
+            {
+                "name": name,
+                "icon": "activity",
+                "cost": str(item.get("price") or "TBC"),
+            }
+        )
+
+    restaurant_candidates: list[dict[str, Any]] = []
+    for item in payload["compact_restaurants"]:
+        name = str(item.get("name", "")).strip()
+        if not _filter_name(name):
+            continue
+        restaurant_candidates.append(
+            {
+                "name": name,
+                "icon": "restaurant",
+                "cost": str(item.get("price") or "TBC"),
+            }
+        )
+
+    hotel_candidates: list[dict[str, Any]] = []
+    for item in payload["compact_hotels"]:
+        name = str(item.get("name", "")).strip()
+        if not _filter_name(name):
+            continue
+        hotel_candidates.append(
+            {
+                "name": name,
+                "icon": "hotel",
+                "cost": _usd_to_sgd_str(item.get("price_per_night_usd")),
+            }
+        )
+
+    flight_out_candidates: list[dict[str, Any]] = []
+    for item in payload["compact_flights_out"]:
+        name = _flight_display(item)
+        if not _filter_name(name):
+            continue
+        flight_out_candidates.append(
+            {
+                "name": name,
+                "icon": "flight",
+                "cost": _usd_to_sgd_str(item.get("price_usd")),
+            }
+        )
+
+    flight_ret_candidates: list[dict[str, Any]] = []
+    for item in payload["compact_flights_ret"]:
+        name = _flight_display(item)
+        if not _filter_name(name):
+            continue
+        flight_ret_candidates.append(
+            {
+                "name": name,
+                "icon": "flight",
+                "cost": _usd_to_sgd_str(item.get("price_usd")),
+            }
+        )
+
+    def _append_unique(pool: list[dict[str, Any]], item: dict[str, Any]) -> None:
+        canonical_name = _canonical_item_name(str(item.get("name", "")))
+        if not canonical_name or canonical_name in forbidden_canonical_names:
+            return
+        if any(_canonical_item_name(str(x.get("name", ""))) == canonical_name for x in pool):
+            return
+        pool.append(item)
+
+    # Supplement pools from all itineraries (including hotel/flight),
+    # so replan does not fail when compact_* payload is sparse.
+    for opt_key, days in (state.get("itineraries") or {}).items():
+        if str(opt_key) == str(selected_option):
+            continue
+        for day in days or []:
+            for item in day.get("items", []) or []:
+                icon = str(item.get("icon", "")).lower()
+                key = str(item.get("key", "")).lower()
+                name = str(item.get("name", "")).strip()
+                cost = str(item.get("cost") or "TBC")
+                if not _filter_name(name):
+                    continue
+                if icon == "activity":
+                    _append_unique(activity_candidates, {"name": name, "icon": "activity", "cost": cost})
+                elif icon == "restaurant":
+                    _append_unique(restaurant_candidates, {"name": name, "icon": "restaurant", "cost": cost})
+                elif icon == "hotel":
+                    _append_unique(hotel_candidates, {"name": name, "icon": "hotel", "cost": cost})
+                elif icon == "flight":
+                    if "return" in key:
+                        _append_unique(flight_ret_candidates, {"name": name, "icon": "flight", "cost": cost})
+                    else:
+                        _append_unique(flight_out_candidates, {"name": name, "icon": "flight", "cost": cost})
+
+    # Last fallback for activity/restaurant only.
+    if not activity_candidates and not restaurant_candidates:
+        fallback = _collect_replan_candidates_from_other_options(
+            state.get("itineraries") or {},
+            selected_option,
+            forbidden_names,
+        )
+        for item in fallback:
+            icon = str(item.get("icon", "")).lower()
+            if icon == "activity":
+                _append_unique(activity_candidates, item)
+            elif icon == "restaurant":
+                _append_unique(restaurant_candidates, item)
+
+    return {
+        "activity": activity_candidates,
+        "restaurant": restaurant_candidates,
+        "hotel": hotel_candidates,
+        "flight_outbound": flight_out_candidates,
+        "flight_return": flight_ret_candidates,
+    }
+
+
+def _usd_to_sgd_str(usd_val: Any) -> str:
+    try:
+        return f"SGD {round(float(str(usd_val).replace(',', '')) * 1.35)}"
+    except Exception:
+        return "TBC"
+
+
+def _flight_display(flight: dict[str, Any]) -> str:
+    display = str(flight.get("display") or "").strip()
+    if display:
+        return display
+    parts = [
+        f"{flight.get('airline', '')} {flight.get('flight_number', '')}".strip(),
+        f"{flight.get('departure_airport', '')} -> {flight.get('arrival_airport', '')}".strip(),
+        f"dep {flight.get('departure_time', '')} -> arr {flight.get('arrival_time', '')}".strip(),
+    ]
+    return " | ".join(part for part in parts if part)
 
 
 def _apply_key_based_replan(
@@ -1273,64 +1458,126 @@ def _apply_key_based_replan(
     days: list[dict[str, Any]],
     replace_item_keys: set[str],
     locked_item_keys: set[str],
-    candidates: list[dict[str, Any]],
-) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+    typed_candidates: dict[str, list[dict[str, Any]]],
+    forbidden_names: set[str],
+    replace_slots: set[str] | None = None,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]], set[str]]:
     replanned_days = deepcopy(days)
+    forbidden_canonical_names = {
+        _canonical_item_name(name) for name in forbidden_names if _canonical_item_name(name)
+    }
     used_names = {
-        str(item.get("name", "")).strip().lower()
+        _canonical_item_name(str(item.get("name", "")).strip())
         for day in replanned_days
         for item in (day.get("items", []) or [])
-        if str(item.get("name", "")).strip()
+        if _canonical_item_name(str(item.get("name", "")).strip())
     }
-    candidate_idx = 0
+    pool_index = {
+        "activity": 0,
+        "restaurant": 0,
+        "hotel": 0,
+        "flight_outbound": 0,
+        "flight_return": 0,
+    }
     change_log: list[dict[str, Any]] = []
     unresolved: list[dict[str, Any]] = []
+    generated_names: set[str] = set()
+    replace_slots_norm: set[str] = {
+        str(s).strip() for s in (replace_slots or set()) if str(s).strip()
+    }
+    # When the planner reuses the same catalog key on multiple rows (e.g. same restaurant twice),
+    # key-only matching replaces every row with that key. Slots are "day_idx:item_idx" and disambiguate.
+    use_slot_targeting = bool(replace_slots_norm)
 
-    for day in replanned_days:
+    def _pick_replacement(
+        *,
+        pool: list[dict[str, Any]],
+        old_name: str,
+        pool_key: str,
+    ) -> dict[str, Any] | None:
+        old_canonical_name = _canonical_item_name(old_name)
+
+        # Pass 1: strict mode (must be unseen in current itinerary).
+        while pool_index[pool_key] < len(pool):
+            cand = pool[pool_index[pool_key]]
+            pool_index[pool_key] += 1
+            cand_canonical_name = _canonical_item_name(str(cand.get("name", "")))
+            if not cand_canonical_name:
+                continue
+            if cand_canonical_name in forbidden_canonical_names:
+                continue
+            if cand_canonical_name == old_canonical_name:
+                continue
+            if cand_canonical_name in used_names:
+                continue
+            return cand
+
+        # Pass 2: relaxed mode (allow reuse across days, but still must differ from old).
+        for cand in pool:
+            cand_canonical_name = _canonical_item_name(str(cand.get("name", "")))
+            if not cand_canonical_name:
+                continue
+            if cand_canonical_name in forbidden_canonical_names:
+                continue
+            if cand_canonical_name == old_canonical_name:
+                continue
+            return cand
+        return None
+
+    for day_idx, day in enumerate(replanned_days):
         day_label = str(day.get("day", "Day ?"))
-        for item in day.get("items", []) or []:
+        for item_idx, item in enumerate(day.get("items", []) or []):
             key = str(item.get("key") or "")
-            if key in locked_item_keys or key not in replace_item_keys:
+            slot = f"{day_idx}:{item_idx}"
+            if use_slot_targeting:
+                if slot not in replace_slots_norm:
+                    continue
+                if key in locked_item_keys:
+                    continue
+            elif key in locked_item_keys or key not in replace_item_keys:
                 continue
             icon = str(item.get("icon", "")).lower()
-            if icon not in {"activity", "restaurant"}:
+            # Flights are not user-replannable; ignore any flight keys in replace_item_keys.
+            if icon == "flight":
+                continue
+            if icon not in {"activity", "restaurant", "hotel"}:
                 unresolved.append(
                     {
                         "day": day_label,
                         "item_key": key,
                         "item_name": str(item.get("name", "")),
-                        "reason": "only_activity_or_restaurant_can_be_replaced",
+                        "reason": "unsupported_item_type",
                     }
                 )
                 continue
 
-            replacement = None
-            while candidate_idx < len(candidates):
-                cand = candidates[candidate_idx]
-                candidate_idx += 1
-                if cand["name"].lower() in used_names:
-                    continue
-                if cand["icon"] != icon:
-                    continue
-                replacement = cand
-                break
+            pool_key = icon
+            pool = typed_candidates.get(pool_key) or []
+            old_name = str(item.get("name", ""))
+            replacement = _pick_replacement(pool=pool, old_name=old_name, pool_key=pool_key)
 
             if replacement is None:
                 unresolved.append(
                     {
                         "day": day_label,
                         "item_key": key,
-                        "item_name": str(item.get("name", "")),
+                        "item_name": old_name,
                         "reason": "no_suitable_replacement_found",
+                        "pool_key": pool_key,
+                        "pool_size": len(pool),
                     }
                 )
                 continue
 
-            old_name = str(item.get("name", ""))
             item["name"] = replacement["name"]
             item["cost"] = replacement["cost"]
-            item["key"] = f"{icon}_dynamic_replan_{_slug(replacement['name'])}"
-            used_names.add(replacement["name"].lower())
+            if icon == "hotel":
+                # Keep semantic keys stable for downstream logic/UI.
+                item["key"] = key
+            else:
+                item["key"] = f"{icon}_dynamic_replan_{_slug(replacement['name'])}"
+            used_names.add(_canonical_item_name(replacement["name"]))
+            generated_names.add(replacement["name"])
             change_log.append(
                 {
                     "day": day_label,
@@ -1338,10 +1585,11 @@ def _apply_key_based_replan(
                     "old_item": old_name,
                     "new_item": replacement["name"],
                     "item_key": key,
+                    "slot": slot,
                 }
             )
 
-    return replanned_days, change_log, unresolved
+    return replanned_days, change_log, unresolved, generated_names
 
 
 def dynamic_replan_agent(state: dict[str, Any]) -> dict[str, Any]:
@@ -1359,30 +1607,42 @@ def dynamic_replan_agent(state: dict[str, Any]) -> dict[str, Any]:
         replace_item_keys = {
             str(x) for x in (replan_request.get("replace_item_keys") or []) if str(x)
         }
+        replace_slots = {
+            str(x).strip()
+            for x in (replan_request.get("replace_slots") or [])
+            if str(x).strip()
+        }
         locked_item_keys = {
             str(x) for x in (replan_request.get("locked_item_keys") or []) if str(x)
         }
         locked_names = {
-            str(x).strip().lower()
+            str(x).strip()
             for x in (replan_request.get("locked_item_names") or [])
             if str(x).strip()
         }
         replace_names = {
-            str(x).strip().lower()
+            str(x).strip()
             for x in (replan_request.get("replace_item_names") or [])
             if str(x).strip()
         }
-        forbidden_names = locked_names | replace_names
-        candidates = _collect_replan_candidates_from_other_options(
-            state.get("itineraries") or {},
-            selected_option,
-            forbidden_names,
+        one_round_ban_names = {
+            str(x).strip()
+            for x in (replan_request.get("one_round_ban_names") or [])
+            if str(x).strip()
+        }
+        forbidden_names = locked_names | replace_names | one_round_ban_names
+        typed_candidates = _collect_typed_replan_candidates(
+            state=state,
+            selected_option=selected_option,
+            forbidden_names=forbidden_names,
         )
-        replanned_days, change_log, unresolved = _apply_key_based_replan(
+        replanned_days, change_log, unresolved, generated_names = _apply_key_based_replan(
             days=days,
             replace_item_keys=replace_item_keys,
             locked_item_keys=locked_item_keys,
-            candidates=candidates,
+            typed_candidates=typed_candidates,
+            forbidden_names=forbidden_names,
+            replace_slots=replace_slots,
         )
         replanner_output = {
             "plan_id": state.get("plan_id"),
@@ -1404,11 +1664,21 @@ def dynamic_replan_agent(state: dict[str, Any]) -> dict[str, Any]:
                 "current_time": "N/A",
                 "location": state.get("destination") or "Current trip",
                 "original_plan_title": f"Option {selected_option}",
-                "selected_for_replan_count": len(replace_item_keys),
+                "selected_for_replan_count": len(replace_slots) if replace_slots else len(replace_item_keys),
                 "locked_item_count": len(locked_item_keys),
+                "locked_item_keys": sorted(locked_item_keys),
+                "locked_item_names": sorted(locked_names),
+                "one_round_ban_names_next": sorted(generated_names),
+                "candidate_pool_counts": {
+                    "activity": len(typed_candidates.get("activity") or []),
+                    "restaurant": len(typed_candidates.get("restaurant") or []),
+                    "hotel": len(typed_candidates.get("hotel") or []),
+                    "flight_outbound": len(typed_candidates.get("flight_outbound") or []),
+                    "flight_return": len(typed_candidates.get("flight_return") or []),
+                },
             },
             "ripple_effect": (
-                "Selected items were regenerated while unchecked items were kept unchanged."
+                "Unchecked items were regenerated while checked (visited) items were kept locked."
             ),
         }
         return {

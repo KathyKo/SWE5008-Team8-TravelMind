@@ -14,10 +14,86 @@ ICON_MAP = {
 }
 
 
+def _build_replan_request_from_my_trip(days: list[dict], selected_opt: str) -> dict:
+    visited = st.session_state.get("visited", {}) or {}
+    replace_item_keys: list[str] = []
+    replace_slots: list[str] = []
+    locked_item_keys: list[str] = []
+    replace_item_names: list[str] = []
+    locked_item_names: list[str] = []
+
+    for day_idx, day in enumerate(days):
+        for item_idx, item in enumerate(day.get("items", [])):
+            item_id = f"trip_slot_{day_idx}_{item_idx}"
+            item_key = str(item.get("key") or f"item_{day_idx}_{item_idx}")
+            item_name = str(item.get("name") or "")
+            icon_l = str(item.get("icon", "")).lower()
+            if visited.get(item_id, False):
+                locked_item_keys.append(item_key)
+                if item_name:
+                    locked_item_names.append(item_name)
+            else:
+                if icon_l == "flight":
+                    continue
+                replace_item_keys.append(item_key)
+                replace_slots.append(f"{day_idx}:{item_idx}")
+                if item_name:
+                    replace_item_names.append(item_name)
+
+    summary = st.session_state.get("plan_request_summary") or {}
+    plan_state = st.session_state.get("plan_state") or {}
+
+    return {
+        "plan_id": st.session_state.get("plan_id"),
+        "origin": summary.get("origin") or plan_state.get("origin"),
+        "destination": summary.get("destination") or plan_state.get("destination"),
+        "dates": summary.get("dates") or plan_state.get("dates"),
+        "duration": summary.get("duration") or plan_state.get("duration"),
+        "budget": summary.get("budget") or plan_state.get("budget"),
+        "preferences": plan_state.get("preferences"),
+        "itineraries": st.session_state.get("plan_itineraries") or {},
+        "option_meta": st.session_state.get("plan_option_meta") or {},
+        "research": plan_state.get("research") or {},
+        "inventory": plan_state.get("inventory") or {},
+        "tool_log": list(plan_state.get("tool_log") or []),
+        "compact_attractions": plan_state.get("compact_attractions") or [],
+        "compact_restaurants": plan_state.get("compact_restaurants") or [],
+        "compact_hotels": plan_state.get("compact_hotels") or [],
+        "compact_flights_out": plan_state.get("compact_flights_out") or [],
+        "compact_flights_ret": plan_state.get("compact_flights_ret") or [],
+        "flight_options_outbound": st.session_state.get("plan_flight_outbound") or plan_state.get("flight_options_outbound") or [],
+        "flight_options_return": st.session_state.get("plan_flight_return") or plan_state.get("flight_options_return") or [],
+        "hotel_options": st.session_state.get("plan_hotel_options") or plan_state.get("hotel_options") or [],
+        "att_list_text": plan_state.get("att_list_text") or "",
+        "rest_list_text": plan_state.get("rest_list_text") or "",
+        "hotel_list_text": plan_state.get("hotel_list_text") or "",
+        "flight_out_text": plan_state.get("flight_out_text") or "",
+        "flight_ret_text": plan_state.get("flight_ret_text") or "",
+        "hotel_opts": plan_state.get("hotel_opts") or st.session_state.get("plan_hotel_options") or [],
+        "replan_request": {
+            "selected_option": selected_opt,
+            "itinerary_days": days,
+            "replace_item_keys": replace_item_keys,
+            "replace_slots": replace_slots,
+            "replace_item_names": replace_item_names,
+            "locked_item_keys": locked_item_keys,
+            "locked_item_names": locked_item_names,
+            "one_round_ban_names": [],
+            "round": 1,
+            "source": "my_trip_checked_items",
+        },
+    }
+
+
 # ─── Right panel ──────────────────────────────────────────────────────────────
 
 def _render_right_panel():
     plan_state = st.session_state.get("plan_state")
+    selected_check = (
+        st.session_state.get("selected_option_check")
+        or (plan_state or {}).get("selected_option_check")
+        or {}
+    )
 
     with st.container(border=True):
 
@@ -65,7 +141,53 @@ def _render_right_panel():
 
         # ── Fairness & Bias Checks ────────────────────────
         st.markdown("**Fairness & Bias Checks**")
-        if plan_state:
+        if selected_check:
+            filter_bubble_detected = bool(selected_check.get("filter_bubble_detected"))
+            demographic_bias_detected = bool(selected_check.get("demographic_bias_detected"))
+            filter_bubble_detail = str(selected_check.get("filter_bubble_detail") or "").strip()
+            demographic_bias_detail = str(selected_check.get("demographic_bias_detail") or "").strip()
+            cold_start_note = str(selected_check.get("cold_start_note") or "").strip()
+            confidence = str(selected_check.get("personalization_confidence") or "").lower()
+
+            if not filter_bubble_detected:
+                with st.expander("✅ No filter bubble detected", expanded=False):
+                    st.markdown(
+                        f"<span style='color:#166534;font-size:13px;line-height:1.65'>"
+                        f"{html.escape(filter_bubble_detail or 'No obvious echo-chamber pattern found in this itinerary.')}"
+                        f"</span>",
+                        unsafe_allow_html=True,
+                    )
+            else:
+                with st.expander("⚠ Filter bubble risk detected", expanded=False):
+                    st.markdown(
+                        f"<span style='color:#fde68a;font-size:13px;line-height:1.65'>"
+                        f"{html.escape(filter_bubble_detail or 'This itinerary may over-focus on narrow activity types.')}"
+                        f"</span>",
+                        unsafe_allow_html=True,
+                    )
+
+            if not demographic_bias_detected:
+                with st.expander("✅ No demographic bias", expanded=False):
+                    st.markdown(
+                        f"<span style='color:#166534;font-size:13px;line-height:1.65'>"
+                        f"{html.escape(demographic_bias_detail or 'No direct demographic bias indicators were found.')}"
+                        f"</span>",
+                        unsafe_allow_html=True,
+                    )
+            else:
+                with st.expander("⚠ Demographic bias risk detected", expanded=False):
+                    st.markdown(
+                        f"<span style='color:#fde68a;font-size:13px;line-height:1.65'>"
+                        f"{html.escape(demographic_bias_detail or 'Potential demographic sensitivity detected; review is recommended.')}"
+                        f"</span>",
+                        unsafe_allow_html=True,
+                    )
+
+            if cold_start_note:
+                st.warning(f"⚠ {cold_start_note}")
+            elif confidence == "low":
+                st.warning("⚠ Cold-start: Limited history - 3 more trips needed for full personalisation")
+        elif plan_state:
             is_valid = plan_state.get("is_valid")
             debate_count = plan_state.get("debate_count") or 0
             critique = plan_state.get("critique") or {}
@@ -163,51 +285,7 @@ def _render_right_panel():
 
 
 # ─── Main render ──────────────────────────────────────────────────────────────
-def _build_replan_request_from_my_trip(days: list[dict], selected_opt: str) -> dict:
-    visited = st.session_state.get("visited", {}) or {}
-    replace_item_keys: list[str] = []
-    locked_item_keys: list[str] = []
-    replace_item_names: list[str] = []
-    locked_item_names: list[str] = []
 
-    for day_idx, day in enumerate(days):
-        for item_idx, item in enumerate(day.get("items", [])):
-            item_id = f"trip_{day_idx}_{item.get('name', item_idx)}"
-            item_key = str(item.get("key") or f"item_{day_idx}_{item_idx}")
-            item_name = str(item.get("name") or "")
-            if visited.get(item_id, False):
-                replace_item_keys.append(item_key)
-                if item_name:
-                    replace_item_names.append(item_name)
-            else:
-                locked_item_keys.append(item_key)
-                if item_name:
-                    locked_item_names.append(item_name)
-
-    summary = st.session_state.get("plan_request_summary") or {}
-    plan_state = st.session_state.get("plan_state") or {}
-
-    return {
-        "plan_id": st.session_state.get("plan_id"),
-        "origin": summary.get("origin") or plan_state.get("origin"),
-        "destination": summary.get("destination") or plan_state.get("destination"),
-        "dates": summary.get("dates") or plan_state.get("dates"),
-        "duration": summary.get("duration") or plan_state.get("duration"),
-        "budget": summary.get("budget") or plan_state.get("budget"),
-        "preferences": plan_state.get("preferences"),
-        "itineraries": st.session_state.get("plan_itineraries") or {},
-        "option_meta": st.session_state.get("plan_option_meta") or {},
-        "replan_request": {
-            "selected_option": selected_opt,
-            "itinerary_days": days,
-            "replace_item_keys": replace_item_keys,
-            "replace_item_names": replace_item_names,
-            "locked_item_keys": locked_item_keys,
-            "locked_item_names": locked_item_names,
-            "round": 1,
-            "source": "my_trip_checked_items",
-        },
-    }
 def render():
     # Use real plan data if available, else fall back to demo data
     plan_itineraries = st.session_state.get("plan_itineraries") or {}
@@ -247,18 +325,18 @@ def render():
                 f"font-weight:500;line-height:1.8'>✓ {visited_count} places visited</div>",
                 unsafe_allow_html=True,
             )
-    with act2:
-        if st.button("🔄 Need to Dynamic Replan?", use_container_width=True):
-            request_payload = _build_replan_request_from_my_trip(days,selected_opt)
-            if not request_payload["replan_request"]["replace_item_keys"]:
-                st.warning("Please tick the itinerary items you want to modify before running dynamic replan.")
-                return
-            else:
-                st.session_state.replan_pending_state = request_payload
-                st.session_state.replan_error = ""
-                st.session_state.replan_unsatisfied = {}
-                st.session_state.pending_nav = "replan"
-                st.rerun()
+        with act2:
+            if st.button("🔄 Need to Dynamic Replan?", use_container_width=True):
+                request_payload = _build_replan_request_from_my_trip(days, selected_opt)
+                if not request_payload["replan_request"]["replace_item_keys"]:
+                    st.warning("All items are marked as visited. Uncheck future/unvisited items to replan remaining itinerary.")
+                else:
+                    st.session_state.replan_pending_state = request_payload
+                    st.session_state.replan_unsatisfied = {}
+                    st.session_state.replan_error = ""
+                    # Defer nav change to app.py before radio(key="main_section_key") is instantiated.
+                    st.session_state.pending_nav = "replan"
+                    st.rerun()
 
         st.markdown("---")
 
@@ -275,7 +353,7 @@ def render():
                 st.caption("✓ Check off places you've been — this trains your personal AI profile")
 
                 for item_idx, item in enumerate(day.get("items", [])):
-                    item_id = f"trip_{day_idx}_{item.get('name', item_idx)}"
+                    item_id = f"trip_slot_{day_idx}_{item_idx}"
                     is_checked = visited.get(item_id, False)
 
                     col_check, col_time, col_icon, col_name, col_cost = st.columns(
@@ -335,3 +413,5 @@ def render():
 
     with col_side:
         _render_right_panel()
+
+
