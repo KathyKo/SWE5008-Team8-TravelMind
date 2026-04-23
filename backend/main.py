@@ -16,7 +16,7 @@ Interactive docs:
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.routers import research, planner, explainability, security, auth, agent_proxy
+from backend.routers import research, planner, explainability, security, auth, agent_proxy, graph_proxy
 
 
 @asynccontextmanager
@@ -61,6 +61,7 @@ app.include_router(explainability.router, prefix="/explainability", tags=["Agent
 app.include_router(security.router,       prefix="/travel",         tags=["Travel Compatibility"])
 app.include_router(auth.router,           prefix="/auth",           tags=["Auth"])
 app.include_router(agent_proxy.router,    prefix="/agent",          tags=["Agent Proxy"])
+app.include_router(graph_proxy.router,    prefix="/api/invoke",     tags=["Agent Graph Proxy"])
 
 
 # ── Health ────────────────────────────────────────────────────
