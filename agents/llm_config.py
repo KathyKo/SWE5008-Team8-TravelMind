@@ -1,7 +1,8 @@
 import os
 
-# Unified default model for agents that still read OPENAI_MODEL
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-5.4-nano-2026-03-17")
+# Unified default model for agents that still read OPENAI_MODEL.
+# Keep this on a broadly accessible model to avoid org-verification 404s.
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-nano-2025-04-14")
 
 # DMX provider config (requested for planner/debate/judge paths)
 DMX_BASE_URL = os.getenv("DMX_BASE_URL", "https://www.dmxapi.cn/v1")

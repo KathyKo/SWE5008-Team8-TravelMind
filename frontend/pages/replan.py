@@ -2,178 +2,252 @@
 pages/replan.py — Dynamic Re-planning page
 """
 
-import time
+import html
 import os
 import requests
 import streamlit as st
-from data.store import SITUATIONS, TIME_OPTIONS, ALT_OPTIONS, REPLAN_LOG
 
-AGENTS_REPLAN_URL = os.getenv("AGENTS_REPLAN_URL", "http://agents:8001/replan").rstrip("/")
-
-
-def _build_feedback() -> dict:
-    return {
-        "situation": st.session_state.replan_situation,
-        "time": st.session_state.replan_time,
-        "current_day": "Day 3",
-        "current_time": "14:00",
-        "current_location": "Central Kyoto, near Nishiki Market",
-    }
+BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000").rstrip("/")
+BACKEND_REPLAN_URL = os.getenv(
+    "BACKEND_REPLAN_URL",
+    f"{BACKEND_URL}/agent/replan",
+).rstrip("/")
 
 
-def _call_replan_backend() -> dict:
-    payload = {
-        "user_feedback": _build_feedback(),
-        "user_id": st.session_state.get("user_id", "demo_user"),
-    }
-    resp = requests.post(AGENTS_REPLAN_URL, json=payload, timeout=90)
+ICON_MAP = {
+    "flight": "✈️",
+    "hotel": "🏨",
+    "activity": "🎯",
+    "restaurant": "🍽️",
+}
+
+
+def _call_replan_backend(state_payload: dict) -> dict:
+    resp = requests.post(BACKEND_REPLAN_URL, json={"state": state_payload}, timeout=180)
     resp.raise_for_status()
     return resp.json()
 
 
+def _run_pending_replan_if_needed() -> None:
+    pending = st.session_state.get("replan_pending_state")
+    if not pending:
+        return
+    try:
+        with st.spinner("Dynamic replan agent is generating updates..."):
+            result = _call_replan_backend(pending)
+        replanner_output = result.get("replanner_output", {}) if isinstance(result, dict) else {}
+        replanned_plan = (replanner_output.get("replanned_plan") or {}).get("plan") or []
+        st.session_state.replan_backend_result = replanner_output
+        st.session_state.replan_current_days = replanned_plan
+        st.session_state.replan_unsatisfied = {}
+        st.session_state.replan_error = ""
+    except Exception as exc:
+        st.session_state.replan_error = str(exc)
+        st.session_state.replan_backend_result = {}
+        st.session_state.replan_current_days = []
+    finally:
+        st.session_state.replan_pending_state = None
+
+
+def _render_itinerary_with_checks(days: list[dict]) -> None:
+    unsat = st.session_state.get("replan_unsatisfied", {}) or {}
+    backend_result = st.session_state.get("replan_backend_result") or {}
+    context = backend_result.get("context") or {}
+    locked_item_keys = {str(x) for x in (context.get("locked_item_keys") or []) if str(x)}
+    for day_idx, day in enumerate(days):
+        day_title = day.get("day", f"Day {day_idx + 1}")
+        day_budget = day.get("budget", "")
+        expander_label = f"📅 {day_title}  —  {day_budget}" if day_budget else f"📅 {day_title}"
+        with st.expander(expander_label, expanded=(day_idx == 0)):
+            st.caption(
+                "On this page, if you are not satisfied, you can select the itinerary items you want to modify, "
+                "and we will update only those selected items. "
+                "(Note: items you have already visited cannot be selected.)"
+            )
+            for item_idx, item in enumerate(day.get("items", [])):
+                item_key = str(item.get("key") or f"item_{day_idx}_{item_idx}")
+                # Slot id must be unique per row (same itinerary key can repeat across days).
+                checkbox_id = f"replan_slot_{day_idx}_{item_idx}"
+                is_locked_visited = item_key in locked_item_keys
+                raw_icon = item.get("icon", "")
+                icon_l = str(raw_icon).lower() if isinstance(raw_icon, str) else ""
+                is_flight = icon_l == "flight"
+                checked = bool(unsat.get(checkbox_id, False))
+                col_check, col_time, col_icon, col_name, col_cost = st.columns([0.5, 0.8, 0.4, 4, 1.2])
+                with col_check:
+                    new_checked = st.checkbox(
+                        "Mark for replan",
+                        value=True if is_locked_visited else checked,
+                        key=f"replan_chk_{checkbox_id}",
+                        label_visibility="collapsed",
+                        disabled=is_locked_visited or is_flight,
+                    )
+                    if (not is_locked_visited) and (new_checked != checked):
+                        unsat[checkbox_id] = new_checked
+                        st.session_state.replan_unsatisfied = unsat
+                name_style = (
+                    "text-decoration:line-through;color:#9ca3af"
+                    if is_locked_visited
+                    else "font-size:13px;font-weight:500"
+                )
+                time_color = "#9ca3af" if is_locked_visited else "#6b7280"
+                icon_opacity = "opacity:0.35" if is_locked_visited else ""
+                with col_time:
+                    st.markdown(
+                        f"<span style='color:{time_color};font-size:12px;font-family:monospace'>{item.get('time', '')}</span>",
+                        unsafe_allow_html=True,
+                    )
+                with col_icon:
+                    display_icon = ICON_MAP.get(raw_icon, raw_icon) if isinstance(raw_icon, str) else raw_icon
+                    st.markdown(
+                        f"<span style='font-size:18px;{icon_opacity}'>{display_icon}</span>",
+                        unsafe_allow_html=True,
+                    )
+                with col_name:
+                    st.markdown(
+                        f"<span style='{name_style}'>{html.escape(str(item.get('name', '')))}</span>",
+                        unsafe_allow_html=True,
+                    )
+                with col_cost:
+                    st.markdown(
+                        f"<span style='color:#6b7280;font-size:12px;font-family:monospace'>{item.get('cost', '')}</span>",
+                        unsafe_allow_html=True,
+                    )
+
+
+def _build_replan_again_payload(days: list[dict], selected_option: str, prev_round: int) -> dict:
+    unsat = st.session_state.get("replan_unsatisfied", {}) or {}
+    backend_result = st.session_state.get("replan_backend_result") or {}
+    context = backend_result.get("context") or {}
+    replace_item_keys: list[str] = []
+    replace_slots: list[str] = []
+    locked_item_keys: list[str] = [str(x) for x in (context.get("locked_item_keys") or []) if str(x)]
+    replace_item_names: list[str] = []
+    locked_item_names: list[str] = [str(x) for x in (context.get("locked_item_names") or []) if str(x)]
+
+    for day_idx, day in enumerate(days):
+        for item_idx, item in enumerate(day.get("items", [])):
+            item_key = str(item.get("key") or f"item_{day_idx}_{item_idx}")
+            item_name = str(item.get("name") or "")
+            checkbox_id = f"replan_slot_{day_idx}_{item_idx}"
+            raw_icon = item.get("icon", "")
+            if str(raw_icon).lower() == "flight":
+                continue
+            if unsat.get(checkbox_id, False):
+                replace_item_keys.append(item_key)
+                replace_slots.append(f"{day_idx}:{item_idx}")
+                if item_name:
+                    replace_item_names.append(item_name)
+
+    summary = st.session_state.get("plan_request_summary") or {}
+    plan_state = st.session_state.get("plan_state") or {}
+    return {
+        "plan_id": st.session_state.get("plan_id"),
+        "origin": summary.get("origin") or plan_state.get("origin"),
+        "destination": summary.get("destination") or plan_state.get("destination"),
+        "dates": summary.get("dates") or plan_state.get("dates"),
+        "duration": summary.get("duration") or plan_state.get("duration"),
+        "budget": summary.get("budget") or plan_state.get("budget"),
+        "preferences": plan_state.get("preferences"),
+        "itineraries": st.session_state.get("plan_itineraries") or {},
+        "option_meta": st.session_state.get("plan_option_meta") or {},
+        "research": plan_state.get("research") or {},
+        "inventory": plan_state.get("inventory") or {},
+        "tool_log": list(plan_state.get("tool_log") or []),
+        "compact_attractions": plan_state.get("compact_attractions") or [],
+        "compact_restaurants": plan_state.get("compact_restaurants") or [],
+        "compact_hotels": plan_state.get("compact_hotels") or [],
+        "compact_flights_out": plan_state.get("compact_flights_out") or [],
+        "compact_flights_ret": plan_state.get("compact_flights_ret") or [],
+        "flight_options_outbound": st.session_state.get("plan_flight_outbound") or plan_state.get("flight_options_outbound") or [],
+        "flight_options_return": st.session_state.get("plan_flight_return") or plan_state.get("flight_options_return") or [],
+        "hotel_options": st.session_state.get("plan_hotel_options") or plan_state.get("hotel_options") or [],
+        "att_list_text": plan_state.get("att_list_text") or "",
+        "rest_list_text": plan_state.get("rest_list_text") or "",
+        "hotel_list_text": plan_state.get("hotel_list_text") or "",
+        "flight_out_text": plan_state.get("flight_out_text") or "",
+        "flight_ret_text": plan_state.get("flight_ret_text") or "",
+        "hotel_opts": plan_state.get("hotel_opts") or st.session_state.get("plan_hotel_options") or [],
+        "replan_request": {
+            "selected_option": selected_option,
+            "itinerary_days": days,
+            "replace_item_keys": replace_item_keys,
+            "replace_slots": replace_slots,
+            "replace_item_names": replace_item_names,
+            "locked_item_keys": locked_item_keys,
+            "locked_item_names": locked_item_names,
+            "one_round_ban_names": list(context.get("one_round_ban_names_next") or []),
+            "round": prev_round + 1,
+            "source": "replan_page_followup",
+        },
+    }
+
+
 def render():
     st.session_state.setdefault("replan_backend_result", {})
-    st.session_state.setdefault("replan_alt_options", ALT_OPTIONS)
+    st.session_state.setdefault("replan_current_days", [])
+    st.session_state.setdefault("replan_unsatisfied", {})
+    st.session_state.setdefault("replan_error", "")
 
-    context = (st.session_state.get("replan_backend_result", {}) or {}).get("context", {})
+    _run_pending_replan_if_needed()
+
+    backend_result = st.session_state.get("replan_backend_result") or {}
+    context = backend_result.get("context") or {}
+    days = st.session_state.get("replan_current_days") or []
+
     st.markdown("### Dynamic Re-planning")
-    st.markdown("<span style='color:#7a90b0;font-size:14px'>Tell us what changed — TravelMind will adapt your itinerary.</span>", unsafe_allow_html=True)
+    st.markdown(
+        "<span style='color:#7a90b0;font-size:14px'>"
+        "Review the updated itinerary and mark items you still want to change.</span>",
+        unsafe_allow_html=True,
+    )
     st.markdown("")
 
-    # ── Location bar ─────────────────────────────────────────
     with st.container(border=True):
         c1, c2, c3 = st.columns([0.3, 4, 1])
         with c1:
             st.markdown("🟢")
         with c2:
-            st.markdown(f"**{context.get('location', 'Central Kyoto, near Nishiki Market')}**")
+            st.markdown(f"**{context.get('location', 'Current trip context')}**")
             st.caption(
-                f"{context.get('current_day', 'Day 3')} · {context.get('current_time', '14:00')} · "
-                f"Originally: {context.get('original_plan_title', 'Debate winner plan')}"
+                f"{context.get('current_day', 'Dynamic replan')} · {context.get('current_time', 'N/A')} · "
+                f"Originally: {context.get('original_plan_title', 'Selected option')}"
             )
         with c3:
-            st.markdown("🌤 26°C")
+            st.markdown("🔁 Replanned")
+
+    if st.session_state.get("replan_error"):
+        st.error(st.session_state["replan_error"])
+        return
+    if not days:
+        st.info("Go to My Trip, tick items, then click 'Need to Dynamic Replan?'. The replanned result will appear here.")
+        return
 
     st.markdown("---")
+    st.markdown("#### Replanned Itinerary")
+    _render_itinerary_with_checks(days)
 
-    # ── Step 1: Situation ─────────────────────────────────────
-    st.markdown("#### 1. What's changed?")
-    st.caption("Select the situation that best describes your current state.")
+    col_a, col_b = st.columns(2)
+    selected_option = str(backend_result.get("winner_option") or st.session_state.get("selected_option", "A"))
+    prev_round = int(backend_result.get("round") or 1)
 
-    col1, col2, col3, col4 = st.columns(4)
-    situation_cols = [col1, col2, col3, col4]
-
-    for i, sit in enumerate(SITUATIONS):
-        with situation_cols[i]:
-            selected = st.session_state.replan_situation == sit["key"]
-            if st.button(
-                f"{sit['emoji']}\n**{sit['label']}**\n{sit['desc']}",
-                key=f"sit_{sit['key']}",
-                use_container_width=True,
-                type="primary" if selected else "secondary",
+    with col_a:
+        if st.button("🔁 Replan Selected Items Again", type="primary", use_container_width=True):
+            payload = _build_replan_again_payload(days, selected_option, prev_round)
+            if not payload["replan_request"].get("replace_slots") and not payload["replan_request"].get(
+                "replace_item_keys"
             ):
-                st.session_state.replan_situation = sit["key"]
-                st.session_state.replan_time = None
-                st.session_state.replan_done = False
-                st.session_state.chosen_alt = None
-                st.rerun()
-
-    # ── Step 2: Time ──────────────────────────────────────────
-    if st.session_state.replan_situation:
-        sit_label = next(s["label"] for s in SITUATIONS if s["key"] == st.session_state.replan_situation)
-        st.success(f"Selected: **{sit_label}**")
-        st.markdown("---")
-        st.markdown("#### 2. How much time do you have?")
-        st.caption("We'll find alternatives that fit your remaining day.")
-
-        t_col1, t_col2, t_col3 = st.columns(3)
-        time_cols = [t_col1, t_col2, t_col3]
-
-        for i, opt in enumerate(TIME_OPTIONS):
-            with time_cols[i]:
-                selected = st.session_state.replan_time == opt["key"]
-                if st.button(
-                    f"{opt['emoji']}\n**{opt['label']}**\n{opt['desc']}",
-                    key=f"time_{opt['key']}",
-                    use_container_width=True,
-                    type="primary" if selected else "secondary",
-                ):
-                    st.session_state.replan_time = opt["key"]
-                    st.session_state.replan_done = False
-                    st.session_state.chosen_alt = None
-                    st.rerun()
-
-    # ── Re-plan working ───────────────────────────────────────
-    if st.session_state.replan_time and not st.session_state.replan_done:
-        st.markdown("---")
-        with st.container(border=True):
-            st.markdown("🔄 **Re-planning Agent working...**")
-            log_placeholder = st.empty()
-            log_lines = []
-            for tag, msg in REPLAN_LOG:
-                color = "#3b9eff" if tag == "INFO" else "#10b981"
-                log_lines.append(f"<span style='color:{color};font-family:monospace;font-size:11px'>[{tag}]</span> <span style='font-size:12px;color:#7a90b0'>{msg}</span>")
-                log_placeholder.markdown("<br>".join(log_lines), unsafe_allow_html=True)
-                time.sleep(0.5)
-            try:
-                result = _call_replan_backend()
-                replanner_output = result.get("replanner_output", {}) if isinstance(result, dict) else {}
-                alts = replanner_output.get("alternatives")
-                if isinstance(alts, list) and alts:
-                    st.session_state.replan_alt_options = alts
-                else:
-                    st.session_state.replan_alt_options = ALT_OPTIONS
-                st.session_state.replan_backend_result = replanner_output
-            except Exception as exc:
-                st.session_state.replan_alt_options = ALT_OPTIONS
-                st.session_state.replan_backend_result = {"error": str(exc)}
-        st.session_state.replan_done = True
-        st.rerun()
-
-    # ── Alternatives ──────────────────────────────────────────
-    if st.session_state.replan_done:
-        st.markdown("---")
-        st.markdown("#### Nearby Alternatives")
-        backend_error = (st.session_state.get("replan_backend_result") or {}).get("error")
-        if backend_error:
-            st.info(f"后端重规划暂不可用，已回退到演示方案：{backend_error}")
-
-        alt_options = st.session_state.get("replan_alt_options") or ALT_OPTIONS
-        for i, alt in enumerate(alt_options):
-            with st.container(border=True):
-                chosen = st.session_state.chosen_alt == i
-                c_icon, c_body, c_btn = st.columns([0.5, 5, 1.5])
-                with c_icon:
-                    st.markdown(f"<span style='font-size:28px'>{alt['icon']}</span>", unsafe_allow_html=True)
-                with c_body:
-                    st.markdown(f"**{alt['name']}**")
-                    st.caption(alt["desc"])
-                    tag_color = "#10b981" if alt["tag"] == "free" else "#7a90b0"
-                    st.markdown(
-                        f"<span style='font-size:11px;font-family:monospace;color:{tag_color}'>{alt['price']}</span> &nbsp; "
-                        f"<span style='font-size:11px;color:#f59e0b'>{alt['rating']}</span> &nbsp; "
-                        f"<span style='font-size:11px;color:#4a5a72'>{alt['dist']}</span>",
-                        unsafe_allow_html=True,
-                    )
-                with c_btn:
-                    if st.button(
-                        "✓ Selected" if chosen else "Select",
-                        key=f"alt_{i}",
-                        use_container_width=True,
-                        type="primary" if chosen else "secondary",
-                    ):
-                        st.session_state.chosen_alt = i
-                        st.rerun()
-
-        # ── Ripple effect ──────────────────────────────────────
-        if st.session_state.chosen_alt is not None:
-            alt = alt_options[st.session_state.chosen_alt]
-            ripple = (st.session_state.get("replan_backend_result") or {}).get("ripple_effect")
-            if ripple:
-                st.warning(f"📅 **Ripple effect:** {ripple}")
+                st.warning("Please tick the itinerary items you want to modify first.")
             else:
-                st.warning(
-                    f"📅 **Ripple effect:** {alt['name']} selected. "
-                    "Bamboo Grove moved to Day 4 (09:00). Tenryuji shifted to Day 4 afternoon. "
-                    "Budget unchanged — SGD 2,847 total."
-                )
+                st.session_state.replan_pending_state = payload
+                st.session_state.replan_error = ""
+                st.rerun()
+    with col_b:
+        if st.button("✅ Use This Replan In My Trip", use_container_width=True):
+            all_itins = dict(st.session_state.get("plan_itineraries") or {})
+            all_itins[selected_option] = days
+            st.session_state.plan_itineraries = all_itins
+            st.session_state.selected_option = selected_option
+            st.session_state.pending_nav = "my_trip"
+            st.toast("Replanned itinerary applied to My Trip.")
+            st.rerun()
