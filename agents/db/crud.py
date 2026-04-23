@@ -22,7 +22,7 @@ def save_plan(db: Session, plan_id: str, state: dict, result: dict, via_debate: 
         dates                   = state.get("dates", ""),
         duration                = state.get("duration", ""),
         budget                  = state.get("budget", ""),
-        preferences             = state.get("preferences", ""),
+        preferences             = state.get("preferences") or "",
         hard_constraints        = state.get("hard_constraints") or None,
         soft_preferences        = state.get("soft_preferences") or None,
         search_queries          = state.get("search_queries")   or None,

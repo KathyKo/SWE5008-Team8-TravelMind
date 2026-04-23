@@ -10,6 +10,7 @@ logger = get_agent_logger("travelmind.agents.orchestrator")
 # All Agents use the same hostname, only the port is different (starting from 8100)
 AGENT_HOST = os.getenv("AGENT_HOST", "localhost")
 AGENT_SCHEME = os.getenv("AGENT_SCHEME", "http")
+AGENT_HTTP_TIMEOUT = float(os.getenv("AGENT_HTTP_TIMEOUT", "180"))
 
 AGENT_URLS = {
     "input_guard": os.getenv("AGENT_INPUT_GUARD_URL", f"{AGENT_SCHEME}://{AGENT_HOST}:8100/api/invoke/input_guard"),
@@ -40,7 +41,7 @@ def call_remote_agent(agent_name: str, state: State) -> Dict:
     )
 
     try:
-        response = requests.post(url, json=request_payload, timeout=60.0)
+        response = requests.post(url, json=request_payload, timeout=AGENT_HTTP_TIMEOUT)
         response.raise_for_status()
         response_json = response.json()
         logger.info(
