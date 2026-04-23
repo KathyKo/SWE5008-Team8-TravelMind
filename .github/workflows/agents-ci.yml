@@ -70,7 +70,8 @@ jobs:
             --junitxml=agents-test-results.xml \
             --cov=agents \
             --cov-report=xml:agents-coverage.xml \
-            --cov-report=term-missing
+            --cov-report=term-missing \
+            --cov-fail-under=80
 
       - name: Publish agents test results
         if: always()
@@ -105,6 +106,13 @@ jobs:
           echo "### Agents Coverage" >> "$GITHUB_STEP_SUMMARY"
           echo "- Line coverage: **${{ steps.agents_coverage.outputs.rate }}%**" >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Free disk space
+        run: |
+          df -h
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          pip cache purge
+          df -h
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -125,7 +133,7 @@ jobs:
           image-ref: travelmind-agents:${{ github.sha }}
           severity: CRITICAL,HIGH
           ignore-unfixed: true
-          exit-code: 0
+          exit-code: 1
 
       - name: Extract metadata
         if: github.event_name != 'pull_request'

@@ -50,7 +50,6 @@ def _setup_llm_guard_flagged(monkeypatch):
         ),
     )
 
-
 def _setup_moderation_flagged(monkeypatch):
     monkeypatch.setattr(
         ig,

@@ -50,7 +50,6 @@ def test_backend_health_and_root_endpoints(backend_main_module):
     assert "TravelMind API" in root_payload["message"]
     assert root_payload["docs"] == "/docs"
 
-
 def _load_auth_module():
     module_path = Path(__file__).resolve().parents[1] / "routers" / "auth.py"
     if "backend.routers" not in sys.modules:

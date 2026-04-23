@@ -62,7 +62,8 @@ jobs:
             --junitxml=backend-test-results.xml \
             --cov=backend \
             --cov-report=xml:backend-coverage.xml \
-            --cov-report=term-missing
+            --cov-report=term-missing \
+            --cov-fail-under=80
 
       - name: Publish backend test results
         if: always()
@@ -121,7 +122,7 @@ jobs:
           image-ref: travelmind-backend:${{ github.sha }}
           severity: CRITICAL,HIGH
           ignore-unfixed: true
-          exit-code: 0
+          exit-code: 1
 
       - name: Extract metadata
         if: github.event_name != 'pull_request'
