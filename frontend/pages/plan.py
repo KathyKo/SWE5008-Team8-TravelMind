@@ -59,31 +59,31 @@ def _render_agent_panel(placeholder, status: dict):
         "pending": {
             "bg": "rgba(255,255,255,0.04)",
             "border": "rgba(255,255,255,0.08)",
-            "color": "#7a90b0",
+            "color": "#111827",
             "label": "pending",
         },
         "running": {
             "bg": "rgba(59,158,255,0.12)",
             "border": "rgba(59,158,255,0.35)",
-            "color": "#3b9eff",
+            "color": "#111827",
             "label": "running",
         },
         "success": {
             "bg": "rgba(16,185,129,0.12)",
             "border": "rgba(16,185,129,0.35)",
-            "color": "#10b981",
+            "color": "#111827",
             "label": "success",
         },
         "error": {
             "bg": "rgba(239,68,68,0.12)",
             "border": "rgba(239,68,68,0.35)",
-            "color": "#ef4444",
+            "color": "#111827",
             "label": "failed",
         },
         "skipped": {
             "bg": "rgba(255,255,255,0.02)",
             "border": "rgba(255,255,255,0.06)",
-            "color": "#4a5a72",
+            "color": "#111827",
             "label": "skipped",
         },
     }
@@ -95,7 +95,7 @@ def _render_agent_panel(placeholder, status: dict):
             style = style_map.get(s["state"], style_map["pending"])
             detail = html.escape(s.get("detail") or "")
             detail_html = (
-                f"<div style='color:#7a90b0;font-size:12px;margin-top:4px'>{detail}</div>"
+                f"<div style='color:#111827;font-size:12px;margin-top:4px'>{detail}</div>"
                 if detail
                 else ""
             )
@@ -109,7 +109,7 @@ def _render_agent_panel(placeholder, status: dict):
     margin-bottom:8px;
     min-width:0;">
   <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
-    <span style="color:#e8edf5;font-size:13px;font-weight:500;line-height:1.35;word-break:break-word;overflow-wrap:anywhere;">
+    <span style="color:#111827;font-size:13px;font-weight:500;line-height:1.35;word-break:break-word;overflow-wrap:anywhere;">
       <span style="margin-right:6px">{step['icon']}</span>
       {step['name']}
     </span>
@@ -400,7 +400,7 @@ def render_itinerary(option: str, itineraries: dict, option_meta: dict):
                 col_time, col_icon, col_name, col_cost = st.columns([0.8, 0.4, 4, 1.2])
                 with col_time:
                     st.markdown(
-                        f"<span style='color:#7a90b0;font-size:12px;font-family:monospace'>"
+                        f"<span style='color:#374151;font-size:12px;font-family:monospace'>"
                         f"{item.get('time', '')}</span>",
                         unsafe_allow_html=True,
                     )
@@ -411,13 +411,13 @@ def render_itinerary(option: str, itineraries: dict, option_meta: dict):
                     )
                 with col_name:
                     st.markdown(
-                        f"<span style='color:#e8edf5;font-size:13px;font-weight:500'>"
+                        f"<span style='color:#111827;font-size:13px;font-weight:500'>"
                         f"{item.get('name', '')}</span>",
                         unsafe_allow_html=True,
                     )
                 with col_cost:
                     st.markdown(
-                        f"<span style='color:#7a90b0;font-size:12px;font-family:monospace'>"
+                        f"<span style='color:#374151;font-size:12px;font-family:monospace'>"
                         f"{item.get('cost', '')}</span>",
                         unsafe_allow_html=True,
                     )

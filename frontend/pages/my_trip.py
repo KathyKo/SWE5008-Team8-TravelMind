@@ -152,7 +152,7 @@ def _render_right_panel():
             if not filter_bubble_detected:
                 with st.expander("✅ No filter bubble detected", expanded=False):
                     st.markdown(
-                        f"<span style='color:#d1fae5;font-size:13px;line-height:1.65'>"
+                        f"<span style='color:#166534;font-size:13px;line-height:1.65'>"
                         f"{html.escape(filter_bubble_detail or 'No obvious echo-chamber pattern found in this itinerary.')}"
                         f"</span>",
                         unsafe_allow_html=True,
@@ -169,7 +169,7 @@ def _render_right_panel():
             if not demographic_bias_detected:
                 with st.expander("✅ No demographic bias", expanded=False):
                     st.markdown(
-                        f"<span style='color:#d1fae5;font-size:13px;line-height:1.65'>"
+                        f"<span style='color:#166534;font-size:13px;line-height:1.65'>"
                         f"{html.escape(demographic_bias_detail or 'No direct demographic bias indicators were found.')}"
                         f"</span>",
                         unsafe_allow_html=True,
