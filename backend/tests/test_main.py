@@ -27,6 +27,7 @@ def backend_main_module(monkeypatch):
         "auth",
         "agent_proxy",
         "graph_proxy",
+        "fairness",
     ):
         module = types.ModuleType(f"backend.routers.{name}")
         module.router = APIRouter()

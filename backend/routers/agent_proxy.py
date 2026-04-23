@@ -28,7 +28,7 @@ AGENTS_FAIRNESS_CHECK_URL = os.getenv(
 ).rstrip("/")
 AGENTS_REPLAN_URL = os.getenv(
     "AGENTS_REPLAN_URL",
-    "http://agents:8107/api/invoke/replanner",
+    f"{AGENTS_BASE_URL}/api/invoke/replanner",
 ).rstrip("/")
 
 
