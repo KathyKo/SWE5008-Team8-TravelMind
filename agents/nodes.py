@@ -22,7 +22,6 @@ AGENT_URLS = {
     "replanner": os.getenv("AGENT_REPLANNER_URL", f"{AGENT_SCHEME}://{AGENT_HOST}:8107/api/invoke/replanner"),
 }
 
-
 def call_remote_agent(agent_name: str, state: State) -> Dict:
     """
     Send the current State to the specified Docker container and receive the updated State fragment.

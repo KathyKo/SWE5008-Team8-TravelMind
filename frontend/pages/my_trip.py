@@ -17,23 +17,28 @@ ICON_MAP = {
 def _build_replan_request_from_my_trip(days: list[dict], selected_opt: str) -> dict:
     visited = st.session_state.get("visited", {}) or {}
     replace_item_keys: list[str] = []
+    replace_slots: list[str] = []
     locked_item_keys: list[str] = []
     replace_item_names: list[str] = []
     locked_item_names: list[str] = []
 
     for day_idx, day in enumerate(days):
         for item_idx, item in enumerate(day.get("items", [])):
-            item_id = f"trip_{day_idx}_{item.get('name', item_idx)}"
+            item_id = f"trip_slot_{day_idx}_{item_idx}"
             item_key = str(item.get("key") or f"item_{day_idx}_{item_idx}")
             item_name = str(item.get("name") or "")
+            icon_l = str(item.get("icon", "")).lower()
             if visited.get(item_id, False):
-                replace_item_keys.append(item_key)
-                if item_name:
-                    replace_item_names.append(item_name)
-            else:
                 locked_item_keys.append(item_key)
                 if item_name:
                     locked_item_names.append(item_name)
+            else:
+                if icon_l == "flight":
+                    continue
+                replace_item_keys.append(item_key)
+                replace_slots.append(f"{day_idx}:{item_idx}")
+                if item_name:
+                    replace_item_names.append(item_name)
 
     summary = st.session_state.get("plan_request_summary") or {}
     plan_state = st.session_state.get("plan_state") or {}
@@ -48,13 +53,32 @@ def _build_replan_request_from_my_trip(days: list[dict], selected_opt: str) -> d
         "preferences": plan_state.get("preferences"),
         "itineraries": st.session_state.get("plan_itineraries") or {},
         "option_meta": st.session_state.get("plan_option_meta") or {},
+        "research": plan_state.get("research") or {},
+        "inventory": plan_state.get("inventory") or {},
+        "tool_log": list(plan_state.get("tool_log") or []),
+        "compact_attractions": plan_state.get("compact_attractions") or [],
+        "compact_restaurants": plan_state.get("compact_restaurants") or [],
+        "compact_hotels": plan_state.get("compact_hotels") or [],
+        "compact_flights_out": plan_state.get("compact_flights_out") or [],
+        "compact_flights_ret": plan_state.get("compact_flights_ret") or [],
+        "flight_options_outbound": st.session_state.get("plan_flight_outbound") or plan_state.get("flight_options_outbound") or [],
+        "flight_options_return": st.session_state.get("plan_flight_return") or plan_state.get("flight_options_return") or [],
+        "hotel_options": st.session_state.get("plan_hotel_options") or plan_state.get("hotel_options") or [],
+        "att_list_text": plan_state.get("att_list_text") or "",
+        "rest_list_text": plan_state.get("rest_list_text") or "",
+        "hotel_list_text": plan_state.get("hotel_list_text") or "",
+        "flight_out_text": plan_state.get("flight_out_text") or "",
+        "flight_ret_text": plan_state.get("flight_ret_text") or "",
+        "hotel_opts": plan_state.get("hotel_opts") or st.session_state.get("plan_hotel_options") or [],
         "replan_request": {
             "selected_option": selected_opt,
             "itinerary_days": days,
             "replace_item_keys": replace_item_keys,
+            "replace_slots": replace_slots,
             "replace_item_names": replace_item_names,
             "locked_item_keys": locked_item_keys,
             "locked_item_names": locked_item_names,
+            "one_round_ban_names": [],
             "round": 1,
             "source": "my_trip_checked_items",
         },
@@ -302,9 +326,17 @@ def render():
                 unsafe_allow_html=True,
             )
         with act2:
-            if st.button("🔄 Need to Re-plan?", use_container_width=True):
-                st.session_state._pending_nav = "replan"
-                st.rerun()
+            if st.button("🔄 Need to Dynamic Replan?", use_container_width=True):
+                request_payload = _build_replan_request_from_my_trip(days, selected_opt)
+                if not request_payload["replan_request"]["replace_item_keys"]:
+                    st.warning("All items are marked as visited. Uncheck future/unvisited items to replan remaining itinerary.")
+                else:
+                    st.session_state.replan_pending_state = request_payload
+                    st.session_state.replan_unsatisfied = {}
+                    st.session_state.replan_error = ""
+                    # Defer nav change to app.py before radio(key="main_section_key") is instantiated.
+                    st.session_state.pending_nav = "replan"
+                    st.rerun()
 
         st.markdown("---")
 
@@ -321,7 +353,7 @@ def render():
                 st.caption("✓ Check off places you've been — this trains your personal AI profile")
 
                 for item_idx, item in enumerate(day.get("items", [])):
-                    item_id = f"trip_{day_idx}_{item.get('name', item_idx)}"
+                    item_id = f"trip_slot_{day_idx}_{item_idx}"
                     is_checked = visited.get(item_id, False)
 
                     col_check, col_time, col_icon, col_name, col_cost = st.columns(

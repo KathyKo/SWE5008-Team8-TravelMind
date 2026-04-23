@@ -318,6 +318,38 @@ def test_apply_key_based_replan():
     assert unresolved and unresolved[0]["reason"] == "only_activity_or_restaurant_can_be_replaced"
 
 
+def test_apply_key_based_replan_replace_slots_duplicate_keys():
+    """Same catalog key on two rows: only the selected slot must be replaced."""
+    days = [
+        {
+            "day": "Day 1",
+            "items": [
+                {"key": "rest_dup", "icon": "restaurant", "name": "Sushi Same"},
+                {"key": "rest_dup", "icon": "restaurant", "name": "Sushi Same"},
+            ],
+        }
+    ]
+    typed = {
+        "restaurant": [{"name": "Ramen Other", "cost": "20"}],
+        "activity": [],
+        "hotel": [],
+        "flight_outbound": [],
+        "flight_return": [],
+    }
+    replanned, change_log, unresolved, _generated = dr._apply_key_based_replan(
+        days=days,
+        replace_item_keys={"rest_dup"},
+        locked_item_keys=set(),
+        typed_candidates=typed,
+        forbidden_names=set(),
+        replace_slots={"0:0"},
+    )
+    assert replanned[0]["items"][0]["name"] == "Ramen Other"
+    assert replanned[0]["items"][1]["name"] == "Sushi Same"
+    assert len(change_log) == 1
+    assert not unresolved
+
+
 def test_dynamic_replan_agent_key_based_branch():
     state = {
         "plan_id": "p1",

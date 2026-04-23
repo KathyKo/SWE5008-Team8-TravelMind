@@ -13,14 +13,14 @@ import streamlit as st
 
 from data.store import EXPLAIN_DATA
 
-# Full-stream URL for LangGraph orchestrator (agents service port 8001 in Docker).
+BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000").rstrip("/")
 GRAPH_STREAM_URL = os.getenv(
-    "AGENTS_GRAPH_STREAM_URL",
-    "http://localhost:8001/api/invoke/graph/stream",
+    "BACKEND_GRAPH_STREAM_URL",
+    f"{BACKEND_URL}/agent/graph/stream",
 ).rstrip("/")
 FAIRNESS_CHECK_URL = os.getenv(
-    "AGENTS_FAIRNESS_CHECK_URL",
-    GRAPH_STREAM_URL.replace("/api/invoke/graph/stream", "/api/invoke/fairness-check"),
+    "BACKEND_FAIRNESS_CHECK_URL",
+    f"{BACKEND_URL}/agent/fairness-check",
 ).rstrip("/")
 
 TIME_PREF_OPTIONS = [
@@ -104,20 +104,22 @@ def _render_agent_panel(placeholder, status: dict):
 <div style="
     background:{style['bg']};
     border:1px solid {style['border']};
-    border-radius:10px;
+    border-radius:12px;
     padding:10px 12px;
-    margin-bottom:8px;">
-  <div style="display:flex;justify-content:space-between;align-items:center;">
-    <span style="color:#e8edf5;font-size:13px">
+    margin-bottom:8px;
+    min-width:0;">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+    <span style="color:#e8edf5;font-size:13px;font-weight:500;line-height:1.35;word-break:break-word;overflow-wrap:anywhere;">
       <span style="margin-right:6px">{step['icon']}</span>
-      <strong>{step['name']}</strong>
+      {step['name']}
     </span>
     <span style="
         color:{style['color']};
         font-size:11px;
         font-family:monospace;
         text-transform:uppercase;
-        letter-spacing:0.5px">
+        letter-spacing:0.5px;
+        flex-shrink:0">
       {style['label']}
     </span>
   </div>
