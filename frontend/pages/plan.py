@@ -17,7 +17,7 @@ from data.store import EXPLAIN_DATA
 # Full-stream URL for LangGraph orchestrator (agents service port 8001 in Docker).
 GRAPH_STREAM_URL = os.getenv(
     "AGENTS_GRAPH_STREAM_URL",
-    "http://localhost:8001/api/invoke/graph/stream",
+    f"{os.getenv('AGENTS_URL', 'http://localhost:8001').rstrip('/')}/api/invoke/graph/stream",
 ).rstrip("/")
 FAIRNESS_CHECK_URL = os.getenv(
     "AGENTS_FAIRNESS_CHECK_URL",
