@@ -307,15 +307,23 @@ def test_apply_key_based_replan():
         {"day": "Day 1", "items": [{"key": "a1", "icon": "activity", "name": "OldA"}, {"key": "x1", "icon": "hotel", "name": "H"}]},
         {"day": "Day 2", "items": [{"key": "r1", "icon": "restaurant", "name": "OldR"}]},
     ]
-    replanned, change_log, unresolved = dr._apply_key_based_replan(
+    typed_candidates = {
+        "activity": [{"name": "NewA", "cost": "TBC"}],
+        "restaurant": [],
+        "hotel": [],
+        "flight_outbound": [],
+        "flight_return": [],
+    }
+    replanned, change_log, unresolved, _generated = dr._apply_key_based_replan(
         days=days,
         replace_item_keys={"a1", "x1", "r1"},
         locked_item_keys={"r1"},
-        candidates=[{"name": "NewA", "icon": "activity", "cost": "TBC"}],
+        typed_candidates=typed_candidates,
+        forbidden_names=set(),
     )
     assert replanned[0]["items"][0]["name"] == "NewA"
     assert len(change_log) == 1
-    assert unresolved and unresolved[0]["reason"] == "only_activity_or_restaurant_can_be_replaced"
+    assert unresolved and unresolved[0]["reason"] == "no_suitable_replacement_found"
 
 
 def test_apply_key_based_replan_replace_slots_duplicate_keys():
@@ -628,11 +636,19 @@ def test_collect_from_other_options_and_apply_key_no_replacement():
     assert dr._collect_replan_candidates_from_other_options(itineraries, "A", {"a"}) == []
 
     days = [{"day": "Day 1", "items": [{"key": "r1", "icon": "restaurant", "name": "Used"}]}]
-    replanned, change_log, unresolved = dr._apply_key_based_replan(
+    typed_candidates = {
+        "activity": [{"name": "Mismatch", "cost": "1"}],
+        "restaurant": [{"name": "Used", "cost": "1"}],
+        "hotel": [],
+        "flight_outbound": [],
+        "flight_return": [],
+    }
+    replanned, change_log, unresolved, _generated = dr._apply_key_based_replan(
         days=days,
         replace_item_keys={"r1"},
         locked_item_keys=set(),
-        candidates=[{"name": "Used", "icon": "restaurant", "cost": "1"}, {"name": "Mismatch", "icon": "activity", "cost": "1"}],
+        typed_candidates=typed_candidates,
+        forbidden_names=set(),
     )
     assert replanned[0]["items"][0]["name"] == "Used"
     assert change_log == []
@@ -710,3 +726,197 @@ def test_enforce_return_flight_buffer_adjust_and_remove():
     keys = [x["key"] for x in day_remove["items"]]
     assert "a2" not in keys
     assert any(x["reason"] == "insufficient_return_flight_buffer" for x in output["change_log"])
+
+
+def test_llm_judge_model_fallback_flag(monkeypatch):
+    monkeypatch.setenv("JUDGE_API_KEY", "k")
+    monkeypatch.setenv("REPLAN_VERIFIER_MODEL", "model-primary")
+
+    class _Prompt:
+        def __or__(self, _other):
+            return self
+
+        def invoke(self, _data):
+            return {"final_recommendation": "accept", "risk_flags": []}
+
+    calls = {"n": 0}
+
+    def _fake_chat_openai(**kwargs):
+        calls["n"] += 1
+        if kwargs.get("model") == "model-primary":
+            raise RuntimeError("primary unavailable")
+        return object()
+
+    monkeypatch.setattr(dr.ChatPromptTemplate, "from_messages", lambda *_a, **_k: _Prompt())
+    monkeypatch.setattr(dr, "ChatOpenAI", _fake_chat_openai)
+    monkeypatch.setattr(dr, "JsonOutputParser", lambda: object())
+
+    judged = dr._llm_judge({}, {}, {})
+    assert calls["n"] >= 2
+    assert judged["_verifier_model_used"] == "gpt-4.1"
+    assert "model_fallback_used:model-primary->gpt-4.1" in judged["risk_flags"]
+
+
+def test_extract_research_payload_and_typed_candidates_branches():
+    state = {
+        "inventory": "bad-inventory",
+        "compact_attractions": [{"name": "Used A", "price": "20"}],
+        "compact_restaurants": [{"name": "Keep R", "price": "30"}],
+        "compact_hotels": [{"name": "Hotel H", "price_per_night_usd": "100"}],
+        "compact_flights_out": [{"display": "SQ001 outbound", "price_usd": "300"}],
+        "compact_flights_ret": [{"airline": "SQ", "flight_number": "2", "departure_airport": "NRT", "arrival_airport": "SIN", "departure_time": "18:00", "arrival_time": "00:20", "price_usd": "350"}],
+        "itineraries": {
+            "A": [{"day": "Day 1", "items": [{"icon": "activity", "name": "Selected"}]}],
+            "B": [
+                {
+                    "day": "Day 2",
+                    "items": [
+                        {"icon": "activity", "name": "Extra Act", "cost": "1"},
+                        {"icon": "restaurant", "name": "Extra Rest", "cost": "2"},
+                        {"icon": "hotel", "name": "Extra Hotel", "cost": "3"},
+                        {"icon": "flight", "key": "flight_return", "name": "Back Flight", "cost": "4"},
+                        {"icon": "flight", "key": "flight_outbound", "name": "Go Flight", "cost": "5"},
+                    ],
+                }
+            ],
+        },
+    }
+    payload = dr._extract_research_payload_for_replan(state)
+    assert payload["compact_attractions"][0]["name"] == "Used A"
+
+    pools = dr._collect_typed_replan_candidates(
+        state=state,
+        selected_option="A",
+        forbidden_names={"Used A"},
+    )
+    assert any(x["name"] == "Keep R" for x in pools["restaurant"])
+    assert any(x["name"] == "Extra Act" for x in pools["activity"])
+    assert any(x["name"] == "Extra Hotel" for x in pools["hotel"])
+    assert any(x["name"] == "Back Flight" for x in pools["flight_return"])
+    assert any(x["name"] == "Go Flight" for x in pools["flight_outbound"])
+
+
+def test_collect_typed_candidates_fallback_and_utils():
+    state = {
+        "itineraries": {
+            "A": [{"day": "Day 1", "items": [{"icon": "activity", "name": "Chosen"}]}],
+            "B": [{"day": "Day 2", "items": [{"icon": "activity", "name": "Fallback A"}, {"icon": "restaurant", "name": "Fallback R"}]}],
+        }
+    }
+    pools = dr._collect_typed_replan_candidates(
+        state=state,
+        selected_option="A",
+        forbidden_names={"Chosen"},
+    )
+    assert any(x["name"] == "Fallback A" for x in pools["activity"])
+    assert any(x["name"] == "Fallback R" for x in pools["restaurant"])
+    assert dr._usd_to_sgd_str("10") == "SGD 14"
+    assert dr._usd_to_sgd_str("bad") == "TBC"
+    assert dr._flight_display({"display": "Direct flight"}) == "Direct flight"
+    assert "dep" in dr._flight_display({"airline": "SQ", "flight_number": "11", "departure_airport": "SIN", "arrival_airport": "HND", "departure_time": "09:00", "arrival_time": "17:00"})
+
+
+def test_apply_key_based_replan_more_branches():
+    days = [
+        {
+            "day": "Day 1",
+            "items": [
+                {"key": "h1", "icon": "hotel", "name": "Old Hotel"},
+                {"key": "f1", "icon": "flight", "name": "Flight"},
+                {"key": "u1", "icon": "car", "name": "Unknown"},
+            ],
+        }
+    ]
+    typed = {
+        "activity": [],
+        "restaurant": [],
+        "hotel": [{"name": "Old Hotel"}, {"name": "New Hotel", "cost": "99"}],
+        "flight_outbound": [],
+        "flight_return": [],
+    }
+    replanned, change_log, unresolved, generated = dr._apply_key_based_replan(
+        days=days,
+        replace_item_keys={"h1", "f1", "u1"},
+        locked_item_keys={"h1"},
+        typed_candidates=typed,
+        forbidden_names={"forbidden"},
+        replace_slots={"0:0", "0:1", "0:2"},
+    )
+    assert replanned[0]["items"][0]["name"] == "Old Hotel"
+    assert replanned[0]["items"][0]["key"] == "h1"
+    assert change_log == []
+    assert any(x["reason"] == "unsupported_item_type" for x in unresolved)
+    assert generated == set()
+
+    # unlocked hotel replacement keeps key stable and exercises relaxed pick pass
+    replanned2, change_log2, unresolved2, generated2 = dr._apply_key_based_replan(
+        days=days,
+        replace_item_keys={"h1"},
+        locked_item_keys=set(),
+        typed_candidates=typed,
+        forbidden_names=set(),
+        replace_slots={"0:0"},
+    )
+    assert replanned2[0]["items"][0]["name"] == "New Hotel"
+    assert replanned2[0]["items"][0]["key"] == "h1"
+    assert len(change_log2) == 1
+    assert unresolved2 == []
+    assert "New Hotel" in generated2
+
+
+def test_prefer_item_and_ensure_two_skip_paths():
+    assert dr._prefer_item({"name": "Green Bowl", "description": "vegetarian vegan"}, indoor=False, vegetarian=True) is True
+    assert dr._prefer_item({"name": "Plain Place", "description": "normal"}, indoor=False, vegetarian=False) is False
+    cleaned = [{"name": "Keep", "icon": "✨", "desc": ""}]
+    out = dr._ensure_two_alternatives(
+        cleaned=cleaned,
+        candidates=[{"name": "Keep", "icon": "activity"}, {"name": "Used", "icon": "activity"}],
+        consumed_names={"used"},
+    )
+    assert len(out) == 2
+
+
+def test_collect_typed_candidates_fallback_branch(monkeypatch):
+    monkeypatch.setattr(
+        dr,
+        "_collect_replan_candidates_from_other_options",
+        lambda *_a, **_k: [
+            {"name": "FB Activity", "icon": "activity", "cost": "1"},
+            {"name": "FB Restaurant", "icon": "restaurant", "cost": "2"},
+        ],
+    )
+    pools = dr._collect_typed_replan_candidates(
+        state={"itineraries": {"A": [{"day": "Day 1", "items": [{"icon": "hotel", "name": "Only Hotel"}]}]}},
+        selected_option="A",
+        forbidden_names=set(),
+    )
+    assert [x["name"] for x in pools["activity"]] == ["FB Activity"]
+    assert [x["name"] for x in pools["restaurant"]] == ["FB Restaurant"]
+
+
+def test_apply_key_based_replan_pick_replacement_filter_branches():
+    days = [{"day": "Day 1", "items": [{"key": "a1", "icon": "activity", "name": "Old"}]}]
+    typed = {
+        "activity": [
+            {"name": ""},
+            {"name": "Forbidden", "cost": "1"},
+            {"name": "Old", "cost": "2"},
+            {"name": "UsedName", "cost": "3"},
+        ],
+        "restaurant": [],
+        "hotel": [],
+        "flight_outbound": [],
+        "flight_return": [],
+    }
+    # First pass consumes all candidates and fails due to empty/forbidden/old/used;
+    # second pass (relaxed) can still pick UsedName.
+    replanned, change_log, unresolved, _generated = dr._apply_key_based_replan(
+        days=days,
+        replace_item_keys={"a1"},
+        locked_item_keys=set(),
+        typed_candidates=typed,
+        forbidden_names={"Forbidden"},
+    )
+    assert replanned[0]["items"][0]["name"] == "UsedName"
+    assert len(change_log) == 1
+    assert unresolved == []
