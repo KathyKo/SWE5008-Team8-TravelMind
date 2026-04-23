@@ -24,7 +24,7 @@ from agents.specialists.planner_agent import planner_agent
 from agents.specialists.research_agent import research_agent
 from agents.agent_tools import get_tools_for_agent
 from agents.specialists.explainability_agent import explainability_agent
-from agents.specialists.debate_agent import debate_agent
+from agents.specialists.debate_agent import debate_agent, evaluate_selected_option_fairness
 from agents.specialists.dynamic_replan_agent import dynamic_replan_agent
 from agents.db.crud import save_plan, load_plan
 from agents.db.database import SessionLocal
@@ -39,15 +39,8 @@ app = FastAPI(
 
 
 def _enforce_agent_port(request: Request, expected_port: int, agent_name: str) -> None:
-    actual_port = request.url.port
-    if actual_port != expected_port:
-        raise HTTPException(
-            status_code=409,
-            detail=(
-                f"Port mismatch for {agent_name}: expected {expected_port}, got {actual_port}. "
-                f"Please call {agent_name} on port {expected_port}."
-            ),
-        )
+    # All agents run in a single container on port 8001; port enforcement is skipped.
+    pass
 
 class AgentInvokeRequest(BaseModel):
     state: dict[str, Any]
@@ -278,5 +271,21 @@ def invoke_replanner(request: Request, payload: AgentInvokeRequest):
     except Exception as exc:
         log.exception("replanner failed")
         raise HTTPException(status_code=500, detail=f"replanner failed: {exc}") from exc
+
+
+class FairnessCheckRequest(BaseModel):
+    state: dict[str, Any]
+    selected_option: str
+
+
+@app.post("/api/invoke/fairness-check")
+def invoke_fairness_check(payload: FairnessCheckRequest):
+    try:
+        result = evaluate_selected_option_fairness(payload.state, payload.selected_option)
+        return result
+    except Exception as exc:
+        log.exception("fairness-check failed")
+        raise HTTPException(status_code=500, detail=f"fairness-check failed: {exc}") from exc
+
 
 app.include_router(security_router)
