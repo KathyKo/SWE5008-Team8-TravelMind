@@ -33,7 +33,7 @@ def call_remote_agent(agent_name: str, state: State) -> Dict:
         raise ValueError(f"Unknown agent: {agent_name}")
 
     request_payload = {"state": state}
-    logger.info(
+    logger.debug(
         "[call_remote_agent] request agent=%s url=%s payload=%s",
         agent_name,
         url,
@@ -44,7 +44,7 @@ def call_remote_agent(agent_name: str, state: State) -> Dict:
         response = requests.post(url, json=request_payload, timeout=AGENT_HTTP_TIMEOUT)
         response.raise_for_status()
         response_json = response.json()
-        logger.info(
+        logger.debug(
             "[call_remote_agent] response agent=%s url=%s status=%s body=%s",
             agent_name,
             url,

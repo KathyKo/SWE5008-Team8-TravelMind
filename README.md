@@ -170,13 +170,17 @@ Copy `.env.example` to `.env` and fill in all values:
 
 ## Agents
 
-| Agent | Responsibility |
-|---|---|
-| Orchestrator | Routes user requests to the appropriate specialist |
-| Concierge | Gathers user preferences — destination, dates, budget, interests |
-| Booking Agent | Searches and presents flight and hotel options |
-| Local Guide | Recommends attractions, activities, and local experiences |
-| Summarizer | Produces the final consolidated travel itinerary |
+| Agent | Port | Responsibility |
+|---|---|---|
+| Orchestrator | 8001 | Entry point — routes requests through the multi-agent pipeline |
+| Input Guard | 8100 | Screens user input for prompt injection and PII before processing |
+| Intent Profile | 8101 | Extracts travel intent, preferences, hard constraints, and soft preferences |
+| Research | 8102 | Fetches and ranks flights, hotels, attractions, and restaurants via external APIs |
+| Planner | 8103 | Generates 3 itinerary options (A/B/C) via ReAct loop using research data |
+| Debate & Critique | 8104 | Reviews plans, raises critiques, and triggers revision loops (up to 3 rounds) |
+| Explainability | 8105 | Generates reasoning traces and per-item explanations for each itinerary option |
+| Output Guard | 8106 | Validates agent output for hallucinations and policy compliance before returning to user |
+| Replanner | 8107 | Handles real-time re-planning requests (fatigue, bad weather, venue closures) |
 
 ---
 
