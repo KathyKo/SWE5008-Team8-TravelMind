@@ -275,7 +275,6 @@ def test_plan_input_tools_returns_low_risk_fast_path(monkeypatch):
     assert plan["run_moderation"] is False
     assert plan["reason"] == "unit_test_fast_path"
 
-
 def test_plan_input_tools_falls_back_on_internal_exception(monkeypatch):
     monkeypatch.setattr(ig, "ENABLE_LLM_PLANNER", True)
 

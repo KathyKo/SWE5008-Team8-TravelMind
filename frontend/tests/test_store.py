@@ -17,7 +17,6 @@ def test_itinerary_option_metadata_has_three_variants():
     assert OPTION_META["A"]["label"].startswith("Option A")
     assert OPTION_META["B"]["budget"].startswith("SGD")
 
-
 def test_itineraries_have_entries_and_item_keys():
     assert len(ITINERARIES["A"]) >= 1
     first_day = ITINERARIES["A"][0]

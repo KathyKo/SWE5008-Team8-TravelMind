@@ -452,7 +452,6 @@ def test_call_explainability_http_error(monkeypatch):
 
 
 # ── local mode: stub agent modules so imports succeed without torch/langchain ──
-
 def _stub_agents(monkeypatch):
     """Insert lightweight stubs for all agent modules imported in local mode."""
     for mod_name in (
